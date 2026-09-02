@@ -444,6 +444,12 @@ function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
   });
   return {fields,tmpl};
 }
+function lbBankMismatchWarning(selectedBank,decodedBank){
+  if(!decodedBank||!selectedBank||decodedBank===selectedBank) return "";
+  const selName=banks[selectedBank]?banks[selectedBank].name:selectedBank;
+  const decName=banks[decodedBank]?banks[decodedBank].name:decodedBank;
+  return `<div class="status warn">⚠️ <b>O banco selecionado no formulário (${selectedBank} — ${selName}) é diferente do banco decodificado na própria linha (${decodedBank} — ${decName}).</b> A leitura do Campo Livre abaixo usa o banco decodificado da linha (${decodedBank}), que é quem realmente define essa composição. Se a linha é mesmo de ${decName}, corrija o banco selecionado no formulário — usar o template do banco errado pode nomear o campo divergente incorretamente.</div>`;
+}
 function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   const {cl,dv}=lbClassifyDiffs(len,diffs);
   if(!cl.length) return "";
@@ -691,11 +697,14 @@ function compare(){
   const diffs=[];
   for(let i=0;i<Math.max(a.length,b.length);i++) if(a[i]!==b[i]) diffs.push(i+1);
   const len = a.length===b.length ? a.length : null;
+  const decodedBank = (len===47||len===44) ? a.slice(0,3) : null;
+  const effBank = decodedBank||bank;
+  const bankMismatch = lbBankMismatchWarning(bank,decodedBank);
   const named = len ? diffs.map(p=>({pos:p,field:(lbFieldForPos(len,p)||{name:"—"}).name,a:a[p-1]||"—",b:b[p-1]||"—"})) : [];
   let clFieldInfo=null;
   if(len&&diffs.length){
     const {cl}=lbClassifyDiffs(len,diffs);
-    if(cl.length){ const {fields}=lbCampoLivreFields(bank,len,cl,a,b); if(fields.length) clFieldInfo=fields[0]; }
+    if(cl.length){ const {fields}=lbCampoLivreFields(effBank,len,cl,a,b); if(fields.length) clFieldInfo=fields[0]; }
   }
   const headline = !diffs.length
     ? `<div class="headline ok">🟢 <div><b>Linhas idênticas.</b>Não há divergência entre Sankhya e banco nesta comparação.</div></div>`
@@ -704,13 +713,13 @@ function compare(){
       : clFieldInfo
         ? `<div class="headline bad">🔴 <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. Confira esse dado no cadastro do Sankhya.</div></div>`
         : `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]}.</b>${(named[0]?"Primeiro campo afetado: "+named[0].field+".":"")}</div></div>`);
-  let html=`<div class="card">${headline}<div class="kpis"><div class="kpi">Sankhya<b>${a.length}</b></div><div class="kpi">Banco<b>${b.length}</b></div><div class="kpi">Diferenças<b>${diffs.length}</b></div><div class="kpi">Primeira<b>${diffs[0]||"—"}</b></div></div>`;
+  let html=`<div class="card">${headline}<div class="kpis"><div class="kpi">Sankhya<b>${a.length}</b></div><div class="kpi">Banco<b>${b.length}</b></div><div class="kpi">Diferenças<b>${diffs.length}</b></div><div class="kpi">Primeira<b>${diffs[0]||"—"}</b></div></div>${bankMismatch}`;
   if(len&&diffs.length&&len<=100) html+=lbDiffStrip(a,b);
   if(named.length){
     html+="<h3>Campos onde a divergência ocorre</h3><table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>"+named.slice(0,200).map(x=>`<tr><td>${x.pos}</td><td>${x.field}</td><td class="pos">${x.a}</td><td class="pos">${x.b}</td></tr>`).join("")+"</table>";
     const fields=[...new Set(named.map(x=>x.field))];
     html+=`<p class="muted">Campos afetados: <b>${fields.join(", ")}</b>.</p>`;
-    html+=lbCampoLivreNote(bank,len,diffs,a,b);
+    html+=lbCampoLivreNote(effBank,len,diffs,a,b);
   } else if(diffs.length){
     html+="<h3>Posições divergentes</h3><pre>"+diffs.join(", ")+"</pre><p class='muted'>Para nomear os campos, informe linhas de mesmo tamanho (44, 47 ou 48 dígitos).</p>";
   }
@@ -929,6 +938,8 @@ function generateReport(save){
   }
   const errsA=lbSelfErrors(a);
   const bLine=bankLineTxt?lbDiagnoseLine(bankLineTxt):null;
+  const effBank=a.banco||bank; // o Campo Livre é interpretado pelo banco decodificado da própria linha, não pelo selecionado no formulário
+  const bankMismatch=lbBankMismatchWarning(bank,a.banco);
 
   // ---- monta o veredito e a causa provável primeiro, para exibir no topo ----
   let headline, causeList=[], diffs=[], named=[], len=null, rawA=clean(sankLine), rawB=bankLineTxt?clean(bankLineTxt):"";
@@ -951,7 +962,7 @@ function generateReport(save){
       const hitsBanco=fieldsHit.includes("Banco"), hitsValor=fieldsHit.includes("Valor"), hitsFator=fieldsHit.includes("Fator de Vencimento"), hitsDV=fieldsHit.some(f=>f.startsWith("DV")), hasCL=fieldsHit.includes("Campo Livre");
       const onlyCampoLivre = hasCL && !hitsBanco && !hitsValor && !hitsFator;
       let clFieldInfo=null;
-      if(hasCL){ const {cl}=lbClassifyDiffs(len,diffs); if(cl.length){ const {fields}=lbCampoLivreFields(bank,len,cl,rawA,rawB); if(fields.length) clFieldInfo=fields[0]; } }
+      if(hasCL){ const {cl}=lbClassifyDiffs(len,diffs); if(cl.length){ const {fields}=lbCampoLivreFields(effBank,len,cl,rawA,rawB); if(fields.length) clFieldInfo=fields[0]; } }
       if(hitsBanco)causeList.push("O código do banco está diferente entre as duas linhas — confira o banco cadastrado no título/beneficiário no Sankhya.");
       if(hitsValor)causeList.push("O valor decodificado é diferente — confira o valor do título e eventuais acréscimos/descontos aplicados no boleto.");
       if(hitsFator)causeList.push("O fator de vencimento é diferente — confira a data de vencimento cadastrada e se ambos os lados usam a mesma regra de fator (a regra mudou em 22/02/2025).");
@@ -966,6 +977,7 @@ function generateReport(save){
 
   let html=`<div class='card'><h2>Laudo técnico de divergência</h2>${headline}`;
   html+=`<div class="kpis"><div class="kpi">Banco<b>${banks[bank]?banks[bank].name:bank}</b></div><div class="kpi">Referência<b>${ref||"—"}</b></div><div class="kpi">Tipo (Sankhya)<b>${a.type||"—"}</b></div><div class="kpi">Tipo (Banco)<b>${bLine?bLine.type:"—"}</b></div></div>`;
+  html+=bankMismatch;
 
   html+="<h3>1. A linha do Sankhya é matematicamente consistente?</h3>";
   html+=`<div class="status ${errsA.length?"bad":"ok"}">${errsA.length?"❌ NÃO — "+errsA.length+" dígito(s) verificador(es) não conferem":"✅ SIM — todos os dígitos verificadores conferem"}</div>`;
@@ -985,7 +997,7 @@ function generateReport(save){
         if(len<=100) html+=lbDiffStrip(rawA,rawB);
         html+="<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>"+named.slice(0,200).map(x=>`<tr><td>${x.pos}</td><td>${x.field}</td><td class="pos">${x.s}</td><td class="pos">${x.k}</td></tr>`).join("")+"</table>";
         html+="<h3>4. Causa provável</h3><ul>"+causeList.map(c=>"<li>"+c+"</li>").join("")+"</ul>";
-        html+=lbCampoLivreNote(bank,len,diffs,rawA,rawB);
+        html+=lbCampoLivreNote(effBank,len,diffs,rawA,rawB);
       }
     }
   } else if(bankLineTxt&&bLine&&!bLine.ok){
@@ -1096,6 +1108,7 @@ function runGuidedDiagnosis(save){
   const a=lbDiagnoseLine(line);
   if(!a.ok){$("guidedResult").innerHTML=`<div class="card"><div class="status bad">❌ ${a.error}</div></div>`;if(save)saveGuidedCase(bank,ref,"bad");return}
   const errsA=lbSelfErrors(a);
+  const effBank=a.banco||bank; // o Campo Livre é interpretado pelo banco decodificado da própria linha, não pelo selecionado no formulário
   const hints=abiHints(bank,obs);
   const extra=[];
   if(a.valor!=null&&infoValue!=null&&!isNaN(infoValue)&&Math.abs(a.valor-infoValue)>0.001)
@@ -1105,8 +1118,7 @@ function runGuidedDiagnosis(save){
     if(dNova!==infoDue&&dAntiga!==infoDue)
       extra.push({level:"warn",title:"Vencimento não confere com nenhuma das duas regras de fator",detail:`A linha decodifica ${dNova} (regra vigente) ou ${dAntiga} (regra anterior a 22/02/2025). Informado no formulário: ${infoDue}.`});
   }
-  if(a.banco&&a.banco!==bank)
-    extra.push({level:"warn",title:"Código do banco na linha difere do banco selecionado",detail:`A linha traz o banco ${a.banco}; o formulário selecionou ${bank}.`});
+  const bankMismatch=lbBankMismatchWarning(bank,a.banco);
   const errors=errsA.concat(extra.filter(x=>x.level==="bad"));
   const overall=errors.length?"bad":"ok";
   const firstErrTitle = errors.length ? (errors[0].title||`${errors[0].name} não confere`) : "";
@@ -1127,14 +1139,15 @@ function runGuidedDiagnosis(save){
       const len=rawA.length, d=[];
       for(let i=0;i<len;i++)if(rawA[i]!==rawB[i])d.push(i+1);
       let clTag="";
-      if(d.length){ const {cl}=lbClassifyDiffs(len,d); if(cl.length){ const {fields}=lbCampoLivreFields(bank,len,cl,rawA,rawB); if(fields.length) clTag=` — ${fields.map(f=>f.label).join(", ")}`; } }
-      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status ${d.length?"bad":"ok"}">${d.length?`🔴 ${d.length} posição(ões) diferentes, a partir da posição ${d[0]}${clTag}`:"🟢 Linhas idênticas"}</div>${d.length?(len<=100?lbDiffStrip(rawA,rawB):"")+`<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>${d.slice(0,100).map(i=>`<tr><td>${i}</td><td>${(lbFieldForPos(len,i)||{name:"—"}).name}</td><td>${rawA[i-1]||"—"}</td><td>${rawB[i-1]||"—"}</td></tr>`).join("")}</table>${lbCampoLivreNote(bank,len,d,rawA,rawB)}`:""}</div>`;
+      if(d.length){ const {cl}=lbClassifyDiffs(len,d); if(cl.length){ const {fields}=lbCampoLivreFields(effBank,len,cl,rawA,rawB); if(fields.length) clTag=` — ${fields.map(f=>f.label).join(", ")}`; } }
+      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status ${d.length?"bad":"ok"}">${d.length?`🔴 ${d.length} posição(ões) diferentes, a partir da posição ${d[0]}${clTag}`:"🟢 Linhas idênticas"}</div>${d.length?(len<=100?lbDiffStrip(rawA,rawB):"")+`<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>${d.slice(0,100).map(i=>`<tr><td>${i}</td><td>${(lbFieldForPos(len,i)||{name:"—"}).name}</td><td>${rawA[i-1]||"—"}</td><td>${rawB[i-1]||"—"}</td></tr>`).join("")}</table>${lbCampoLivreNote(effBank,len,d,rawA,rawB)}`:""}</div>`;
     }
   }
   $("guidedResult").innerHTML=`<div class="card">
   <h2>Resultado do diagnóstico</h2>
   ${headline}
   <div class="kpis"><div class="kpi">Tipo<b>${a.type}</b></div><div class="kpi">Dígitos<b>${clean(line).length}</b></div><div class="kpi">Testes<b>${(a.fields||[]).filter(f=>f.calc!==undefined).length}</b></div><div class="kpi">Valor<b>${a.valor!=null?a.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"—"}</b></div></div>
+  ${bankMismatch}
   <h3>Resultado por validação</h3>${lbRenderFields(a)}
   ${extra.length?`<h3>Conferências adicionais (cadastro × linha)</h3>${extra.map(x=>`<div class="diagnostic-row ${x.level}"><b>${x.title}</b><span>${x.detail}</span></div>`).join("")}`:""}
   ${hints.length?`<h3>O que verificar no Sankhya</h3>${hints.map(x=>`<div class="diagnostic-row warn"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}`:""}
