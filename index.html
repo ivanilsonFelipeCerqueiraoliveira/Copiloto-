@@ -161,11 +161,17 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="card">
 <h2>Como o motor interpreta a configuração</h2>
 <table><tr><th>Token</th><th>Significado</th></tr>
-<tr><td><b>N</b></td><td>Substitui pelas posições do Nosso Número.</td></tr>
-<tr><td><b>D</b></td><td>Substitui pelo DV do Nosso Número.</td></tr>
+<tr><td><b>N</b></td><td>Nosso Número (campo "Nosso Número" acima).</td></tr>
+<tr><td><b>D</b></td><td>DV do Nosso Número (campo "DV do Nosso Número" acima).</td></tr>
+<tr><td><b>C</b></td><td>Convênio (campo "Convênio" acima).</td></tr>
+<tr><td><b>A</b></td><td>Agência (campo "Agência" acima).</td></tr>
+<tr><td><b>V</b></td><td>Conta (campo "Conta + DV" acima).</td></tr>
+<tr><td><b>K</b></td><td>Carteira (campo "Carteira" acima).</td></tr>
 <tr><td><b>Z</b></td><td>DV de autocheck do Campo Livre pelo módulo 10.</td></tr>
 <tr><td><b>O</b></td><td>DV de autocheck do Campo Livre pelo módulo 11.</td></tr>
-<tr><td>números</td><td>São posições fixas da composição (carteira/convênio).</td></tr></table>
+<tr><td><b>?</b></td><td>Posição ainda não mapeada — vira "0" na geração e aparece como "Não mapeado" nos laudos.</td></tr>
+<tr><td>números</td><td>São posições fixas da composição.</td></tr></table>
+<p class="muted">O template do banco 001 (Banco do Brasil) já vem pré-cadastrado com o Convênio nas posições 7-13 do Campo Livre — verificado a partir de um caso real de divergência analisado nesta conversa. As demais posições ainda estão como "?" (não confirmadas) até serem conferidas com o manual oficial da BB.</p>
 </div>
 </section>
 
@@ -362,15 +368,101 @@ document.addEventListener("click",e=>{
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fail);
   else fail();
 });
-function lbCampoLivreNote(bank,len,diffs){
-  const startCL = len===47?5:(len===44?20:null);
-  if(!startCL||!diffs.length||!diffs.every(p=>p>=startCL)) return "";
+const LB_FIELD_IMPACT={
+  "Convênio":"Um Convênio incorreto normalmente faz o banco não reconhecer o contrato de cobrança do beneficiário — o registro do título pode ser rejeitado, tratado como de outro beneficiário/carteira, ou o pagamento não baixar automaticamente no Sankhya.",
+  "Nosso Número":"Um Nosso Número incorreto faz o banco não localizar o título correspondente — o pagamento pode ficar sem baixa automática ou ser conciliado no título errado.",
+  "DV do Nosso Número":"O dígito verificador do Nosso Número não fecha; o banco pode recusar o registro do título por inconsistência cadastral.",
+  "Agência":"Uma Agência incorreta pode fazer o banco rejeitar o registro do título por não localizar a conta correspondente.",
+  "Conta":"Uma Conta incorreta pode fazer o crédito do pagamento não ser direcionado à conta correta, ou o banco rejeitar o registro do título.",
+  "Carteira":"Uma Carteira incorreta muda a regra de registro e o cálculo de juros/multa — pode causar rejeição do título ou cobrança de encargos diferente do esperado."
+};
+function lbClassifyDiffs(len,diffs){
+  const cl=[],dv=[],other=[];
+  diffs.forEach(p=>{
+    const f=lbFieldForPos(len,p), name=f?f.name:"—";
+    if(name==="Campo Livre") cl.push(p);
+    else if(name.startsWith("DV")) dv.push(p);
+    else other.push(p);
+  });
+  return {cl,dv,other};
+}
+function lbTemplateFieldRanges(tmpl){
+  const ranges=[]; let i=0;
+  while(i<tmpl.length){
+    const tok=tmpl[i]; let j=i;
+    while(j<tmpl.length&&tmpl[j]===tok) j++;
+    ranges.push({start:i+1,end:j,token:tok,label:lbTokenLabel(tok)});
+    i=j;
+  }
+  return ranges;
+}
+const LB_SEMANTIC_TOKENS=new Set(["N","D","C","A","V","K","Z","O"]);
+/* Mapeia posição do Campo Livre (1-25) <-> posição da linha completa.
+   Não é uma conta linear: há dígitos verificadores (DV1, DV2) intercalados
+   entre os 3 blocos do Campo Livre na linha digitável de 47 posições. */
+function lbCampoLivreIdxToPos(len,idx){
+  if(len===47){
+    if(idx>=1&&idx<=5) return idx+4;
+    if(idx>=6&&idx<=15) return idx+5;
+    if(idx>=16&&idx<=25) return idx+6;
+    return null;
+  }
+  if(len===44) return (idx>=1&&idx<=25)?idx+19:null;
+  return null;
+}
+function lbPosToCampoLivreIdx(len,p){
+  if(len===47){
+    if(p>=5&&p<=9) return p-4;
+    if(p>=11&&p<=20) return p-5;
+    if(p>=22&&p<=31) return p-6;
+    return null;
+  }
+  if(len===44) return (p>=20&&p<=44)?p-19:null;
+  return null;
+}
+function lbExtractCampoLivre(len,raw){
+  if(!raw) return null;
+  if(len===47) return raw.slice(4,9)+raw.slice(10,20)+raw.slice(21,31);
+  if(len===44) return raw.slice(19,44);
+  return null;
+}
+function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
   const tmpl=getBankTemplate(bank);
-  if(!tmpl) return "<p class='muted'>🔎 Divergência restrita ao Campo Livre. Cadastre o template desse banco em Gerador/Validador para o motor apontar exatamente qual dado (Nosso Número, Carteira etc.) está errado.</p>";
-  const posInCL=diffs.map(p=>p-startCL+1).filter(p=>p<=25);
-  const tokens=[...new Set(posInCL.map(p=>tmpl[p-1]).filter(Boolean))];
-  if(!tokens.length) return "";
-  return `<p class="muted">🎯 Usando o template de Campo Livre cadastrado para o banco ${bank} (<code>${tmpl}</code>), a divergência corresponde a: <b>${tokens.map(lbTokenLabel).join(", ")}</b>. Confira esse(s) dado(s) no cadastro do Sankhya.</p>`;
+  if(!tmpl||!clPositions.length) return {fields:[],tmpl};
+  const ranges=lbTemplateFieldRanges(tmpl);
+  const hitIdx=new Set(clPositions.map(p=>lbPosToCampoLivreIdx(len,p)).filter(x=>x!=null));
+  const clA=lbExtractCampoLivre(len,rawA), clB=lbExtractCampoLivre(len,rawB);
+  const fields=[];
+  ranges.forEach(r=>{
+    if(!LB_SEMANTIC_TOKENS.has(r.token)) return;
+    let hit=false;
+    for(let idx=r.start; idx<=r.end; idx++) if(hitIdx.has(idx)){hit=true;break}
+    if(!hit) return;
+    const fp1=lbCampoLivreIdxToPos(len,r.start), fp2=lbCampoLivreIdxToPos(len,r.end);
+    fields.push({label:r.label,posCL:`${r.start}-${r.end}`,posLinha:(fp1&&fp2)?`${fp1}-${fp2}`:"—",
+      valueA: clA?clA.slice(r.start-1,r.end):null, valueB: clB?clB.slice(r.start-1,r.end):null});
+  });
+  return {fields,tmpl};
+}
+function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
+  const {cl,dv}=lbClassifyDiffs(len,diffs);
+  if(!cl.length) return "";
+  const {fields,tmpl}=lbCampoLivreFields(bank,len,cl,rawA,rawB);
+  let html="";
+  if(!tmpl){
+    html="<p class='muted'>🔎 Divergência dentro do Campo Livre. Cadastre o template desse banco em Gerador/Validador para o motor apontar exatamente qual dado (Nosso Número, Convênio, Carteira etc.) está errado.</p>";
+  } else if(fields.length){
+    html="<div class='card' style=\"background:#fffaeb;border-color:#fec84b\"><h3>📍 Campo do cadastro responsável pela divergência</h3>"+
+      fields.map(f=>{
+        const impact=LB_FIELD_IMPACT[f.label];
+        return `<div class="diagnostic-row bad"><b>${f.label}</b><span>Posição ${f.posLinha} da linha (posição ${f.posCL} do Campo Livre).${f.valueA!=null?` Sankhya: <code>${f.valueA}</code> × Banco: <code>${f.valueB}</code>.`:""}${impact?"<br><b>Impacto provável:</b> "+impact:""}</span></div>`;
+      }).join("")+
+      `<p class="muted">Template de Campo Livre usado (banco ${bank}): <code>${tmpl}</code>. Confirme contra o manual oficial vigente.</p></div>`;
+  } else {
+    html="<p class='muted'>Divergência em posições do Campo Livre ainda não mapeadas no template deste banco. Complete o template em Gerador/Validador para nomear o campo exato.</p>";
+  }
+  if(dv.length) html+="<p class='muted'>Os dígitos verificadores também divergem — isso é consequência natural do Campo Livre diferente, não uma causa independente.</p>";
+  return html;
 }
 
 /* ======================================================================
@@ -523,6 +615,10 @@ function lbFieldForPos(len,pos){ const m=lbFieldMap(len); return m ? (m.find(f=>
 function lbTokenLabel(tok){
   if(tok==="N")return "Nosso Número";
   if(tok==="D")return "DV do Nosso Número";
+  if(tok==="C")return "Convênio";
+  if(tok==="A")return "Agência";
+  if(tok==="V")return "Conta";
+  if(tok==="K")return "Carteira";
   if(tok==="Z")return "DV do Campo Livre (mód. 10)";
   if(tok==="O")return "DV do Campo Livre (mód. 11)";
   if(/\d/.test(tok||""))return "Posição fixa (carteira/convênio)";
@@ -530,7 +626,11 @@ function lbTokenLabel(tok){
 }
 function getBankTemplates(){
   let t=JSON.parse(localStorage.getItem("lexbank_templates")||"null");
-  if(!t){ t={"237":"110NNNNNNNND005712345700Z"}; localStorage.setItem("lexbank_templates",JSON.stringify(t)); }
+  if(!t) t={};
+  let changed=false;
+  if(!t["237"]){ t["237"]="110NNNNNNNND005712345700Z"; changed=true; }
+  if(!t["001"]){ t["001"]="??????CCCCCCC????????????"; changed=true; } // Convênio 7 dígitos verificado nas posições 7-13 do Campo Livre; demais posições ainda não confirmadas
+  if(changed) localStorage.setItem("lexbank_templates",JSON.stringify(t));
   return t;
 }
 function getBankTemplate(bank){ return getBankTemplates()[bank]||null }
@@ -592,18 +692,25 @@ function compare(){
   for(let i=0;i<Math.max(a.length,b.length);i++) if(a[i]!==b[i]) diffs.push(i+1);
   const len = a.length===b.length ? a.length : null;
   const named = len ? diffs.map(p=>({pos:p,field:(lbFieldForPos(len,p)||{name:"—"}).name,a:a[p-1]||"—",b:b[p-1]||"—"})) : [];
+  let clFieldInfo=null;
+  if(len&&diffs.length){
+    const {cl}=lbClassifyDiffs(len,diffs);
+    if(cl.length){ const {fields}=lbCampoLivreFields(bank,len,cl,a,b); if(fields.length) clFieldInfo=fields[0]; }
+  }
   const headline = !diffs.length
     ? `<div class="headline ok">🟢 <div><b>Linhas idênticas.</b>Não há divergência entre Sankhya e banco nesta comparação.</div></div>`
     : (a.length!==b.length
       ? `<div class="headline warn">🟠 <div><b>Tamanhos diferentes (${a.length} × ${b.length}).</b>Confirme se ambas são do mesmo tipo de documento (cobrança=47, arrecadação=48, código de barras=44) antes de confiar na comparação posição a posição.</div></div>`
-      : `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]}.</b>${(named[0]?"Primeiro campo afetado: "+named[0].field+".":"")}</div></div>`);
+      : clFieldInfo
+        ? `<div class="headline bad">🔴 <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. Confira esse dado no cadastro do Sankhya.</div></div>`
+        : `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]}.</b>${(named[0]?"Primeiro campo afetado: "+named[0].field+".":"")}</div></div>`);
   let html=`<div class="card">${headline}<div class="kpis"><div class="kpi">Sankhya<b>${a.length}</b></div><div class="kpi">Banco<b>${b.length}</b></div><div class="kpi">Diferenças<b>${diffs.length}</b></div><div class="kpi">Primeira<b>${diffs[0]||"—"}</b></div></div>`;
   if(len&&diffs.length&&len<=100) html+=lbDiffStrip(a,b);
   if(named.length){
     html+="<h3>Campos onde a divergência ocorre</h3><table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>"+named.slice(0,200).map(x=>`<tr><td>${x.pos}</td><td>${x.field}</td><td class="pos">${x.a}</td><td class="pos">${x.b}</td></tr>`).join("")+"</table>";
     const fields=[...new Set(named.map(x=>x.field))];
     html+=`<p class="muted">Campos afetados: <b>${fields.join(", ")}</b>.</p>`;
-    html+=lbCampoLivreNote(bank,len,diffs);
+    html+=lbCampoLivreNote(bank,len,diffs,a,b);
   } else if(diffs.length){
     html+="<h3>Posições divergentes</h3><pre>"+diffs.join(", ")+"</pre><p class='muted'>Para nomear os campos, informe linhas de mesmo tamanho (44, 47 ou 48 dígitos).</p>";
   }
@@ -721,13 +828,22 @@ function renderEngineList(){
 }
 
 /* ===== Gerador / Validador ===== */
-function lbBuildFreeField(template,our,ourDv,freeRule,sumMode){
+function lbBuildFreeField(template,our,ourDv,freeRule,sumMode,extra){
   our=clean(our);ourDv=clean(ourDv);
-  const nCount=(template.match(/N/g)||[]).length;
-  const nDigits=(our||"").padStart(nCount,"0").slice(-nCount);
-  let ni=0;
+  extra=extra||{};
+  const agreement=clean(extra.agreement), agency=clean(extra.agency), account=clean(extra.account), wallet=clean(extra.wallet);
+  const counts={N:0,C:0,A:0,V:0,K:0};
+  for(const ch of template) if(counts[ch]!==undefined) counts[ch]++;
+  const pools={
+    N:(our||"").padStart(counts.N,"0").slice(-counts.N),
+    C:(agreement||"").padStart(counts.C,"0").slice(-counts.C),
+    A:(agency||"").padStart(counts.A,"0").slice(-counts.A),
+    V:(account||"").padStart(counts.V,"0").slice(-counts.V),
+    K:(wallet||"").padStart(counts.K,"0").slice(-counts.K)
+  };
+  const cursor={N:0,C:0,A:0,V:0,K:0};
   const arr=template.split("").map(ch=>{
-    if(ch==="N")return nDigits[ni++]||"0";
+    if(pools[ch]!==undefined) return pools[ch][cursor[ch]++]||"0";
     if(ch==="D")return (ourDv||"0")[0]||"0";
     if(ch==="Z"||ch==="O")return "_";
     return /\d/.test(ch)?ch:"0";
@@ -759,7 +875,8 @@ function generateLine(){
   const factorOverride=clean($("genFactor").value);
   const fator=(factorOverride||String(lbDateToFactor(due||new Date().toISOString().slice(0,10)))).padStart(4,"0").slice(-4);
   const valorDigits=String(Math.round(amount*100)).padStart(10,"0");
-  const campoLivre=lbBuildFreeField(template,our,ourDv,freeRule,sumMode);
+  const campoLivre=lbBuildFreeField(template,our,ourDv,freeRule,sumMode,{agreement:$("genAgreement").value,agency:$("genAgency").value,account:$("genAccount").value,wallet:$("genWallet").value});
+  const incomplete=template.includes("?");
   const c1=bank+currency+campoLivre.slice(0,5), dv1=lbMod10(c1);
   const c2=campoLivre.slice(5,15), dv2=lbMod10(c2);
   const c3=campoLivre.slice(15,25), dv3=lbMod10(c3);
@@ -769,13 +886,13 @@ function generateLine(){
   const pretty=`${linha.slice(0,5)}.${linha.slice(5,10)} ${linha.slice(10,15)}.${linha.slice(15,21)} ${linha.slice(21,26)}.${linha.slice(26,32)} ${linha.slice(32,33)} ${linha.slice(33,47)}`;
   setBankTemplate(bank,template);
   const dates=lbFactorToDates(fator);
-  $("genResult").innerHTML=`<div class="headline ok">🟢 <div><b>Linha digitável gerada com sucesso.</b>Todos os dígitos verificadores foram calculados a partir do template configurado.</div></div>
+  $("genResult").innerHTML=`<div class="headline ${incomplete?"warn":"ok"}">${incomplete?"🟠":"🟢"} <div><b>${incomplete?"Linha gerada, mas o template deste banco está incompleto.":"Linha digitável gerada com sucesso."}</b>${incomplete?'Posições marcadas com "?" foram preenchidas com zero e não representam dados reais — complete o template com o manual oficial antes de usar esta linha em produção.':"Todos os dígitos verificadores foram calculados a partir do template configurado."}</div></div>
   <div class="kpis"><div class="kpi">Campo Livre<b class="pos">${campoLivre}</b></div><div class="kpi">DV Geral<b>${dvGeral}</b></div><div class="kpi">Fator<b>${fator}</b></div><div class="kpi">Valor<b>${amount.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b></div></div>
   <h3>Linha digitável (47 dígitos)</h3><pre>${pretty}</pre>${lbCopyBtn(linha,"Copiar linha digitável")}
   <h3>Código de barras (44 dígitos)</h3><pre>${barcode44}</pre>${lbCopyBtn(barcode44,"Copiar código de barras")}
   <p class="muted">Vencimento pela regra vigente (fator ≥ 1000 a partir de 22/02/2025): <b>${dates.nova.toLocaleDateString("pt-BR")}</b>. Se o banco ainda aplicar a regra anterior (base 07/10/1997), seria: ${dates.antiga.toLocaleDateString("pt-BR")}.</p>
   <h3>Composição do Campo Livre</h3>${lbRenderTemplateTable(template,campoLivre)}
-  <p class="muted">O template define apenas ONDE cada dado entra no Campo Livre; a semântica (quais posições são carteira, conta, nosso número) deve ser confirmada com o manual oficial do banco antes de uso em produção.</p>`;
+  <p class="muted">O template define apenas ONDE cada dado entra no Campo Livre; a semântica (quais posições são carteira, conta, nosso número, convênio) deve ser confirmada com o manual oficial do banco antes de uso em produção.</p>`;
 }
 function useSankhyaExample(){
   $("genBank").value="237";$("genWallet").value="09";$("genAgency").value="1234";$("genAccount").value="56789-0";
@@ -831,15 +948,19 @@ function generateReport(save){
       headline = `<div class="headline ok">🟢 <div><b>As linhas são idênticas dígito a dígito.</b>Não há divergência entre Sankhya e banco.</div></div>`;
     } else {
       const fieldsHit=[...new Set(named.map(x=>x.field))];
-      const onlyCampoLivre=fieldsHit.every(f=>f==="Campo Livre");
-      const hitsBanco=fieldsHit.includes("Banco"), hitsValor=fieldsHit.includes("Valor"), hitsFator=fieldsHit.includes("Fator de Vencimento"), hitsDV=fieldsHit.some(f=>f.startsWith("DV"));
+      const hitsBanco=fieldsHit.includes("Banco"), hitsValor=fieldsHit.includes("Valor"), hitsFator=fieldsHit.includes("Fator de Vencimento"), hitsDV=fieldsHit.some(f=>f.startsWith("DV")), hasCL=fieldsHit.includes("Campo Livre");
+      const onlyCampoLivre = hasCL && !hitsBanco && !hitsValor && !hitsFator;
+      let clFieldInfo=null;
+      if(hasCL){ const {cl}=lbClassifyDiffs(len,diffs); if(cl.length){ const {fields}=lbCampoLivreFields(bank,len,cl,rawA,rawB); if(fields.length) clFieldInfo=fields[0]; } }
       if(hitsBanco)causeList.push("O código do banco está diferente entre as duas linhas — confira o banco cadastrado no título/beneficiário no Sankhya.");
       if(hitsValor)causeList.push("O valor decodificado é diferente — confira o valor do título e eventuais acréscimos/descontos aplicados no boleto.");
       if(hitsFator)causeList.push("O fator de vencimento é diferente — confira a data de vencimento cadastrada e se ambos os lados usam a mesma regra de fator (a regra mudou em 22/02/2025).");
-      if(onlyCampoLivre)causeList.push("A divergência está inteiramente dentro do Campo Livre, onde o banco codifica Agência, Conta, Carteira, Convênio e Nosso Número. "+(errsA.length===0?"Como os dígitos verificadores da linha do Sankhya conferem, o cálculo está correto — o problema é de composição/cadastro, não de fórmula.":"Além disso, os DVs da própria linha do Sankhya não fecham, o que sugere erro de fórmula ou posicionamento no motor de geração, não apenas um dado de cadastro."));
-      if(hitsDV&&!onlyCampoLivre)causeList.push("Um ou mais dígitos verificadores diferem — verifique se Sankhya e banco usam a mesma regra de cálculo (módulo 10/11) e a mesma composição de campos.");
+      if(onlyCampoLivre)causeList.push((clFieldInfo?`A divergência está no campo <b>${clFieldInfo.label}</b> dentro do Campo Livre (Sankhya: ${clFieldInfo.valueA} × Banco: ${clFieldInfo.valueB}). `:"A divergência está inteiramente dentro do Campo Livre, onde o banco codifica Agência, Conta, Carteira, Convênio e Nosso Número. ")+(errsA.length===0?"Como os dígitos verificadores da linha do Sankhya conferem, o cálculo está correto — o problema é de composição/cadastro, não de fórmula.":"Além disso, os DVs da própria linha do Sankhya não fecham, o que sugere erro de fórmula ou posicionamento no motor de geração, não apenas um dado de cadastro."));
+      if(hitsDV&&!hasCL)causeList.push("Um ou mais dígitos verificadores diferem — verifique se Sankhya e banco usam a mesma regra de cálculo (módulo 10/11) e a mesma composição de campos.");
       if(!causeList.length)causeList.push("A divergência não se encaixa nos padrões automáticos reconhecidos; revise manualmente campo a campo na tabela abaixo.");
-      headline = `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]} (campo: ${named[0].field}).</b>Ação recomendada: ${causeList[0]}</div></div>`;
+      headline = clFieldInfo
+        ? `<div class="headline bad">🔴 <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. ${LB_FIELD_IMPACT[clFieldInfo.label]||"Confira esse dado no cadastro do Sankhya."}</div></div>`
+        : `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]} (campo: ${named[0].field}).</b>Ação recomendada: ${causeList[0].replace(/<\/?b>/g,"")}</div></div>`;
     }
   }
 
@@ -864,7 +985,7 @@ function generateReport(save){
         if(len<=100) html+=lbDiffStrip(rawA,rawB);
         html+="<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>"+named.slice(0,200).map(x=>`<tr><td>${x.pos}</td><td>${x.field}</td><td class="pos">${x.s}</td><td class="pos">${x.k}</td></tr>`).join("")+"</table>";
         html+="<h3>4. Causa provável</h3><ul>"+causeList.map(c=>"<li>"+c+"</li>").join("")+"</ul>";
-        html+=lbCampoLivreNote(bank,len,diffs);
+        html+=lbCampoLivreNote(bank,len,diffs,rawA,rawB);
       }
     }
   } else if(bankLineTxt&&bLine&&!bLine.ok){
@@ -1005,7 +1126,9 @@ function runGuidedDiagnosis(save){
     } else {
       const len=rawA.length, d=[];
       for(let i=0;i<len;i++)if(rawA[i]!==rawB[i])d.push(i+1);
-      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status ${d.length?"bad":"ok"}">${d.length?`🔴 ${d.length} posição(ões) diferentes, a partir da posição ${d[0]}`:"🟢 Linhas idênticas"}</div>${d.length?(len<=100?lbDiffStrip(rawA,rawB):"")+`<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>${d.slice(0,100).map(i=>`<tr><td>${i}</td><td>${(lbFieldForPos(len,i)||{name:"—"}).name}</td><td>${rawA[i-1]||"—"}</td><td>${rawB[i-1]||"—"}</td></tr>`).join("")}</table>${lbCampoLivreNote(bank,len,d)}`:""}</div>`;
+      let clTag="";
+      if(d.length){ const {cl}=lbClassifyDiffs(len,d); if(cl.length){ const {fields}=lbCampoLivreFields(bank,len,cl,rawA,rawB); if(fields.length) clTag=` — ${fields.map(f=>f.label).join(", ")}`; } }
+      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status ${d.length?"bad":"ok"}">${d.length?`🔴 ${d.length} posição(ões) diferentes, a partir da posição ${d[0]}${clTag}`:"🟢 Linhas idênticas"}</div>${d.length?(len<=100?lbDiffStrip(rawA,rawB):"")+`<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>${d.slice(0,100).map(i=>`<tr><td>${i}</td><td>${(lbFieldForPos(len,i)||{name:"—"}).name}</td><td>${rawA[i-1]||"—"}</td><td>${rawB[i-1]||"—"}</td></tr>`).join("")}</table>${lbCampoLivreNote(bank,len,d,rawA,rawB)}`:""}</div>`;
     }
   }
   $("guidedResult").innerHTML=`<div class="card">
@@ -1048,6 +1171,10 @@ const lbGuidedAuto=lbDebounce(()=>{ if($("gLine").value.trim()) runGuidedDiagnos
 const lbGenAuto=lbDebounce(()=>{ if($("genOur").value.trim()||$("genAmount").value.trim()) generateLine(); },400);
 ["genBank","genOur","genOurDv","genAmount","genDue","genCurrency","genFactor","genTemplate","genFreeRule","genSumMode"].forEach(id=>{
   $(id).addEventListener("input",lbGenAuto); $(id).addEventListener("change",lbGenAuto);
+});
+$("genBank").addEventListener("change",()=>{
+  const tmpl=getBankTemplate($("genBank").value);
+  if(tmpl) $("genTemplate").value=tmpl;
 });
 
 /* ===== Autosalvamento de formulários (retoma de onde parou) ===== */
