@@ -636,6 +636,7 @@ function getBankTemplates(){
   let changed=false;
   if(!t["237"]){ t["237"]="110NNNNNNNND005712345700Z"; changed=true; }
   if(!t["001"]){ t["001"]="??????CCCCCCC????????????"; changed=true; } // Convênio 7 dígitos verificado nas posições 7-13 do Campo Livre; demais posições ainda não confirmadas
+  if(!t["104"]){ t["104"]="CCCCCCC??????????????????"; changed=true; } // Caixa: Código do Cedente (6 dígitos + DV) verificado nas posições 1-7 do Campo Livre a partir de caso real; a ordem interna (DV antes ou depois dos 6 dígitos) varia entre Sankhya e o banco — ver observação no laudo; demais posições ainda não confirmadas
   if(changed) localStorage.setItem("lexbank_templates",JSON.stringify(t));
   return t;
 }
