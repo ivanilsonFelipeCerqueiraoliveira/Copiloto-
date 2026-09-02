@@ -374,7 +374,8 @@ const LB_FIELD_IMPACT={
   "DV do Nosso Número":"O dígito verificador do Nosso Número não fecha; o banco pode recusar o registro do título por inconsistência cadastral.",
   "Agência":"Uma Agência incorreta pode fazer o banco rejeitar o registro do título por não localizar a conta correspondente.",
   "Conta":"Uma Conta incorreta pode fazer o crédito do pagamento não ser direcionado à conta correta, ou o banco rejeitar o registro do título.",
-  "Carteira":"Uma Carteira incorreta muda a regra de registro e o cálculo de juros/multa — pode causar rejeição do título ou cobrança de encargos diferente do esperado."
+  "Carteira":"Uma Carteira incorreta muda a regra de registro e o cálculo de juros/multa — pode causar rejeição do título ou cobrança de encargos diferente do esperado.",
+  "DV Agência/Conta":"O dígito verificador de Agência/Conta não fecha; normalmente indica que os dígitos de Agência ou Conta usados para montar o Campo Livre não são os mesmos cadastrados, e o banco pode rejeitar o registro do título."
 };
 function lbClassifyDiffs(len,diffs){
   const cl=[],dv=[],other=[];
@@ -396,7 +397,6 @@ function lbTemplateFieldRanges(tmpl){
   }
   return ranges;
 }
-const LB_SEMANTIC_TOKENS=new Set(["N","D","C","A","V","K","Z","O"]);
 /* Mapeia posição do Campo Livre (1-25) <-> posição da linha completa.
    Não é uma conta linear: há dígitos verificadores (DV1, DV2) intercalados
    entre os 3 blocos do Campo Livre na linha digitável de 47 posições. */
@@ -434,7 +434,7 @@ function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
   const clA=lbExtractCampoLivre(len,rawA), clB=lbExtractCampoLivre(len,rawB);
   const fields=[];
   ranges.forEach(r=>{
-    if(!LB_SEMANTIC_TOKENS.has(r.token)) return;
+    if(r.token==="?") return; // não mapeado: sem informação a mostrar, tratado à parte
     let hit=false;
     for(let idx=r.start; idx<=r.end; idx++) if(hitIdx.has(idx)){hit=true;break}
     if(!hit) return;
@@ -625,9 +625,10 @@ function lbTokenLabel(tok){
   if(tok==="A")return "Agência";
   if(tok==="V")return "Conta";
   if(tok==="K")return "Carteira";
+  if(tok==="G")return "DV Agência/Conta";
   if(tok==="Z")return "DV do Campo Livre (mód. 10)";
   if(tok==="O")return "DV do Campo Livre (mód. 11)";
-  if(/\d/.test(tok||""))return "Posição fixa (carteira/convênio)";
+  if(/\d/.test(tok||""))return "Posição fixa do layout";
   return "Não mapeado";
 }
 function getBankTemplates(){
@@ -637,6 +638,7 @@ function getBankTemplates(){
   if(!t["237"]){ t["237"]="110NNNNNNNND005712345700Z"; changed=true; }
   if(!t["001"]){ t["001"]="??????CCCCCCC????????????"; changed=true; } // Convênio 7 dígitos verificado nas posições 7-13 do Campo Livre; demais posições ainda não confirmadas
   if(!t["104"]){ t["104"]="CCCCCCC??????????????????"; changed=true; } // Caixa: Código do Cedente (6 dígitos + DV) verificado nas posições 1-7 do Campo Livre a partir de caso real; a ordem interna (DV antes ou depois dos 6 dígitos) varia entre Sankhya e o banco — ver observação no laudo; demais posições ainda não confirmadas
+  if(!t["341"]){ t["341"]="KKKNNNNNNNNDAAAAVVVVVG000"; changed=true; } // Itaú, carteira 109: Carteira(3)+NossoNúmero(8)+DV NN(1)+Agência(4)+Conta(5)+DV Ag/Conta(1)+zeros fixos(3), verificado integralmente a partir de caso real (Agência e Conta idênticas nas duas linhas confirmam a fronteira)
   if(changed) localStorage.setItem("lexbank_templates",JSON.stringify(t));
   return t;
 }
