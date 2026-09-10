@@ -3,34 +3,45 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LexBank — Diagnóstico Bancário Inteligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
-:root{--bg:#f3f5f8;--card:#fff;--ink:#101828;--muted:#667085;--line:#e4e7ec;--blue:#175cd3;--green:#067647;--yellow:#b54708;--red:#b42318}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
-header{background:#101828;color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:850;font-size:21px}.sub{font-size:12px;color:#98a2b3;margin-top:3px}
-nav{background:#fff;border-bottom:1px solid var(--line);display:flex;gap:4px;padding:8px 18px;position:sticky;top:0;z-index:10;overflow:auto}nav button{border:0;background:none;padding:11px 13px;border-radius:8px;font-weight:700;color:#475467;white-space:nowrap}nav button.active,nav button:hover{background:#eef4ff;color:var(--blue)}
-main{max-width:1500px;margin:20px auto;padding:0 18px}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 1px 2px #00000008}
-h1{font-size:24px;margin:0 0 5px}h2{font-size:17px;margin:0 0 13px}h3{font-size:14px;margin:18px 0 8px}.muted{color:var(--muted);font-size:13px}.form{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:750;color:#344054}.field input,.field select,.field textarea{border:1px solid #d0d5dd;border-radius:8px;padding:10px;font-size:14px;background:#fff}.field textarea{min-height:145px;font-family:ui-monospace,Consolas,monospace}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#eef2f6;color:#344054}.danger{background:#fff1f0;color:var(--red)}
-.status{padding:12px;border-radius:9px;font-weight:800;margin-bottom:12px}.ok{background:#ecfdf3;color:var(--green)}.warn{background:#fffaeb;color:var(--yellow)}.bad{background:#fef3f2;color:var(--red)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.kpi{border:1px solid var(--line);border-radius:9px;padding:11px}.kpi b{display:block;font-size:18px;margin-top:3px;overflow:hidden;text-overflow:ellipsis}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#f9fafb}pre{background:#101828;color:#d0d5dd;padding:13px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.5}
-.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#eef2f6;font-size:11px;font-weight:800}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pos{font-family:ui-monospace,Consolas,monospace}.small{font-size:11px}.link{color:var(--blue);text-decoration:none;font-weight:700}
-@media(max-width:950px){.grid,.two{grid-template-columns:1fr}.form{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:1fr 1fr}}@media(max-width:600px){.form{grid-template-columns:1fr}}
+:root{--bg:#f1f7f6;--card:#fff;--surface-2:#eaf4f2;--ink:#0e2622;--muted:#5b7570;--line:#dbe8e5;--blue:#0c9488;--blue-dark:#0a3b35;--blue-tint:#e3f5f1;--green:#127a55;--yellow:#a8681c;--red:#bf3728;--font-head:'Plus Jakarta Sans',Inter,Segoe UI,Arial,sans-serif;--font-body:Inter,Segoe UI,Arial,sans-serif;--radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body)}
+h1,h2,h3,.brand,.btn,nav button,.kpi b{font-family:var(--font-head)}
+header{background:linear-gradient(155deg,var(--blue-dark),#0d2d29 78%);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandBlock{display:flex;align-items:center;gap:12px}
+.brandMark{width:38px;height:38px;border-radius:11px;background:linear-gradient(150deg,var(--blue),#5fd6c4);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:17px;color:#06231f;flex:0 0 auto;box-shadow:0 4px 14px #00000030}
+.brand{font-weight:800;font-size:21px;letter-spacing:-.01em}.brandTag{display:inline-block;margin-left:9px;padding:2px 9px;border-radius:99px;background:#ffffff1f;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;vertical-align:2px}
+.sub{font-size:12px;color:#bcd8d2;margin-top:3px}
+.headerRight{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+.userBadge{display:flex;align-items:center;gap:9px;background:#ffffff14;border:1px solid #ffffff26;border-radius:99px;padding:6px 8px 6px 14px;font-size:12.5px}
+.userBadge b{font-weight:700}.userBadge button{border:0;background:#ffffff22;color:#fff;border-radius:99px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer}.userBadge button:hover{background:#ffffff38}
+nav{background:#fff;border-bottom:1px solid var(--line);display:flex;gap:3px;padding:9px 22px;position:sticky;top:0;z-index:10;overflow:auto}nav button{border:0;background:none;padding:10px 15px;border-radius:99px;font-weight:700;font-size:13.5px;color:var(--muted);white-space:nowrap;transition:background .15s,color .15s}nav button.active{background:var(--blue);color:#fff}nav button:not(.active):hover{background:var(--blue-tint);color:var(--blue-dark)}
+main{max-width:1500px;margin:22px auto;padding:0 20px}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0e262208}
+h1{font-size:24px;margin:0 0 5px;letter-spacing:-.01em}h2{font-size:17px;margin:0 0 13px}h3{font-size:14px;margin:18px 0 8px}.muted{color:var(--muted);font-size:13px}.form{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:#33534d}.field input,.field select,.field textarea{border:1px solid #cfe0dc;border-radius:9px;padding:10px;font-size:14px;background:#fff;font-family:inherit;color:var(--ink)}.field textarea{min-height:145px;font-family:ui-monospace,Consolas,monospace}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;transition:filter .15s,transform .05s}.btn:hover{filter:brightness(1.06)}.primary{background:var(--blue);color:#fff;box-shadow:0 2px 8px #0c948840}.secondary{background:var(--blue-tint);color:var(--blue-dark)}.danger{background:#fdeceb;color:var(--red)}
+.status{padding:12px;border-radius:10px;font-weight:700;margin-bottom:12px}.ok{background:#e9f7f0;color:var(--green)}.warn{background:#fdf3e5;color:var(--yellow)}.bad{background:#fdecea;color:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.kpi{border:1px solid var(--line);background:var(--surface-2);border-radius:11px;padding:11px}.kpi b{display:block;font-size:18px;margin-top:3px;overflow:hidden;text-overflow:ellipsis}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--surface-2);font-family:var(--font-head);font-weight:700}pre{background:var(--blue-dark);color:#d3ece7;padding:13px;border-radius:10px;overflow:auto;font-size:12px;line-height:1.5}
+.badge{display:inline-block;padding:3px 8px;border-radius:99px;background:var(--blue-tint);color:var(--blue-dark);font-size:11px;font-weight:800}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pos{font-family:ui-monospace,Consolas,monospace}.small{font-size:11px}.link{color:var(--blue);text-decoration:none;font-weight:700}
+@media(max-width:950px){.grid,.two{grid-template-columns:1fr}.form{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:1fr 1fr}}@media(max-width:600px){.form{grid-template-columns:1fr}header{padding:14px 18px}}
 </style>
 
 <style>
-.stepper{display:flex;gap:8px;margin:18px 0}.step{flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;text-align:center}.step b{display:inline-flex;width:25px;height:25px;border-radius:50%;align-items:center;justify-content:center;background:#eee;margin-right:6px}.step.active{border-color:#555}.legend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.legend-grid div{border:1px solid #ddd;border-radius:10px;padding:14px}.legend-grid span{display:block;margin-top:6px}.diagnostic-row{display:grid;grid-template-columns:minmax(220px,30%) 1fr;gap:12px;padding:12px;border:1px solid #ddd;border-radius:9px;margin:8px 0}.diagnostic-row.bad{border-left:5px solid #b42318}.diagnostic-row.warn{border-left:5px solid #b54708}.diagnostic-row.ok{border-left:5px solid #067647}.diagnostic-row.info{border-left:5px solid #175cd3}.status.info{border-left:5px solid #175cd3}.link{cursor:pointer}.muted{line-height:1.5}
+.stepper{display:flex;gap:8px;margin:18px 0}.step{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;text-align:center}.step b{display:inline-flex;width:25px;height:25px;border-radius:50%;align-items:center;justify-content:center;background:var(--surface-2);margin-right:6px}.step.active{border-color:var(--blue)}.legend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.legend-grid div{border:1px solid var(--line);border-radius:10px;padding:14px}.legend-grid span{display:block;margin-top:6px}.diagnostic-row{display:grid;grid-template-columns:minmax(220px,30%) 1fr;gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;margin:8px 0}.diagnostic-row.bad{border-left:5px solid var(--red)}.diagnostic-row.warn{border-left:5px solid var(--yellow)}.diagnostic-row.ok{border-left:5px solid var(--green)}.diagnostic-row.info{border-left:5px solid var(--blue)}.status.info{border-left:5px solid var(--blue)}.link{cursor:pointer}.muted{line-height:1.5}
 @media(max-width:700px){.diagnostic-row{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
 
-/* ===== v10: fluidez, toasts, diff visual, indicadores de erro ===== */
+/* ===== fluidez, toasts, diff visual, indicadores de erro ===== */
 .card,.status,.diagnostic-row{animation:lbFadeIn .22s ease-out}
 @keyframes lbFadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 #lbToastBox{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:340px}
 .lbToast{padding:11px 15px;border-radius:9px;font-weight:700;font-size:13px;box-shadow:0 6px 20px #0003;color:#fff;animation:lbFadeIn .18s ease-out;transition:opacity .3s,transform .3s}
 .lbToast.bad{background:var(--red)}.lbToast.warn{background:var(--yellow)}.lbToast.ok{background:var(--green)}.lbToast.info{background:var(--blue)}
 .headline{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:10px;font-weight:700;margin-bottom:14px;font-size:14.5px;line-height:1.45}
-.headline.bad{background:#fef3f2;border:1px solid #fda29b;color:#7a271a}
-.headline.ok{background:#ecfdf3;border:1px solid #75e0a7;color:#054f31}
-.headline.warn{background:#fffaeb;border:1px solid #fec84b;color:#7a4504}
+.headline.bad{background:#fdecea;border:1px solid #f0b3ab;color:#7c2318}
+.headline.ok{background:#e9f7f0;border:1px solid #9adcbb;color:#0d4d34}
+.headline.warn{background:#fdf3e5;border:1px solid #f0cf9a;color:#6b4712}
 .headline b{display:block;margin-bottom:2px}
 .diffstrip{margin:10px 0;overflow-x:auto;padding-bottom:4px}
 .diffrow{display:flex;align-items:center;gap:8px;margin:2px 0}
@@ -38,17 +49,42 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;borde
 .diffdigits{display:flex;font-family:ui-monospace,Consolas,monospace;font-size:13px;white-space:nowrap}
 .dchar{display:inline-block;min-width:15px;text-align:center;padding:2px 1px;border-radius:3px}
 .dchar.ok{color:var(--green)}
-.dchar.bad{background:#fef3f2;color:var(--red);font-weight:800;box-shadow:inset 0 0 0 1px #fda29b}
-.dchar.ruler{color:#98a2b3;font-size:10px}
-mark{background:#fef0c7;color:#7a4504;border-radius:2px;padding:0 1px}
+.dchar.bad{background:#fdecea;color:var(--red);font-weight:800;box-shadow:inset 0 0 0 1px #f0b3ab}
+.dchar.ruler{color:var(--muted);font-size:10px}
+mark{background:#fbe6bd;color:#6b4712;border-radius:2px;padding:0 1px}
 .btn.small{padding:6px 10px;font-size:12px;font-weight:700}
 .btn:active{transform:scale(.97)}
-.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #175cd3;outline-offset:1px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
 .livehint{font-size:11px;color:var(--muted);margin-top:-6px;margin-bottom:8px}
+
+/* ===== acesso restrito @sankhya.com.br ===== */
+body.lb-gated #lbApp{display:none}
+#lbLogin{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;background:radial-gradient(1100px 600px at 15% -10%,#123e38 0%,var(--blue-dark) 45%,#081c19 100%)}
+body.lb-gated #lbLogin{display:flex}
+.lbLoginCard{width:100%;max-width:400px;background:#fff;border-radius:18px;padding:34px 32px 30px;box-shadow:0 20px 60px #00000040;text-align:center}
+.lbLoginMark{width:52px;height:52px;border-radius:15px;margin:0 auto 16px;background:linear-gradient(150deg,var(--blue),#5fd6c4);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:22px;color:#06231f;box-shadow:0 6px 18px #0c948850}
+.lbLoginCard h1{font-size:20px;margin:0 0 4px}
+.lbLoginCard .muted{margin-bottom:22px}
+.lbLoginCard .field{text-align:left;margin-bottom:14px}
+.lbLoginCard .btn{width:100%;padding:12px;font-size:14px}
+#lbLoginError{color:var(--red);font-size:12.5px;font-weight:700;min-height:18px;margin:-4px 0 10px}
+.lbLoginFoot{margin-top:20px;font-size:11.5px;color:var(--muted);line-height:1.5}
 </style>
 </head>
-<body>
-<header><div><div class="brand">LexBank</div><div class="sub">Diagnóstico bancário • Sankhya • Boletos • Linha Digitável • CNAB 240/400</div></div><div class="sub">v10 — análise em tempo real, diff visual e causas apontadas automaticamente</div></header>
+<body class="lb-gated">
+<div id="lbLogin">
+<div class="lbLoginCard">
+<div class="lbLoginMark">S</div>
+<h1>Acesso LexBank</h1>
+<div class="muted">Ferramenta interna Sankhya de diagnóstico bancário. Entre com seu e-mail corporativo para continuar.</div>
+<div class="field"><label>E-mail corporativo</label><input id="lbLoginEmail" type="email" placeholder="nome.sobrenome@sankhya.com.br" autocomplete="email"></div>
+<div id="lbLoginError"></div>
+<button class="btn primary" onclick="lbLogin()">ENTRAR</button>
+<div class="lbLoginFoot">Acesso restrito a e-mails <b>@sankhya.com.br</b>. Este é um controle simples de acesso local ao navegador — não substitui autenticação corporativa para dados sensíveis.</div>
+</div>
+</div>
+<div id="lbApp">
+<header><div class="brandBlock"><div class="brandMark">S</div><div><div class="brand">LexBank<span class="brandTag">Sankhya</span></div><div class="sub">Diagnóstico bancário • Boletos • Linha Digitável • CNAB 240/400</div></div></div><div class="headerRight"><div class="sub">v11 — identidade Sankhya e acesso restrito</div><div class="userBadge" id="lbUserBadge" hidden><span>👤 <b id="lbUserBadgeEmail"></b></span><button onclick="lbLogout()">Sair</button></div></div></header>
 <nav>
 <button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button>
 </nav>
@@ -297,6 +333,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 </div>
 </section>
 </main>
+</div>
 <script>
 const banks={
 "001":{name:"Banco do Brasil",critical:["Agência","Conta + DV","Convênio","Carteira","Nosso Número"]},
@@ -332,6 +369,47 @@ const docs=[
 ["Safra","Portal institucional","https://www.safra.com.br/"]
 ];
 const $=id=>document.getElementById(id), clean=s=>(s||"").replace(/\D/g,"");
+
+/* ======================================================================
+   ACESSO — restrito a e-mails @sankhya.com.br
+   Controle client-side (não é autenticação de verdade): guarda o e-mail
+   informado no localStorage do navegador. Qualquer pessoa com acesso ao
+   código-fonte da página pode contornar isso — serve para manter uso
+   casual restrito à equipe, não para proteger dados sensíveis.
+   ====================================================================== */
+const LB_ALLOWED_DOMAIN="sankhya.com.br";
+function lbEmailAllowed(email){
+  return new RegExp("@"+LB_ALLOWED_DOMAIN.replace(/\./g,"\\.")+"$","i").test(String(email||"").trim());
+}
+function lbCheckAuth(){
+  const saved=localStorage.getItem("lexbank_auth_email");
+  if(saved && lbEmailAllowed(saved)){ lbUnlockApp(saved); return true; }
+  return false;
+}
+function lbUnlockApp(email){
+  document.body.classList.remove("lb-gated");
+  const badge=$("lbUserBadge");
+  if(badge){ badge.hidden=false; $("lbUserBadgeEmail").textContent=email; }
+}
+function lbLogin(){
+  const email=$("lbLoginEmail").value.trim();
+  const err=$("lbLoginError");
+  if(!email||!email.includes("@")){ err.textContent="Informe um e-mail válido."; return; }
+  if(!lbEmailAllowed(email)){ err.textContent=`Acesso restrito a e-mails @${LB_ALLOWED_DOMAIN}.`; return; }
+  err.textContent="";
+  localStorage.setItem("lexbank_auth_email",email);
+  lbUnlockApp(email);
+}
+function lbLogout(){
+  localStorage.removeItem("lexbank_auth_email");
+  document.body.classList.add("lb-gated");
+  const badge=$("lbUserBadge");
+  if(badge) badge.hidden=true;
+  $("lbLoginEmail").value="";
+  $("lbLoginError").textContent="";
+}
+$("lbLoginEmail").addEventListener("keydown",e=>{ if(e.key==="Enter") lbLogin(); });
+lbCheckAuth();
 
 /* ======================================================================
    UTILITÁRIOS DE UX — toasts, debounce, diff visual, cópia
