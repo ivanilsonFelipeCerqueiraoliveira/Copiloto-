@@ -112,7 +112,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 @media(prefers-reduced-motion:reduce){.lbWaveLine,.lbLoginMesh::before{animation:none}}
 .lbLoginWrap{position:relative;z-index:1;width:100%;max-width:840px;min-height:480px;background:#fff;border-radius:22px;box-shadow:0 24px 70px #00000050;display:flex;overflow:hidden}
 .lbLoginBrand{flex:0 0 320px;background:linear-gradient(165deg,#0d3b35,#0a2622);color:#fff;padding:38px 32px;display:flex;flex-direction:column;justify-content:center}
-.lbLoginBrand .lbLoginMark{width:46px;height:46px;border-radius:13px;margin:0 0 20px;background:linear-gradient(150deg,#5fd6c4,var(--blue));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:19px;color:#06231f;box-shadow:0 6px 16px #0009}
+.lbLoginBrand .lbLoginMark{width:46px;height:46px;border-radius:13px;margin:0 0 20px;background:linear-gradient(150deg,#5fd6c4,var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px #0009}
 .lbLoginBrand h2{font-family:var(--font-head);font-size:22px;margin:0 0 8px;letter-spacing:-.01em}
 .lbLoginBrand p{font-size:13px;color:#bcd8d2;line-height:1.5;margin:0}
 .lbLoginForm{flex:1;padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
@@ -163,9 +163,13 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </svg></div>
 <div class="lbLoginWrap">
 <div class="lbLoginBrand">
-<div class="lbLoginMark">S</div>
+<div class="lbLoginMark"><svg viewBox="0 0 48 48" width="26" height="26" fill="none" aria-hidden="true">
+<defs><linearGradient id="lbMarkGrad" x1="6" y1="12" x2="42" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#eafff6"/><stop offset="1" stop-color="#8ff0d7"/></linearGradient></defs>
+<path d="M9 19 C15 12, 25 12, 31 19 S43 30, 39 24" stroke="url(#lbMarkGrad)" stroke-width="6" stroke-linecap="round"/>
+<path d="M9 31 C15 24, 25 24, 31 31 S43 42, 39 36" stroke="url(#lbMarkGrad)" stroke-width="6" stroke-linecap="round"/>
+</svg></div>
 <h2>LexBank</h2>
-<p>Diagnóstico bancário inteligente para a equipe Sankhya.</p>
+<p>Análise inteligente.<br>Diagnóstico preciso.</p>
 </div>
 <div class="lbLoginForm">
 <h1>Entrar</h1>
