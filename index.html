@@ -40,7 +40,8 @@ header{background:linear-gradient(155deg,#0a3b35,#0d2d29 78%);color:#fff;padding
 .userDropdownEmail{font-size:12px;color:var(--muted);margin:2px 0 10px;word-break:break-all}
 .userDropdownRole{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--blue-tint);color:var(--blue-dark);font-size:11px;font-weight:800;margin-bottom:12px}
 .userDropdown .btn{width:100%;display:block}
-nav{background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:3px;padding:9px 22px;position:sticky;top:0;z-index:10;overflow:auto}nav button{border:0;background:none;padding:10px 15px;border-radius:99px;font-weight:700;font-size:13.5px;color:var(--muted);white-space:nowrap;transition:background .15s,color .15s}nav button.active{background:var(--blue);color:#fff}nav button:not(.active):hover{background:var(--blue-tint);color:var(--blue-dark)}
+nav{background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:3px;padding:9px 22px;position:sticky;top:0;z-index:10;overflow:auto}
+#lbMoreServices{display:none}nav button{border:0;background:none;padding:10px 15px;border-radius:99px;font-weight:700;font-size:13.5px;color:var(--muted);white-space:nowrap;transition:background .15s,color .15s}nav button.active{background:var(--blue);color:#fff}nav button:not(.active):hover{background:var(--blue-tint);color:var(--blue-dark)}
 .lbSideNavHandle{position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:41;width:22px;height:64px;border:0;border-radius:0 12px 12px 0;background:linear-gradient(155deg,#0c9488,#0a3b35);color:#fff;font-size:16px;font-weight:800;line-height:1;cursor:pointer;box-shadow:2px 0 10px #0003;display:flex;align-items:center;justify-content:center;transition:left .28s cubic-bezier(.4,0,.2,1),filter .15s}
 .lbSideNavHandle:hover{filter:brightness(1.12)}
 .lbSideNavHandle.open{left:250px}
@@ -223,7 +224,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <button id="lbSideNavHandle" class="lbSideNavHandle" onclick="lbToggleSideNav()" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="lbSideNav"><span class="lbSideNavArrow">›</span></button>
 <div id="lbSideNavOverlay" class="lbSideNavOverlay" onclick="lbCloseSideNav()"></div>
 <nav id="lbSideNav" class="lbSideNav" aria-hidden="true">
-<div class="lbSideNavTitle">Serviços</div>
+<div class="lbSideNavTitle">Mais serviços</div>
 </nav>
 <header><div class="brandBlock"><div class="brandMark">S</div><div><div class="brand">LexBank<span class="brandTag">Sankhya</span></div><div class="sub">Diagnóstico bancário • Boletos • Linha Digitável • CNAB 240/400</div></div></div><div class="headerRight">
 <div class="sub">v12 — identidade Sankhya</div>
@@ -240,10 +241,13 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </div>
 </div></header>
 <nav id="lbMainNav">
-<button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="decodificacao">Decodificação</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button>
+<button class="active" data-tab="decodificacao">Decodificação</button><button data-tab="comparador">Comparador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="painel">Análise Guiada</button>
+</nav>
+<nav id="lbMoreServices" hidden>
+<button data-tab="diagnostico">Diagnóstico</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="historico">Casos</button>
 </nav>
 <main>
-<section id="diagnostico" class="tab active">
+<section id="diagnostico" class="tab">
 <div class="grid"><div>
 <div class="card"><h1>Diagnóstico de configuração bancária<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Objetivo: identificar quais dados precisam ser conferidos antes de reproduzir o boleto no Sankhya. O sistema não presume uma regra bancária que não esteja cadastrada.</div>
 <h3>Conta / cobrança</h3><div class="form">
@@ -263,7 +267,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div class="form"><div class="field"><label>Banco</label><select id="cmpBank"><option value="">Não informado</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Modalidade</label><input id="cmpMod"></div><div class="field"><label>Carteira</label><input id="cmpWallet"></div></div>
 <div class="two"><div class="field"><label>Sankhya</label><textarea id="line1"></textarea></div><div class="field"><label>Banco / referência</label><textarea id="line2"></textarea></div></div><div class="actions"><button class="btn primary" onclick="compare()">COMPARAR</button></div><div id="cmpResult"></div></div></section>
 
-<section id="decodificacao" class="tab"><div class="card"><h1>Decodificação da linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
+<section id="decodificacao" class="tab active"><div class="card"><h1>Decodificação da linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
 <div class="form"><div class="field"><label>Banco (contexto)</label><select id="decodBank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div></div>
 <div class="field full"><label>Linha digitável</label><textarea id="decodLine" placeholder="Cole a linha digitável, o código de barras ou a linha de arrecadação"></textarea></div>
 <div class="actions"><button class="btn primary" onclick="decodeSingleLine()">DECODIFICAR</button></div>
@@ -1684,7 +1688,7 @@ $("digitline").addEventListener("input",lbDiagAuto);
 /* ===== Menu lateral discreto (espelha as mesmas opções do menu de cima) ===== */
 function lbBuildSideNav(){
   const side=$("lbSideNav");
-  document.querySelectorAll("#lbMainNav button").forEach(b=>{
+  document.querySelectorAll("#lbMoreServices button").forEach(b=>{
     const clone=document.createElement("button");
     clone.dataset.tab=b.dataset.tab; clone.textContent=b.textContent;
     if(b.classList.contains("active")) clone.classList.add("active");
