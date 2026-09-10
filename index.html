@@ -843,11 +843,19 @@ function lbFieldStatusIcon(row){ return row.equal ? "🟢" : (row.kind==="dv" ? 
    lógica de priorização usada no resto do laudo: um campo de negócio divergente
    (🔴) é a causa mais provável; um DV divergente sozinho (🟠) vira a causa só
    quando não há nenhum campo de negócio também divergente. */
+/* O campo de negócio divergente vem antes de um DV divergente sozinho, seguindo a
+   mesma prioridade usada no resto do laudo — é o mesmo critério usado tanto no texto
+   do diagnóstico quanto no registro do caso para a busca de "casos parecidos". */
+function lbMainDivergence(rows){
+  const diffs=rows.filter(r=>!r.equal);
+  if(!diffs.length) return null;
+  const infoDiffs=diffs.filter(d=>d.kind!=="dv"), dvDiffs=diffs.filter(d=>d.kind==="dv");
+  return infoDiffs[0]||dvDiffs[0];
+}
 function lbBuildFieldDiagnosis(rows){
   const diffs=rows.filter(r=>!r.equal);
   if(!diffs.length) return "<p class='status ok'>✅ Nenhuma divergência de campo identificada nesta comparação.</p>";
-  const infoDiffs=diffs.filter(d=>d.kind!=="dv"), dvDiffs=diffs.filter(d=>d.kind==="dv");
-  const main=infoDiffs[0]||dvDiffs[0];
+  const main=lbMainDivergence(rows);
   const posWord=main.posLinha.includes("-")?"posições":"posição";
   if(diffs.length===1){
     return `<p>Foi identificada divergência em <b>${main.label}</b>. A linha digitável gerada pelo Sankhya possui o valor <code>${main.valueA}</code>, enquanto a linha fornecida pelo banco possui o valor <code>${main.valueB}</code>. A divergência está localizada na${posWord==="posições"?"s":""} ${posWord} ${main.posLinha} da linha digitável${main.posCL!=="—"?` (posição ${main.posCL} do Campo Livre)`:""}.</p>`;
@@ -1399,7 +1407,7 @@ function generateReport(save){
   const bankMismatch=lbBankMismatchWarning(bank,a.banco);
 
   // ---- monta o veredito e a causa provável primeiro, para exibir no topo ----
-  let headline, causeList=[], diffs=[], named=[], len=null, rawA=clean(sankLine), rawB=bankLineTxt?clean(bankLineTxt):"";
+  let headline, causeList=[], diffs=[], named=[], len=null, mainDiv=null, rawA=clean(sankLine), rawB=bankLineTxt?clean(bankLineTxt):"";
   if(!bankLineTxt){
     headline = errsA.length
       ? `<div class="headline bad">🔴 <div><b>A linha do Sankhya tem ${errsA.length} dígito(s) verificador(es) incorretos (${errsA.map(x=>x.name).join(", ")}).</b>Isso indica erro de cálculo/posicionamento, independente do banco. Cole também a linha do banco para localizar exatamente onde as duas divergem.</div></div>`
@@ -1464,6 +1472,8 @@ function generateReport(save){
           html+="<table><tr><th>Campo</th><th>Sankhya</th><th>Banco</th><th>Posição na linha</th><th>Resultado</th></tr>"+
             cmpRows.map(r=>`<tr><td>${r.label}${r.kind==="dv"?" <span class='muted'>(DV)</span>":""}</td><td class="pos">${r.valueA}</td><td class="pos">${r.valueB}</td><td class="pos">${r.posLinha}</td><td>${lbFieldStatusIcon(r)}</td></tr>`).join("")+
             "</table>"+lbBuildFieldDiagnosis(cmpRows);
+          mainDiv=lbMainDivergence(cmpRows);
+          if(mainDiv) html+=lbSimilarCasesCard(banks[effBank]?banks[effBank].name:effBank,mainDiv.label);
         }
       }
     }
@@ -1474,13 +1484,30 @@ function generateReport(save){
   }
   html+="</div>";
   $("reportResult").innerHTML=html;
-  if(save)saveReportCase(bank,ref,errsA.length?"Divergência interna na linha do Sankhya":"Estrutura da linha do Sankhya OK");
+  if(save)saveReportCase(effBank,ref,errsA.length?"Divergência interna na linha do Sankhya":"Estrutura da linha do Sankhya OK",mainDiv?mainDiv.label:null);
 }
 function lbPrint(){ window.print() }
-function saveReportCase(bank,ref,status){
+function saveReportCase(bank,ref,status,campo){
   let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");
-  h.unshift({data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Sem referência",status:"Laudo: "+status});
+  const entry={data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Sem referência",status:"Laudo: "+status};
+  if(campo) entry.campo=campo;
+  h.unshift(entry);
   localStorage.setItem("lexbank_cases",JSON.stringify(h.slice(0,200)));renderHistory();
+}
+/* ===== Casos parecidos: usa o próprio histórico local para mostrar se essa combinação
+   banco+campo já apareceu antes, virando o log passivo de "Casos" em contexto ativo
+   durante o próprio laudo. Só compara pelo que já foi registrado — nada é inferido. */
+function lbGetCases(){ return JSON.parse(localStorage.getItem("lexbank_cases")||"[]") }
+function lbFindSimilarCases(bankName,campo){
+  if(!campo) return [];
+  return lbGetCases().filter(c=>c.banco===bankName&&c.campo===campo);
+}
+function lbSimilarCasesCard(bankName,campo){
+  if(!campo) return "";
+  const matches=lbFindSimilarCases(bankName,campo);
+  if(!matches.length) return "";
+  const sample=matches.slice(0,5).map(c=>`<li>${c.data} — ${c.ref}</li>`).join("");
+  return `<div class="card calloutWarn"><h3>🔁 Casos parecidos</h3><p>Isso já apareceu <b>${matches.length}</b> vez(es) antes com <b>${bankName}</b> no campo <b>${campo}</b>:</p><ul>${sample}</ul>${matches.length>5?`<p class="muted">+ ${matches.length-5} outro(s) caso(s) anterior(es) com essa mesma combinação.</p>`:""}</div>`;
 }
 
 /* ===== Mapas Oficiais ===== */
