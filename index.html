@@ -130,7 +130,23 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 #lbLoginError{color:var(--red);font-size:12.5px;font-weight:700;min-height:14px;margin:8px 0 0}
 .lbShake{animation:lbShake .32s}
 @keyframes lbShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.lbRememberRow{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:10px 0 4px;cursor:pointer;user-select:none}
+.lbRememberRow input{accent-color:var(--blue);cursor:pointer}
+#lbLoginBtn.lbBusy{opacity:.82;cursor:progress}
+#lbLoginBtn.lbBusy #lbLoginBtnLabel::after{content:"";display:inline-block;width:13px;height:13px;margin-left:8px;vertical-align:-2px;border-radius:50%;border:2px solid #ffffff80;border-top-color:#fff;animation:lbSpin .6s linear infinite}
+@keyframes lbSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#lbLoginBtn.lbBusy #lbLoginBtnLabel::after{animation:none}}
 @media(max-width:720px){.lbLoginWrap{flex-direction:column;max-width:420px}.lbLoginBrand{flex:none;padding:28px 28px 22px}.lbLoginForm{padding:28px}}
+.confBadge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:800;margin-left:8px;vertical-align:middle;white-space:nowrap}
+.confBadge.confVerified{background:var(--ok-bg);color:var(--ok-fg);border:1px solid var(--ok-border)}
+.confBadge.confPartial{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-border)}
+.confBadge.confUnknown{background:var(--bad-bg);color:var(--bad-fg);border:1px solid var(--bad-border)}
+@media print{
+  header,nav,.actions,.form,.userMenu,.lbIconBtn,#lbLoginWaves,.lbLoginMesh,#lbLogin,#lbToastBox{display:none!important}
+  body,#lbApp,main{background:#fff!important;margin:0;padding:0;max-width:100%}
+  .card{box-shadow:none!important;border:1px solid #ccc;break-inside:avoid}
+  .grid{display:block}
+}
 </style>
 </head>
 <body>
@@ -182,8 +198,9 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <span id="lbLoginCheck" class="lbInputStatus"></span>
 </div>
 </div>
+<label class="lbRememberRow"><input type="checkbox" id="lbLoginRemember" checked> Manter conectado neste navegador</label>
 <div id="lbLoginError"></div>
-<button class="btn primary" id="lbLoginBtn" onclick="lbLogin()">Entrar</button>
+<button class="btn primary" id="lbLoginBtn" onclick="lbLogin()"><span id="lbLoginBtnLabel">Entrar</span></button>
 </div>
 </div>
 </div>
@@ -520,7 +537,7 @@ function lbFadeIn(el){
   raf(()=>{ raf(()=>{ el.style.transition="opacity .35s ease"; el.style.opacity="1"; }); });
 }
 function lbCheckAuth(){
-  const saved=localStorage.getItem("lexbank_auth_email");
+  const saved=localStorage.getItem("lexbank_auth_email")||sessionStorage.getItem("lexbank_auth_email");
   if(saved && lbEmailAllowed(saved)){ lbUnlockApp(saved,{silent:true}); return true; }
   return false;
 }
@@ -592,11 +609,18 @@ function lbLogin(){
   if(!email||!email.includes("@")){ err.textContent="Informe um e-mail válido."; lbShakeLogin(); return; }
   if(!lbEmailAllowed(email)){ err.textContent=`Acesso restrito a e-mails @${LB_ALLOWED_DOMAIN}.`; lbShakeLogin(); return; }
   err.textContent="";
-  localStorage.setItem("lexbank_auth_email",email);
-  lbUnlockApp(email);
+  const btn=$("lbLoginBtn"), remember=$("lbLoginRemember").checked;
+  btn.classList.add("lbBusy"); btn.disabled=true;
+  setTimeout(()=>{
+    if(remember){ localStorage.setItem("lexbank_auth_email",email); sessionStorage.removeItem("lexbank_auth_email"); }
+    else { sessionStorage.setItem("lexbank_auth_email",email); localStorage.removeItem("lexbank_auth_email"); }
+    btn.classList.remove("lbBusy"); btn.disabled=false;
+    lbUnlockApp(email);
+  },420);
 }
 function lbLogout(){
   localStorage.removeItem("lexbank_auth_email");
+  sessionStorage.removeItem("lexbank_auth_email");
   $("lbApp").style.display="none";
   $("lbLogin").style.display="flex";
   lbFadeIn($("lbLogin"));
@@ -654,6 +678,22 @@ const LB_FIELD_IMPACT={
   "Carteira":"Uma Carteira incorreta muda a regra de registro e o cálculo de juros/multa — pode causar rejeição do título ou cobrança de encargos diferente do esperado.",
   "DV Agência/Conta":"O dígito verificador de Agência/Conta não fecha; normalmente indica que os dígitos de Agência ou Conta usados para montar o Campo Livre não são os mesmos cadastrados, e o banco pode rejeitar o registro do título."
 };
+/* Nível de confiança de cada template de Campo Livre cadastrado: reflete exatamente
+   o que foi provado por caso real (ver comentários em getBankTemplates). Nunca marcar
+   "verified" sem confirmação ponta a ponta — é o que sustenta a credibilidade do laudo. */
+const LB_TEMPLATE_CONFIDENCE={
+  "237":{level:"partial",note:"Apenas Nosso Número, seu DV e um trecho de zeros fixos foram confirmados por caso real; as demais posições ainda não foram mapeadas."},
+  "001":{level:"partial",note:"Apenas o Convênio (posições 7–13 do Campo Livre) foi confirmado por caso real; as demais posições ainda não foram mapeadas."},
+  "104":{level:"partial",note:"Apenas o Código do Cedente (posições 1–7 do Campo Livre) foi confirmado por caso real; as demais posições ainda não foram mapeadas."},
+  "341":{level:"verified",note:"Template confirmado integralmente por caso real (carteira 109), incluindo cruzamento de Agência/Conta idênticas nas duas linhas."}
+};
+function lbConfidenceBadge(bank){
+  const c=LB_TEMPLATE_CONFIDENCE[bank];
+  if(!c) return {badge:`<span class="confBadge confUnknown">❔ confiança não registrada</span>`,note:"Este template ainda não tem o nível de confiança documentado — trate os campos abaixo com cautela extra e confirme contra o manual oficial."};
+  const cls=c.level==="verified"?"confVerified":"confPartial";
+  const label=c.level==="verified"?"✔ verificado com caso real":"⚠ parcialmente confirmado";
+  return {badge:`<span class="confBadge ${cls}">${label}</span>`,note:c.note};
+}
 function lbClassifyDiffs(len,diffs){
   const cl=[],dv=[],other=[];
   diffs.forEach(p=>{
@@ -735,12 +775,13 @@ function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   if(!tmpl){
     html="<p class='muted'>🔎 Divergência dentro do Campo Livre. Cadastre o template desse banco em Gerador/Validador para o motor apontar exatamente qual dado (Nosso Número, Convênio, Carteira etc.) está errado.</p>";
   } else if(fields.length){
-    html="<div class='card calloutWarn'><h3>📍 Campo do cadastro responsável pela divergência</h3>"+
+    const conf=lbConfidenceBadge(bank);
+    html="<div class='card calloutWarn'><h3>📍 Campo do cadastro responsável pela divergência "+conf.badge+"</h3>"+
       fields.map(f=>{
         const impact=LB_FIELD_IMPACT[f.label];
         return `<div class="diagnostic-row bad"><b>${f.label}</b><span>Posição ${f.posLinha} da linha (posição ${f.posCL} do Campo Livre).${f.valueA!=null?` Sankhya: <code>${f.valueA}</code> × Banco: <code>${f.valueB}</code>.`:""}${impact?"<br><b>Impacto provável:</b> "+impact:""}</span></div>`;
       }).join("")+
-      `<p class="muted">Template de Campo Livre usado (banco ${bank}): <code>${tmpl}</code>. Confirme contra o manual oficial vigente.</p></div>`;
+      `<p class="muted">Template de Campo Livre usado (banco ${bank}): <code>${tmpl}</code>. ${conf.note}</p></div>`;
   } else {
     html="<p class='muted'>Divergência em posições do Campo Livre ainda não mapeadas no template deste banco. Complete o template em Gerador/Validador para nomear o campo exato.</p>";
   }
