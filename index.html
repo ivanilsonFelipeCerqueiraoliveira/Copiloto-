@@ -41,6 +41,19 @@ header{background:linear-gradient(155deg,#0a3b35,#0d2d29 78%);color:#fff;padding
 .userDropdownRole{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--blue-tint);color:var(--blue-dark);font-size:11px;font-weight:800;margin-bottom:12px}
 .userDropdown .btn{width:100%;display:block}
 nav{background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:3px;padding:9px 22px;position:sticky;top:0;z-index:10;overflow:auto}nav button{border:0;background:none;padding:10px 15px;border-radius:99px;font-weight:700;font-size:13.5px;color:var(--muted);white-space:nowrap;transition:background .15s,color .15s}nav button.active{background:var(--blue);color:#fff}nav button:not(.active):hover{background:var(--blue-tint);color:var(--blue-dark)}
+.lbSideNavHandle{position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:41;width:22px;height:64px;border:0;border-radius:0 12px 12px 0;background:linear-gradient(155deg,#0c9488,#0a3b35);color:#fff;font-size:16px;font-weight:800;line-height:1;cursor:pointer;box-shadow:2px 0 10px #0003;display:flex;align-items:center;justify-content:center;transition:left .28s cubic-bezier(.4,0,.2,1),filter .15s}
+.lbSideNavHandle:hover{filter:brightness(1.12)}
+.lbSideNavHandle.open{left:250px}
+.lbSideNavHandle .lbSideNavArrow{display:inline-block;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.lbSideNavHandle.open .lbSideNavArrow{transform:rotate(180deg)}
+.lbSideNavOverlay{position:fixed;inset:0;background:#0a1f1c66;opacity:0;pointer-events:none;transition:opacity .28s;z-index:39}
+.lbSideNavOverlay.open{opacity:1;pointer-events:auto}
+.lbSideNav{position:fixed;top:0;left:0;height:100vh;width:250px;background:var(--card);border-right:1px solid var(--line);box-shadow:4px 0 24px #0004;z-index:40;display:flex;flex-direction:column;gap:2px;padding:18px 10px;overflow-y:auto;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.lbSideNav.open{transform:translateX(0)}
+.lbSideNavTitle{font-family:var(--font-head);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 12px 10px}
+.lbSideNav button{display:block;width:100%;text-align:left;border-radius:9px;padding:11px 12px}
+@media(max-width:720px){.lbSideNavHandle{width:20px;height:56px}.lbSideNav{width:82vw;max-width:280px}.lbSideNavHandle.open{left:82vw}}
+@media(prefers-reduced-motion:reduce){.lbSideNavHandle,.lbSideNav,.lbSideNavOverlay,.lbSideNavArrow{transition:none}}
 main{max-width:1500px;margin:22px auto;padding:0 20px}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0e262208}
 h1{font-size:24px;margin:0 0 5px;letter-spacing:-.01em}h2{font-size:17px;margin:0 0 13px}h3{font-size:14px;margin:18px 0 8px}.muted{color:var(--muted);font-size:13px}.form{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:#33534d}.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:9px;padding:10px;font-size:14px;background:var(--card);font-family:inherit;color:var(--ink)}.field textarea{min-height:145px;font-family:ui-monospace,Consolas,monospace}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;transition:filter .15s,transform .05s}.btn:hover{filter:brightness(1.06)}.primary{background:var(--blue);color:#fff;box-shadow:0 2px 8px #0c948840}.secondary{background:var(--blue-tint);color:var(--blue-dark)}.danger{background:var(--bad-bg);color:var(--red)}
 .status{padding:12px;border-radius:10px;font-weight:700;margin-bottom:12px}.ok{background:var(--ok-bg);color:var(--ok-fg)}.warn{background:var(--warn-bg);color:var(--warn-fg)}.bad{background:var(--bad-bg);color:var(--bad-fg)}
@@ -142,7 +155,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .confBadge.confPartial{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-border)}
 .confBadge.confUnknown{background:var(--bad-bg);color:var(--bad-fg);border:1px solid var(--bad-border)}
 @media print{
-  header,nav,.actions,.form,.userMenu,.lbIconBtn,#lbLoginWaves,.lbLoginMesh,#lbLogin,#lbToastBox{display:none!important}
+  header,nav,.actions,.form,.userMenu,.lbIconBtn,#lbLoginWaves,.lbLoginMesh,#lbLogin,#lbToastBox,.lbSideNavHandle,.lbSideNav,.lbSideNavOverlay{display:none!important}
   body,#lbApp,main{background:#fff!important;margin:0;padding:0;max-width:100%}
   .card{box-shadow:none!important;border:1px solid #ccc;break-inside:avoid}
   .grid{display:block}
@@ -205,6 +218,11 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </div>
 </div>
 <div id="lbApp">
+<button id="lbSideNavHandle" class="lbSideNavHandle" onclick="lbToggleSideNav()" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="lbSideNav"><span class="lbSideNavArrow">›</span></button>
+<div id="lbSideNavOverlay" class="lbSideNavOverlay" onclick="lbCloseSideNav()"></div>
+<nav id="lbSideNav" class="lbSideNav" aria-hidden="true">
+<div class="lbSideNavTitle">Serviços</div>
+</nav>
 <header><div class="brandBlock"><div class="brandMark">S</div><div><div class="brand">LexBank<span class="brandTag">Sankhya</span></div><div class="sub">Diagnóstico bancário • Boletos • Linha Digitável • CNAB 240/400</div></div></div><div class="headerRight">
 <div class="sub">v12 — identidade Sankhya</div>
 <button class="lbIconBtn" id="lbThemeToggle" onclick="lbToggleTheme()" title="Mudar tema" aria-label="Mudar tema claro/escuro">🌙</button>
@@ -219,7 +237,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </div>
 </div>
 </div></header>
-<nav>
+<nav id="lbMainNav">
 <button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button>
 </nav>
 <main>
@@ -1536,7 +1554,30 @@ $("bank").onchange=()=>{renderCritical();renderChecklist()};
 document.querySelectorAll("#diagnostico input,#diagnostico textarea").forEach(x=>x.addEventListener("input",renderChecklist));
 const lbDiagAuto=lbDebounce(()=>{ if($("digitline").value.trim()) runDiagnosis(false); },400);
 $("digitline").addEventListener("input",lbDiagAuto);
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
+/* ===== Menu lateral discreto (espelha as mesmas opções do menu de cima) ===== */
+function lbBuildSideNav(){
+  const side=$("lbSideNav");
+  document.querySelectorAll("#lbMainNav button").forEach(b=>{
+    const clone=document.createElement("button");
+    clone.dataset.tab=b.dataset.tab; clone.textContent=b.textContent;
+    if(b.classList.contains("active")) clone.classList.add("active");
+    side.appendChild(clone);
+  });
+}
+function lbOpenSideNav(){
+  $("lbSideNav").classList.add("open"); $("lbSideNav").setAttribute("aria-hidden","false");
+  $("lbSideNavOverlay").classList.add("open");
+  $("lbSideNavHandle").classList.add("open"); $("lbSideNavHandle").setAttribute("aria-expanded","true");
+}
+function lbCloseSideNav(){
+  $("lbSideNav").classList.remove("open"); $("lbSideNav").setAttribute("aria-hidden","true");
+  $("lbSideNavOverlay").classList.remove("open");
+  $("lbSideNavHandle").classList.remove("open"); $("lbSideNavHandle").setAttribute("aria-expanded","false");
+}
+function lbToggleSideNav(){ $("lbSideNav").classList.contains("open") ? lbCloseSideNav() : lbOpenSideNav(); }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") lbCloseSideNav(); });
+lbBuildSideNav();
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(`nav button[data-tab="${b.dataset.tab}"]`).forEach(x=>x.classList.add("active"));$(b.dataset.tab).classList.add("active");lbCloseSideNav();});
 renderCritical();renderChecklist();renderRules();renderDocs();renderHistory();renderEngineList();renderMaps();
 </script>
 </body></html>
