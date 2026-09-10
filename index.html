@@ -79,6 +79,8 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
 .livehint{font-size:11px;color:var(--muted);margin-top:-6px;margin-bottom:8px}
 .calloutWarn{background:var(--warn-bg);border-color:var(--warn-border)}
+.lbEmbedCard{padding:0;overflow:hidden}
+.lbEmbedFrame{width:100%;height:75vh;min-height:480px;border:0;display:block;background:#fff}
 
 /* ===== acesso restrito @sankhya.com.br =====
    #lbApp começa escondido e #lbLogin visível por padrão (sem depender de
@@ -149,7 +151,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </div>
 </div></header>
 <nav>
-<button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button>
+<button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button><button data-tab="bia">BIA (Sankhya)</button>
 </nav>
 <main>
 <section id="diagnostico" class="tab active">
@@ -181,6 +183,17 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <section id="biblioteca" class="tab"><div class="card"><h1>Biblioteca oficial</h1><div class="muted">Fontes iniciais. A plataforma deve armazenar a URL, documento, versão e vigência do manual usado como fonte normativa.</div><div id="docs"></div></div></section>
 
 <section id="historico" class="tab"><div class="card"><h1>Casos analisados</h1><div class="muted">Histórico local do navegador. Idealmente, a versão corporativa deverá usar banco de dados para compartilhamento da equipe.</div><div class="actions"><button class="btn danger" onclick="clearHistory()">Apagar casos locais</button></div><div id="history"></div></div></section>
+
+<section id="bia" class="tab">
+<div class="card">
+<h1>BIA — Inteligência Artificial Sankhya</h1>
+<div class="muted">Assistente oficial da Sankhya, incorporado aqui para consulta rápida sem trocar de aba. Sistemas com login corporativo costumam bloquear ser exibidos dentro de outra página por segurança — se a tela abaixo ficar em branco ou não carregar, use o botão para abrir em uma aba separada.</div>
+<div class="actions"><a class="btn primary" href="https://bia.sankhya.com.br/" target="_blank" rel="noopener">Abrir BIA em nova aba ↗</a></div>
+</div>
+<div class="card lbEmbedCard">
+<iframe src="https://bia.sankhya.com.br/" title="BIA — Sankhya" class="lbEmbedFrame" referrerpolicy="no-referrer-when-downgrade" loading="lazy"></iframe>
+</div>
+</section>
 
 <section id="motor" class="tab">
 <div class="card">
