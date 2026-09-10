@@ -238,7 +238,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </div>
 </div></header>
 <nav id="lbMainNav">
-<button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button>
+<button class="active" data-tab="diagnostico">Diagnóstico</button><button data-tab="comparador">Comparador</button><button data-tab="decodificacao">Decodificação</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="painel">Análise Guiada</button><button data-tab="historico">Casos</button>
 </nav>
 <main>
 <section id="diagnostico" class="tab active">
@@ -260,6 +260,13 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável</h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cmpBank"><option value="">Não informado</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Modalidade</label><input id="cmpMod"></div><div class="field"><label>Carteira</label><input id="cmpWallet"></div></div>
 <div class="two"><div class="field"><label>Sankhya</label><textarea id="line1"></textarea></div><div class="field"><label>Banco / referência</label><textarea id="line2"></textarea></div></div><div class="actions"><button class="btn primary" onclick="compare()">COMPARAR</button></div><div id="cmpResult"></div></div></section>
+
+<section id="decodificacao" class="tab"><div class="card"><h1>Decodificação da linha digitável</h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
+<div class="form"><div class="field"><label>Banco (contexto)</label><select id="decodBank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div></div>
+<div class="field full"><label>Linha digitável</label><textarea id="decodLine" placeholder="Cole a linha digitável, o código de barras ou a linha de arrecadação"></textarea></div>
+<div class="actions"><button class="btn primary" onclick="decodeSingleLine()">DECODIFICAR</button></div>
+<div id="decodResult"><div class="muted">Nenhuma linha decodificada ainda.</div></div>
+</div></section>
 
 <section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer</h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. A busca destaca as ocorrências do termo direto na amostra.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cnabBank"><option value="">Automático</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Formato</label><select id="cnabFormat"><option>Automático</option><option>CNAB 240</option><option>CNAB 400</option></select></div><div class="field"><label>Pesquisar termo</label><input id="cnabSearch" placeholder="Ex.: 0001234567"></div><div class="field"><label>Posição inicial</label><input id="cnabPosStart" type="number" min="1"></div><div class="field"><label>Posição final</label><input id="cnabPosEnd" type="number" min="1"></div><div class="field full"><label>Arquivo / conteúdo</label><input id="cnabFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="cnabText" placeholder="Cole o CNAB aqui..."></textarea></div></div>
@@ -779,6 +786,69 @@ function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
   });
   return {fields,tmpl};
 }
+/* Tokens do template que representam um dígito verificador dentro do Campo Livre
+   (não um dado de negócio como agência/conta/convênio). Usado para diferenciar, na
+   comparação, "🔴 valor divergente" de "🟠 dígito verificador divergente" — são
+   situações diferentes e não podem ser mostradas com o mesmo peso/ícone. */
+const LB_DV_TOKENS=new Set(["D","G","Z","O"]);
+/* Decodifica TODOS os campos nomeados do template (não só os que divergem) a partir
+   de uma única linha — é a base tanto da tela de Decodificação quanto da comparação
+   completa por campo. Campos com token "?" nunca aparecem aqui: não inventamos. */
+function lbCampoLivreAllFields(bank,len,rawLine){
+  const tmpl=getBankTemplate(bank);
+  const cl=rawLine?lbExtractCampoLivre(len,rawLine):null;
+  if(!tmpl||!cl) return {fields:[],tmpl};
+  const fields=lbTemplateFieldRanges(tmpl).filter(r=>r.token!=="?").map(r=>{
+    const fp1=lbCampoLivreIdxToPos(len,r.start), fp2=lbCampoLivreIdxToPos(len,r.end);
+    return {label:r.label,token:r.token,posCL:`${r.start}-${r.end}`,
+      posLinha:(fp1&&fp2)?`${fp1}-${fp2}`:"—",value:cl.slice(r.start-1,r.end)};
+  });
+  return {fields,tmpl};
+}
+/* Comparação campo a campo (não posição a posição): banco, vencimento e valor da
+   estrutura geral, mais cada campo nomeado do Campo Livre que o layout do banco já
+   tem comprovado. Só cobre linhas de cobrança/código de barras (47/44), onde banco,
+   fator e valor têm posição fixa e conhecida — arrecadação (48) não entra aqui. */
+function lbCompareAllFields(bank,len,rawA,rawB){
+  const rows=[];
+  if(len===47||len===44){
+    const bankPos=[1,3], fatorPos=len===47?[34,37]:[6,9], valorPos=len===47?[38,47]:[10,19];
+    const bA=rawA.slice(bankPos[0]-1,bankPos[1]), bB=rawB.slice(bankPos[0]-1,bankPos[1]);
+    rows.push({label:"Banco",kind:"info",posLinha:`${bankPos[0]}-${bankPos[1]}`,posCL:"—",valueA:bA,valueB:bB,equal:bA===bB});
+    const fA=rawA.slice(fatorPos[0]-1,fatorPos[1]), fB=rawB.slice(fatorPos[0]-1,fatorPos[1]);
+    rows.push({label:"Vencimento",kind:"info",posLinha:`${fatorPos[0]}-${fatorPos[1]}`,posCL:"—",
+      valueA:lbFactorToDates(fA).nova.toLocaleDateString("pt-BR"),valueB:lbFactorToDates(fB).nova.toLocaleDateString("pt-BR"),equal:fA===fB});
+    const vA=rawA.slice(valorPos[0]-1,valorPos[1]), vB=rawB.slice(valorPos[0]-1,valorPos[1]);
+    rows.push({label:"Valor",kind:"info",posLinha:`${valorPos[0]}-${valorPos[1]}`,posCL:"—",
+      valueA:lbValorFromDigits(vA).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}),
+      valueB:lbValorFromDigits(vB).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}),equal:vA===vB});
+  }
+  const {fields}=lbCampoLivreAllFields(bank,len,rawA);
+  const clB=lbExtractCampoLivre(len,rawB);
+  fields.forEach(f=>{
+    const [s,e]=f.posCL.split("-").map(Number);
+    const valueB=clB?clB.slice(s-1,e):null;
+    rows.push({label:f.label,kind:LB_DV_TOKENS.has(f.token)?"dv":"info",posLinha:f.posLinha,posCL:f.posCL,valueA:f.value,valueB,equal:f.value===valueB});
+  });
+  return rows;
+}
+function lbFieldStatusIcon(row){ return row.equal ? "🟢" : (row.kind==="dv" ? "🟠" : "🔴"); }
+/* Texto de diagnóstico a partir das linhas da comparação por campo — segue a mesma
+   lógica de priorização usada no resto do laudo: um campo de negócio divergente
+   (🔴) é a causa mais provável; um DV divergente sozinho (🟠) vira a causa só
+   quando não há nenhum campo de negócio também divergente. */
+function lbBuildFieldDiagnosis(rows){
+  const diffs=rows.filter(r=>!r.equal);
+  if(!diffs.length) return "<p class='status ok'>✅ Nenhuma divergência de campo identificada nesta comparação.</p>";
+  const infoDiffs=diffs.filter(d=>d.kind!=="dv"), dvDiffs=diffs.filter(d=>d.kind==="dv");
+  const main=infoDiffs[0]||dvDiffs[0];
+  const posWord=main.posLinha.includes("-")?"posições":"posição";
+  if(diffs.length===1){
+    return `<p>Foi identificada divergência em <b>${main.label}</b>. A linha digitável gerada pelo Sankhya possui o valor <code>${main.valueA}</code>, enquanto a linha fornecida pelo banco possui o valor <code>${main.valueB}</code>. A divergência está localizada na${posWord==="posições"?"s":""} ${posWord} ${main.posLinha} da linha digitável${main.posCL!=="—"?` (posição ${main.posCL} do Campo Livre)`:""}.</p>`;
+  }
+  return `<p>Foram identificadas ${diffs.length} divergências: ${diffs.map(d=>d.label).join(", ")}.</p>`+
+    `<p>O principal ponto divergente identificado foi <b>${main.label}</b>, localizado na${posWord==="posições"?"s":""} ${posWord} ${main.posLinha} da linha digitável.</p>`;
+}
 function lbBankMismatchWarning(selectedBank,decodedBank){
   if(!decodedBank||!selectedBank||decodedBank===selectedBank) return "";
   const selName=banks[selectedBank]?banks[selectedBank].name:selectedBank;
@@ -805,6 +875,39 @@ function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   }
   if(dv.length) html+="<p class='muted'>Os dígitos verificadores também divergem — isso é consequência natural do Campo Livre diferente, não uma causa independente.</p>";
   return html;
+}
+
+/* ===== Decodificação de uma única linha ===== */
+function decodeSingleLine(){
+  const selBank=$("decodBank").value, raw=$("decodLine").value;
+  if(!clean(raw)){ $("decodResult").innerHTML="<div class='muted'>Nenhuma linha decodificada ainda.</div>"; return; }
+  const parsed=lbDiagnoseLine(raw);
+  if(!parsed.ok){ $("decodResult").innerHTML=`<div class="status bad">❌ ${parsed.error}</div>`; return; }
+  const effBank=parsed.banco||selBank;
+  let html=`<div class="kpis"><div class="kpi">Banco<b>${banks[parsed.banco]?banks[parsed.banco].name:(parsed.banco||"—")}</b></div><div class="kpi">Tipo<b>${parsed.type}</b></div><div class="kpi">Tamanho<b>${parsed.length} dígitos</b></div></div>`;
+  html+=lbBankMismatchWarning(selBank,parsed.banco);
+  html+="<h3>Estrutura geral</h3>"+lbRenderFields(parsed);
+  if(parsed.barcode) html+=`<p class="muted">Código de barras reconstruído: <code>${parsed.barcode}</code></p>`;
+  if(parsed.valor!=null) html+=`<p class="muted">Valor decodificado: <b>${parsed.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b>.</p>`;
+  if(parsed.dates) html+=`<p class="muted">Vencimento decodificado — regra vigente (desde 22/02/2025): <b>${parsed.dates.nova.toLocaleDateString("pt-BR")}</b>; regra anterior: ${parsed.dates.antiga.toLocaleDateString("pt-BR")}.</p>`;
+  if(parsed.campoLivre!=null){
+    const tmpl=getBankTemplate(effBank);
+    const {badge,note}=lbConfidenceBadge(effBank);
+    html+=`<h3>Campos do Campo Livre ${tmpl?badge:""}</h3>`;
+    if(!tmpl){
+      html+="<p class='muted'>Nenhum template de Campo Livre cadastrado para este banco ainda. Cadastre em Gerador/Validador a partir de um caso real (linha Sankhya × linha do banco).</p>";
+    } else {
+      const {fields}=lbCampoLivreAllFields(effBank,parsed.length,clean(raw));
+      if(!fields.length){
+        html+="<p class='muted'>O template deste banco ainda não tem nenhuma posição confirmada por caso real — nada é exibido aqui até haver comprovação, para não arriscar um diagnóstico incorreto.</p>";
+      } else {
+        html+="<table><tr><th>Campo</th><th>Posição na linha</th><th>Posição no Campo Livre</th><th>Valor</th></tr>"+
+          fields.map(f=>`<tr><td>${f.label}${LB_DV_TOKENS.has(f.token)?" <span class='muted'>(DV)</span>":""}</td><td class="pos">${f.posLinha}</td><td class="pos">${f.posCL}</td><td class="pos">${f.value}</td></tr>`).join("")+
+          "</table>"+`<p class="muted">${note}</p>`;
+      }
+    }
+  }
+  $("decodResult").innerHTML=html;
 }
 
 /* ======================================================================
@@ -874,6 +977,7 @@ function lbParseCobranca(lineRaw){
   const base43=banco+moeda+fator+valorDigits+campoLivre;
   const calcDvGeral=lbMod11General(base43);
   return {ok:true, length:47, banco, moeda, campoLivre, fator, valorDigits,
+    barcode: banco+moeda+String(dvGeral)+fator+valorDigits+campoLivre,
     valor:lbValorFromDigits(valorDigits), dates:lbFactorToDates(fator),
     fields:[
       {name:"Banco",pos:"1-3",value:banco},
@@ -975,6 +1079,14 @@ function getBankTemplates(){
   if(!t["001"]){ t["001"]="??????CCCCCCC????????????"; changed=true; } // Convênio 7 dígitos verificado nas posições 7-13 do Campo Livre; demais posições ainda não confirmadas
   if(!t["104"]){ t["104"]="CCCCCCC??????????????????"; changed=true; } // Caixa: Código do Cedente (6 dígitos + DV) verificado nas posições 1-7 do Campo Livre a partir de caso real; a ordem interna (DV antes ou depois dos 6 dígitos) varia entre Sankhya e o banco — ver observação no laudo; demais posições ainda não confirmadas
   if(!t["341"]){ t["341"]="KKKNNNNNNNNDAAAAVVVVVG000"; changed=true; } // Itaú, carteira 109: Carteira(3)+NossoNúmero(8)+DV NN(1)+Agência(4)+Conta(5)+DV Ag/Conta(1)+zeros fixos(3), verificado integralmente a partir de caso real (Agência e Conta idênticas nas duas linhas confirmam a fronteira)
+  // Santander, Sicoob, Sicredi e Safra: bancos já suportados nas demais telas (diagnóstico,
+  // regras, checklist), mas NENHUMA posição do Campo Livre foi comprovada por caso real ainda —
+  // por isso o template fica só com "?" (nenhum campo nomeado é exibido/comparado até termos um
+  // par de linhas Sankhya×banco real para provar as posições, igual foi feito para os demais bancos).
+  if(!t["033"]){ t["033"]="?????????????????????????"; changed=true; }
+  if(!t["756"]){ t["756"]="?????????????????????????"; changed=true; }
+  if(!t["748"]){ t["748"]="?????????????????????????"; changed=true; }
+  if(!t["422"]){ t["422"]="?????????????????????????"; changed=true; }
   if(changed) localStorage.setItem("lexbank_templates",JSON.stringify(t));
   return t;
 }
@@ -1338,6 +1450,16 @@ function generateReport(save){
         html+="<h3>4. Causa provável</h3><ul>"+causeList.map(c=>"<li>"+c+"</li>").join("")+"</ul>";
         html+=lbCampoLivreNote(effBank,len,diffs,rawA,rawB);
       }
+      if(len===47||len===44){
+        const cmpRows=lbCompareAllFields(effBank,len,rawA,rawB);
+        if(cmpRows.length){
+          const {badge}=lbConfidenceBadge(effBank);
+          html+=`<h3>5. Comparação por campo (Sankhya × Banco) ${getBankTemplate(effBank)?badge:""}</h3>`;
+          html+="<table><tr><th>Campo</th><th>Sankhya</th><th>Banco</th><th>Posição na linha</th><th>Resultado</th></tr>"+
+            cmpRows.map(r=>`<tr><td>${r.label}${r.kind==="dv"?" <span class='muted'>(DV)</span>":""}</td><td class="pos">${r.valueA}</td><td class="pos">${r.valueB}</td><td class="pos">${r.posLinha}</td><td>${lbFieldStatusIcon(r)}</td></tr>`).join("")+
+            "</table>"+lbBuildFieldDiagnosis(cmpRows);
+        }
+      }
     }
   } else if(bankLineTxt&&bLine&&!bLine.ok){
     html+=`<h3>2. A linha do banco é válida?</h3><div class="status bad">❌ ${bLine.error}</div>`;
@@ -1514,6 +1636,9 @@ const lbReportAuto=lbDebounce(()=>{ if($("reportSankhya").value.trim()) generate
 $("reportSankhya").addEventListener("input",lbReportAuto);
 $("reportBankLine").addEventListener("input",lbReportAuto);
 $("reportBank").addEventListener("change",lbReportAuto);
+const lbDecodAuto=lbDebounce(decodeSingleLine,350);
+$("decodLine").addEventListener("input",lbDecodAuto);
+$("decodBank").addEventListener("change",lbDecodAuto);
 
 const lbGuidedAuto=lbDebounce(()=>{ if($("gLine").value.trim()) runGuidedDiagnosis(false); },350);
 ["gLine","gBankLine","gValue"].forEach(id=>$(id).addEventListener("input",lbGuidedAuto));
