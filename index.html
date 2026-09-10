@@ -85,8 +85,26 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
    classe no <body>, que um host de publicação pode não deixar controlar);
    o JS de autenticação inverte isso quando libera o acesso. */
 #lbApp{display:none;opacity:0}
-#lbLogin{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;background:radial-gradient(1200px 700px at 12% -10%,#154944 0%,#0a3b35 45%,#071614 100%)}
-.lbLoginWrap{width:100%;max-width:840px;min-height:480px;background:#fff;border-radius:22px;box-shadow:0 24px 70px #00000050;display:flex;overflow:hidden}
+#lbLogin{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:radial-gradient(1400px 900px at 15% -10%,#142a46 0%,#0b1526 48%,#05080f 100%)}
+#lbLogin::before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(closest-side,#000 0%,transparent 85%);-webkit-mask-image:radial-gradient(closest-side,#000 0%,transparent 85%)}
+.lbLoginWaves{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.lbLoginWaves svg{width:100%;height:100%;display:block}
+.lbWaveLine path{fill:none;stroke-linecap:round}
+.lbWaveOrange path{stroke:#ff9d4d}
+.lbWaveGreen path{stroke:#3ddc97}
+.lbWaveCyan path{stroke:#38bdf8}
+.lbWavePurple path{stroke:#a78bfa}
+.lbWaveLine{opacity:.7}
+.lbWaveOrange{animation:lbWaveScrollOrange 16s linear infinite}
+.lbWaveGreen{animation:lbWaveScrollGreen 20s linear infinite reverse}
+.lbWaveCyan{animation:lbWaveScrollCyan 24s linear infinite}
+.lbWavePurple{animation:lbWaveScrollPurple 18s linear infinite reverse}
+@keyframes lbWaveScrollOrange{from{transform:translateX(0)}to{transform:translateX(-420px)}}
+@keyframes lbWaveScrollGreen{from{transform:translateX(0)}to{transform:translateX(-380px)}}
+@keyframes lbWaveScrollCyan{from{transform:translateX(0)}to{transform:translateX(-460px)}}
+@keyframes lbWaveScrollPurple{from{transform:translateX(0)}to{transform:translateX(-400px)}}
+@media(prefers-reduced-motion:reduce){.lbWaveLine{animation:none}}
+.lbLoginWrap{position:relative;z-index:1;width:100%;max-width:840px;min-height:480px;background:#fff;border-radius:22px;box-shadow:0 24px 70px #00000050;display:flex;overflow:hidden}
 .lbLoginBrand{flex:0 0 320px;background:linear-gradient(165deg,#0d3b35,#0a2622);color:#fff;padding:38px 32px;display:flex;flex-direction:column;justify-content:center}
 .lbLoginBrand .lbLoginMark{width:46px;height:46px;border-radius:13px;margin:0 0 20px;background:linear-gradient(150deg,#5fd6c4,var(--blue));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:19px;color:#06231f;box-shadow:0 6px 16px #0009}
 .lbLoginBrand h2{font-family:var(--font-head);font-size:22px;margin:0 0 8px;letter-spacing:-.01em}
@@ -111,6 +129,12 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </head>
 <body>
 <div id="lbLogin">
+<div class="lbLoginWaves" aria-hidden="true"><svg viewBox="0 0 1600 340" preserveAspectRatio="none">
+<g class="lbWaveLine lbWaveOrange"><path d="M-420,210 Q-315.0,176.0 -210.0,210 Q-105.0,244.0 0.0,210 Q105.0,176.0 210.0,210 Q315.0,244.0 420.0,210 Q525.0,176.0 630.0,210 Q735.0,244.0 840.0,210 Q945.0,176.0 1050.0,210 Q1155.0,244.0 1260.0,210 Q1365.0,176.0 1470.0,210 Q1575.0,244.0 1680.0,210 Q1785.0,176.0 1890.0,210 Q1995.0,244.0 2100.0,210 Q2205.0,176.0 2310.0,210 Q2415.0,244.0 2520.0,210 Q2625.0,176.0 2730.0,210 Q2835.0,244.0 2940.0,210 Q3045.0,176.0 3150.0,210 Q3255.0,244.0 3360.0,210 Q3465.0,176.0 3570.0,210 Q3675.0,244.0 3780.0,210" stroke-width="3"/></g>
+<g class="lbWaveLine lbWaveGreen"><path d="M-380,90 Q-285.0,136.0 -190.0,90 Q-95.0,44.0 0.0,90 Q95.0,136.0 190.0,90 Q285.0,44.0 380.0,90 Q475.0,136.0 570.0,90 Q665.0,44.0 760.0,90 Q855.0,136.0 950.0,90 Q1045.0,44.0 1140.0,90 Q1235.0,136.0 1330.0,90 Q1425.0,44.0 1520.0,90 Q1615.0,136.0 1710.0,90 Q1805.0,44.0 1900.0,90 Q1995.0,136.0 2090.0,90 Q2185.0,44.0 2280.0,90 Q2375.0,136.0 2470.0,90 Q2565.0,44.0 2660.0,90 Q2755.0,136.0 2850.0,90 Q2945.0,44.0 3040.0,90 Q3135.0,136.0 3230.0,90 Q3325.0,44.0 3420.0,90 Q3515.0,136.0 3610.0,90" stroke-width="3"/></g>
+<g class="lbWaveLine lbWaveCyan"><path d="M-460,235 Q-345.0,205.0 -230.0,235 Q-115.0,265.0 0.0,235 Q115.0,205.0 230.0,235 Q345.0,265.0 460.0,235 Q575.0,205.0 690.0,235 Q805.0,265.0 920.0,235 Q1035.0,205.0 1150.0,235 Q1265.0,265.0 1380.0,235 Q1495.0,205.0 1610.0,235 Q1725.0,265.0 1840.0,235 Q1955.0,205.0 2070.0,235 Q2185.0,265.0 2300.0,235 Q2415.0,205.0 2530.0,235 Q2645.0,265.0 2760.0,235 Q2875.0,205.0 2990.0,235 Q3105.0,265.0 3220.0,235 Q3335.0,205.0 3450.0,235 Q3565.0,265.0 3680.0,235" stroke-width="2.5"/></g>
+<g class="lbWaveLine lbWavePurple"><path d="M-400,150 Q-300.0,190.0 -200.0,150 Q-100.0,110.0 0.0,150 Q100.0,190.0 200.0,150 Q300.0,110.0 400.0,150 Q500.0,190.0 600.0,150 Q700.0,110.0 800.0,150 Q900.0,190.0 1000.0,150 Q1100.0,110.0 1200.0,150 Q1300.0,190.0 1400.0,150 Q1500.0,110.0 1600.0,150 Q1700.0,190.0 1800.0,150 Q1900.0,110.0 2000.0,150 Q2100.0,190.0 2200.0,150 Q2300.0,110.0 2400.0,150 Q2500.0,190.0 2600.0,150 Q2700.0,110.0 2800.0,150 Q2900.0,190.0 3000.0,150 Q3100.0,110.0 3200.0,150 Q3300.0,190.0 3400.0,150 Q3500.0,110.0 3600.0,150" stroke-width="2.5"/></g>
+</svg></div>
 <div class="lbLoginWrap">
 <div class="lbLoginBrand">
 <div class="lbLoginMark">S</div>
