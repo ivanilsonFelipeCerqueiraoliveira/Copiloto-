@@ -154,8 +154,10 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .confBadge.confVerified{background:var(--ok-bg);color:var(--ok-fg);border:1px solid var(--ok-border)}
 .confBadge.confPartial{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-border)}
 .confBadge.confUnknown{background:var(--bad-bg);color:var(--bad-fg);border:1px solid var(--bad-border)}
+.lbPrintBtn{border:1px solid var(--line);background:var(--card);color:var(--muted);width:26px;height:26px;border-radius:50%;font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:9px;vertical-align:middle;transition:background .15s,color .15s,border-color .15s}
+.lbPrintBtn:hover{background:var(--blue-tint);color:var(--blue-dark);border-color:var(--blue)}
 @media print{
-  header,nav,.actions,.form,.userMenu,.lbIconBtn,#lbLoginWaves,.lbLoginMesh,#lbLogin,#lbToastBox,.lbSideNavHandle,.lbSideNav,.lbSideNavOverlay{display:none!important}
+  header,nav,.actions,.form,.two,.userMenu,.lbIconBtn,.lbPrintBtn,#lbLoginWaves,.lbLoginMesh,#lbLogin,#lbToastBox,.lbSideNavHandle,.lbSideNav,.lbSideNavOverlay{display:none!important}
   body,#lbApp,main{background:#fff!important;margin:0;padding:0;max-width:100%}
   .card{box-shadow:none!important;border:1px solid #ccc;break-inside:avoid}
   .grid{display:block}
@@ -243,7 +245,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <main>
 <section id="diagnostico" class="tab active">
 <div class="grid"><div>
-<div class="card"><h1>Diagnóstico de configuração bancária</h1><div class="muted">Objetivo: identificar quais dados precisam ser conferidos antes de reproduzir o boleto no Sankhya. O sistema não presume uma regra bancária que não esteja cadastrada.</div>
+<div class="card"><h1>Diagnóstico de configuração bancária<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Objetivo: identificar quais dados precisam ser conferidos antes de reproduzir o boleto no Sankhya. O sistema não presume uma regra bancária que não esteja cadastrada.</div>
 <h3>Conta / cobrança</h3><div class="form">
 <div class="field"><label>Banco</label><select id="bank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
 <div class="field"><label>Agência</label><input id="agency"></div><div class="field"><label>Conta + DV</label><input id="account"></div>
@@ -257,18 +259,18 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div><div class="card"><h2>Checklist</h2><div id="checklist"></div></div><div class="card"><h2>Campos críticos</h2><div id="critical"></div></div><div class="card"><h2>Regras disponíveis</h2><div id="ruleStatus"></div></div></div></div>
 </section>
 
-<section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável</h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
+<section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cmpBank"><option value="">Não informado</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Modalidade</label><input id="cmpMod"></div><div class="field"><label>Carteira</label><input id="cmpWallet"></div></div>
 <div class="two"><div class="field"><label>Sankhya</label><textarea id="line1"></textarea></div><div class="field"><label>Banco / referência</label><textarea id="line2"></textarea></div></div><div class="actions"><button class="btn primary" onclick="compare()">COMPARAR</button></div><div id="cmpResult"></div></div></section>
 
-<section id="decodificacao" class="tab"><div class="card"><h1>Decodificação da linha digitável</h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
+<section id="decodificacao" class="tab"><div class="card"><h1>Decodificação da linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
 <div class="form"><div class="field"><label>Banco (contexto)</label><select id="decodBank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div></div>
 <div class="field full"><label>Linha digitável</label><textarea id="decodLine" placeholder="Cole a linha digitável, o código de barras ou a linha de arrecadação"></textarea></div>
 <div class="actions"><button class="btn primary" onclick="decodeSingleLine()">DECODIFICAR</button></div>
 <div id="decodResult"><div class="muted">Nenhuma linha decodificada ainda.</div></div>
 </div></section>
 
-<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer</h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. A busca destaca as ocorrências do termo direto na amostra.</div>
+<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. A busca destaca as ocorrências do termo direto na amostra.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cnabBank"><option value="">Automático</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Formato</label><select id="cnabFormat"><option>Automático</option><option>CNAB 240</option><option>CNAB 400</option></select></div><div class="field"><label>Pesquisar termo</label><input id="cnabSearch" placeholder="Ex.: 0001234567"></div><div class="field"><label>Posição inicial</label><input id="cnabPosStart" type="number" min="1"></div><div class="field"><label>Posição final</label><input id="cnabPosEnd" type="number" min="1"></div><div class="field full"><label>Arquivo / conteúdo</label><input id="cnabFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="cnabText" placeholder="Cole o CNAB aqui..."></textarea></div></div>
 <div class="actions"><button class="btn primary" onclick="analyzeCNAB()">ANALISAR ARQUIVO</button><button class="btn secondary" onclick="findPosition()">CONSULTAR POSIÇÃO</button></div><div id="cnabResult"></div></div></section>
 
@@ -372,7 +374,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 
 <section id="laudo" class="tab">
 <div class="card">
-<h1>Laudo Automático de Divergência</h1>
+<h1>Laudo Automático de Divergência<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
 <div class="muted">Cole a linha do Sankhya e a linha de referência do banco. O motor valida os dígitos verificadores de cada linha isoladamente, decodifica valor e vencimento, compara posição a posição e aponta a causa provável — exatamente como uma análise manual de linha digitável. O laudo é atualizado automaticamente enquanto você cola/edita as linhas.</div>
 <div class="form">
 <div class="field"><label>Banco</label><select id="reportBank"><option value="237">237 — Bradesco</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
@@ -381,14 +383,14 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="field full"><label>Linha Sankhya</label><textarea id="reportSankhya"></textarea></div>
 <div class="field full"><label>Linha Banco / referência</label><textarea id="reportBankLine"></textarea></div>
 </div>
-<div class="actions"><button class="btn primary" onclick="generateReport()">GERAR LAUDO</button><button class="btn secondary" onclick="printReport()">IMPRIMIR / PDF</button></div>
+<div class="actions"><button class="btn primary" onclick="generateReport()">GERAR LAUDO</button></div>
 </div>
 <div class="card"><div id="reportResult"><div class="muted">Nenhum laudo gerado.</div></div></div>
 </section>
 
 <section id="cnabint" class="tab">
 <div class="card">
-<h1>CNAB Inteligente — Analisador Posicional</h1>
+<h1>CNAB Inteligente — Analisador Posicional<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
 <div class="muted">Cole um arquivo CNAB 240/400 ou uma linha isolada. O analisador identifica o tipo de registro, segmento quando possível, conta posições e permite consultar o mapa cadastrado para o banco.</div>
 <div class="form">
 <div class="field"><label>Banco</label><select id="cnabBank2"><option value="237">237 — Bradesco</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
@@ -444,7 +446,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 
 <section id="painel" class="tab">
 <div class="card">
-<h1>Diagnóstico Guiado</h1>
+<h1>Diagnóstico Guiado<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
 <div class="muted">Fluxo rápido para descobrir onde está a divergência: cadastro → título → composição → dígitos verificadores → CNAB → causa provável → ação recomendada. A análise roda sozinha assim que você cola a linha (ou pressione Enter).</div>
 
 <div class="stepper">
@@ -1470,7 +1472,7 @@ function generateReport(save){
   $("reportResult").innerHTML=html;
   if(save)saveReportCase(bank,ref,errsA.length?"Divergência interna na linha do Sankhya":"Estrutura da linha do Sankhya OK");
 }
-function printReport(){ window.print() }
+function lbPrint(){ window.print() }
 function saveReportCase(bank,ref,status){
   let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");
   h.unshift({data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Sem referência",status:"Laudo: "+status});
