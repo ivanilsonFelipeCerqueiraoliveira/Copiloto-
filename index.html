@@ -155,6 +155,9 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .confBadge.confVerified{background:var(--ok-bg);color:var(--ok-fg);border:1px solid var(--ok-border)}
 .confBadge.confPartial{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-border)}
 .confBadge.confUnknown{background:var(--bad-bg);color:var(--bad-fg);border:1px solid var(--bad-border)}
+.lbBarcodeWrap{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px;display:inline-block;max-width:100%;overflow-x:auto;margin:6px 0}
+.lbBarcodeSvg rect{fill:#000}
+.lbBarcodeDigits{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:.8px;color:#000;text-align:center;margin-top:8px;white-space:nowrap}
 .lbPrintBtn{border:1px solid var(--line);background:var(--card);color:var(--muted);width:26px;height:26px;border-radius:50%;font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:9px;vertical-align:middle;transition:background .15s,color .15s,border-color .15s}
 .lbPrintBtn:hover{background:var(--blue-tint);color:var(--blue-dark);border-color:var(--blue)}
 @media print{
@@ -901,7 +904,12 @@ function decodeSingleLine(){
   let html=`<div class="kpis"><div class="kpi">Banco<b>${banks[parsed.banco]?banks[parsed.banco].name:(parsed.banco||"—")}</b></div><div class="kpi">Tipo<b>${parsed.type}</b></div><div class="kpi">Tamanho<b>${parsed.length} dígitos</b></div></div>`;
   html+=lbBankMismatchWarning(selBank,parsed.banco);
   html+="<h3>Estrutura geral</h3>"+lbRenderFields(parsed);
-  if(parsed.barcode) html+=`<p class="muted">Código de barras reconstruído: <code>${parsed.barcode}</code></p>`;
+  const barcodeDigits=parsed.barcode||(parsed.length===44?clean(raw):null);
+  if(barcodeDigits){
+    html+="<h3>Código de barras</h3>";
+    html+=`<div class="lbBarcodeWrap">${lbBarcodeSvg(barcodeDigits)}<div class="lbBarcodeDigits">${barcodeDigits}</div></div>`;
+    html+="<p class=\"muted\">Padrão 2 de 5 Intercalado (ITF), o mesmo usado nos boletos impressos — pode ser lido por qualquer leitor de código de barras do celular.</p>";
+  }
   if(parsed.valor!=null) html+=`<p class="muted">Valor decodificado: <b>${parsed.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b>.</p>`;
   if(parsed.dates) html+=`<p class="muted">Vencimento decodificado — regra vigente (desde 22/02/2025): <b>${parsed.dates.nova.toLocaleDateString("pt-BR")}</b>; regra anterior: ${parsed.dates.antiga.toLocaleDateString("pt-BR")}.</p>`;
   if(parsed.campoLivre!=null){
@@ -929,6 +937,41 @@ function decodeSingleLine(){
    Regras públicas (módulo 10, módulo 11, fator de vencimento). A
    semântica do Campo Livre é específica de cada banco (ver templates).
    ====================================================================== */
+
+/* Código de barras visual — padrão "2 de 5 Intercalado" (ITF), o mesmo usado em
+   boletos bancários reais. N = elemento estreito, W = elemento largo; cada dígito
+   usa exatamente 2 elementos largos entre 5 (por isso "2 de 5"). Tabela pública e
+   fixa do padrão ITF — não é específica de banco nenhum. */
+const LB_ITF_PATTERNS={
+  "0":"NNWWN","1":"WNNNW","2":"NWNNW","3":"WWNNN","4":"NNWNW",
+  "5":"WNWNN","6":"NWWNN","7":"NNNWW","8":"WNNWN","9":"NWNWN"
+};
+function lbEncodeITF(digits){
+  if(!/^\d+$/.test(digits)||digits.length%2!==0) return null;
+  const N=1,W=2.5, els=[];
+  els.push({bar:true,w:N},{bar:false,w:N},{bar:true,w:N},{bar:false,w:N}); // início
+  for(let i=0;i<digits.length;i+=2){
+    const p1=LB_ITF_PATTERNS[digits[i]], p2=LB_ITF_PATTERNS[digits[i+1]];
+    for(let j=0;j<5;j++){
+      els.push({bar:true,w:p1[j]==="W"?W:N});
+      els.push({bar:false,w:p2[j]==="W"?W:N});
+    }
+  }
+  els.push({bar:true,w:W},{bar:false,w:N},{bar:true,w:N}); // parada
+  return els;
+}
+function lbBarcodeSvg(digits){
+  const els=lbEncodeITF(digits);
+  if(!els) return "";
+  const unit=2.2, height=70;
+  let x=0; const bars=[];
+  els.forEach(e=>{
+    const w=e.w*unit;
+    if(e.bar) bars.push(`<rect x="${x.toFixed(2)}" y="0" width="${w.toFixed(2)}" height="${height}"/>`);
+    x+=w;
+  });
+  return `<svg class="lbBarcodeSvg" width="${x.toFixed(2)}" height="${height}" viewBox="0 0 ${x.toFixed(2)} ${height}" role="img" aria-label="Código de barras do boleto">${bars.join("")}</svg>`;
+}
 
 function lbMod10Variant(digits,sumMode){
   let sum=0,w=2;
