@@ -99,7 +99,16 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
    classe no <body>, que um host de publicação pode não deixar controlar);
    o JS de autenticação inverte isso quando libera o acesso. */
 #lbApp{display:none;opacity:0}
-#lbLogin{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:radial-gradient(1400px 900px at 20% 0%,#123a3f 0%,#0a1f2e 40%,#050b16 100%)}
+/* A tela de login fica travada nas cores do tema claro sempre, não importa o tema
+   escolhido no app (ou o do sistema) — redeclarar as variáveis aqui garante que
+   var(--ink)/var(--muted)/etc. usadas por qualquer campo dentro do login resolvam
+   pro valor claro, sem precisar sobrescrever cada propriedade uma por uma. */
+#lbLogin{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:radial-gradient(1400px 900px at 20% 0%,#123a3f 0%,#0a1f2e 40%,#050b16 100%);
+  color-scheme:light;
+  --bg:#f1f7f6;--card:#fff;--surface-2:#eaf4f2;--ink:#0e2622;--muted:#5b7570;--line:#dbe8e5;
+  --blue:#0c9488;--blue-dark:#0a3b35;--blue-tint:#e3f5f1;--green:#127a55;--yellow:#a8681c;--red:#bf3728;
+  --ok-bg:#e9f7f0;--ok-border:#9adcbb;--ok-fg:#0d4d34;--warn-bg:#fdf3e5;--warn-border:#f0cf9a;--warn-fg:#6b4712;--bad-bg:#fdecea;--bad-border:#f0b3ab;--bad-fg:#7c2318;
+}
 .lbLoginMesh{position:absolute;left:-10%;right:-10%;top:-8%;height:62%;pointer-events:none;overflow:hidden;
   clip-path:polygon(0% 0%,100% 0%,100% 10%,88% 20%,75% 32%,60% 40%,50% 43%,40% 40%,25% 32%,12% 20%,0% 10%);
   -webkit-clip-path:polygon(0% 0%,100% 0%,100% 10%,88% 20%,75% 32%,60% 40%,50% 43%,40% 40%,25% 32%,12% 20%,0% 10%)}
@@ -209,17 +218,19 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div class="lbLoginForm">
 <h1>Entrar</h1>
 <div class="muted">Use seu e-mail corporativo para continuar</div>
+<form id="lbLoginFormEl" onsubmit="lbLogin(); return false;">
 <div class="field">
-<label>E-mail</label>
+<label for="lbLoginEmail">E-mail</label>
 <div class="lbInputIcon">
 <span>✉️</span>
-<input id="lbLoginEmail" type="email" placeholder="nome.sobrenome@sankhya.com.br" autocomplete="email" autofocus>
+<input id="lbLoginEmail" name="email" type="email" placeholder="nome.sobrenome@sankhya.com.br" autocomplete="email" autofocus>
 <span id="lbLoginCheck" class="lbInputStatus"></span>
 </div>
 </div>
 <label class="lbRememberRow"><input type="checkbox" id="lbLoginRemember" checked> Manter conectado neste navegador</label>
 <div id="lbLoginError"></div>
-<button class="btn primary" id="lbLoginBtn" onclick="lbLogin()"><span id="lbLoginBtnLabel">Entrar</span></button>
+<button class="btn primary" id="lbLoginBtn" type="submit"><span id="lbLoginBtnLabel">Entrar</span></button>
+</form>
 </div>
 </div>
 </div>
@@ -624,7 +635,7 @@ function lbToggleTheme(){
   localStorage.setItem("lexbank_theme",next);
   lbApplyTheme(next);
 }
-lbApplyTheme(localStorage.getItem("lexbank_theme"));
+lbApplyTheme(localStorage.getItem("lexbank_theme")||"light"); // padrão sempre claro; escuro só se o usuário escolher explicitamente
 function lbShakeLogin(){
   const card=$("lbLogin").querySelector(".lbLoginForm");
   card.classList.remove("lbShake"); void card.offsetWidth; card.classList.add("lbShake");
@@ -665,7 +676,6 @@ function lbLogout(){
   $("lbLoginCheck").textContent=""; $("lbLoginCheck").className="lbInputStatus";
 }
 $("lbLoginEmail").addEventListener("input",lbLoginEmailFeedback);
-$("lbLoginEmail").addEventListener("keydown",e=>{ if(e.key==="Enter") lbLogin(); });
 lbCheckAuth();
 
 /* ======================================================================
