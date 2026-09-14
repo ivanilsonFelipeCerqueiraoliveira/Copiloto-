@@ -258,9 +258,61 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <button class="active" data-tab="decodificacao">Decodificação</button><button data-tab="comparador">Comparador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="painel">Análise Guiada</button>
 </nav>
 <nav id="lbMoreServices" hidden>
-<button data-tab="diagnostico">Diagnóstico</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="historico">Casos</button>
+<button data-tab="ajuda">Conhecendo o LexBank</button><button data-tab="diagnostico">Diagnóstico</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="historico">Casos</button>
 </nav>
 <main>
+<section id="ajuda" class="tab"><div class="card">
+<h1>Conhecendo o LexBank<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
+<div class="muted">Guia rápido de uso do LexBank — como acessar, navegar pela interface e interpretar os laudos de divergência de linha digitável. <a class="link" href="https://claude.ai/artifact/9jAbKSeGUNbPL752VDjGW4" target="_blank" rel="noopener">Ver versão completa, com capturas de tela ↗</a></div>
+
+<h3>O que é o LexBank</h3>
+<p>O LexBank diagnostica problemas de linha digitável e código de barras de boletos. Quando um boleto gerado pelo Sankhya não registra no banco, ele compara a linha do Sankhya com a linha correta do banco e aponta exatamente qual dado do cadastro está errado — agência, convênio, carteira, Nosso Número ou um dígito verificador — em vez de exigir comparação dígito a dígito manual.</p>
+
+<h3>Como acessar</h3>
+<p>O acesso é restrito a e-mails corporativos <code>@sankhya.com.br</code>. Digite seu e-mail na tela inicial e clique em Entrar. Marque "Manter conectado neste navegador" pra não precisar digitar de novo nas próximas vezes.</p>
+
+<h3>A tela principal</h3>
+<table>
+<tr><th>Onde</th><th>O que faz</th></tr>
+<tr><td>Menu de cima</td><td>Os 5 serviços mais usados: Decodificação, Comparador, Laudo Automático, Gerador/Validador e Análise Guiada.</td></tr>
+<tr><td>Seta na borda esquerda</td><td>Abre a gaveta com os demais serviços, incluindo este guia.</td></tr>
+<tr><td>Ícone 🌙 / ☀️</td><td>Alterna entre tema claro e escuro (abre sempre no claro por padrão).</td></tr>
+<tr><td>Iniciais no canto superior direito</td><td>Seu menu de usuário — nome, e-mail, perfil e opção de sair.</td></tr>
+</table>
+
+<h3>Serviços principais</h3>
+<p><b>Decodificação</b> — cola uma linha digitável (44, 47 ou 48 dígitos) e mostra o que está codificado em cada posição, incluindo o código de barras reconstruído e escaneável.</p>
+<p><b>Comparador</b> — cola a linha do Sankhya e a do banco lado a lado e mostra rapidamente em quais posições elas divergem, dígito a dígito.</p>
+<p><b>Laudo Automático</b> — o diagnóstico mais completo: consistência matemática de cada linha, onde divergem, causa provável, comparação campo a campo com ícones de status, e se aquele mesmo problema já aconteceu antes com aquele banco ("Casos parecidos"). Use o ícone 🖨️ ao lado do título pra imprimir ou salvar o laudo em PDF.</p>
+<p><b>Gerador / Validador</b> — monta uma linha digitável a partir dos dados de cadastro, aplicando as fórmulas públicas da FEBRABAN.</p>
+<p><b>Análise Guiada</b> — um fluxo mais simples que o Laudo Automático, pra uma resposta rápida.</p>
+
+<h3>Como ler os resultados</h3>
+<table>
+<tr><th>Ícone</th><th>Significado</th></tr>
+<tr><td>🟢 Igual</td><td>O campo é idêntico nas duas linhas.</td></tr>
+<tr><td>🔴 Valor divergente</td><td>Um dado de negócio real é diferente (agência, convênio, carteira, Nosso Número...) — corrigir no cadastro do Sankhya.</td></tr>
+<tr><td>🟠 DV divergente</td><td>Só o dígito verificador daquele campo é diferente — o dado em si pode estar certo.</td></tr>
+</table>
+<p>Nas tabelas do Campo Livre você também vê um selo de confiança: <span class="confBadge confVerified">✔ verificado com caso real</span> <span class="confBadge confPartial">⚠ parcialmente confirmado</span> <span class="confBadge confUnknown">❔ confiança não registrada</span>. O LexBank nunca inventa a posição de um campo — enquanto não houver um caso real comprovando, o campo aparece como "não mapeado".</p>
+
+<h3>Outros serviços (nesta mesma gaveta)</h3>
+<table>
+<tr><td><b>Diagnóstico</b></td><td>Checklist de cadastro por banco antes de emitir um boleto.</td></tr>
+<tr><td><b>CNAB Explorer / CNAB Inteligente</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400.</td></tr>
+<tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras e templates versionados por banco, com fonte oficial.</td></tr>
+<tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
+<tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador.</td></tr>
+<tr><td><b>Teste da Plataforma</b></td><td>Suíte interna que valida a matemática do motor (módulo 10, módulo 11, fator de vencimento).</td></tr>
+</table>
+
+<h3>Perguntas frequentes</h3>
+<p><b>Por que alguns bancos não mostram nenhum campo do Campo Livre?</b><br>Porque nenhuma posição daquele banco foi comprovada ainda com um caso real. Se você tem um par de linhas real (Sankhya × banco) com uma divergência conhecida, isso pode ser cadastrado.</p>
+<p><b>Meus casos e templates ficam salvos pra sempre?</b><br>Ficam salvos no navegador do seu computador (localStorage), não num servidor compartilhado. Limpar os dados do navegador ou trocar de computador apaga esse histórico local.</p>
+<p><b>O código de barras gerado pode ser escaneado de verdade?</b><br>Sim — usa o padrão 2 de 5 Intercalado (ITF), o mesmo dos boletos impressos.</p>
+<p><b>Preciso ter as duas linhas (Sankhya e banco) pra usar o LexBank?</b><br>Pro Laudo Automático e o Comparador, sim. Pra só entender o que tem dentro de uma linha, use a Decodificação com uma linha só.</p>
+</div></section>
+
 <section id="diagnostico" class="tab">
 <div class="grid"><div>
 <div class="card"><h1>Diagnóstico de configuração bancária<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Objetivo: identificar quais dados precisam ser conferidos antes de reproduzir o boleto no Sankhya. O sistema não presume uma regra bancária que não esteja cadastrada.</div>
