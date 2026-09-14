@@ -260,7 +260,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <button class="active" data-tab="decodificacao">Decodificação</button><button data-tab="comparador">Comparador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="painel">Análise Guiada</button>
 </nav>
 <nav id="lbMoreServices" hidden>
-<button data-tab="ajuda">Conhecendo o LexBank</button><button data-tab="diagnostico">Diagnóstico</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="cnabint">CNAB Inteligente</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="testes">Teste da Plataforma</button><button data-tab="historico">Casos</button>
+<button data-tab="ajuda">Conhecendo o LexBank</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="historico">Casos</button>
 </nav>
 <main>
 <section id="ajuda" class="tab"><div class="card">
@@ -287,7 +287,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <p><b>Comparador</b> — cola a linha do Sankhya e a do banco lado a lado e mostra rapidamente em quais posições elas divergem, dígito a dígito.</p>
 <p><b>Laudo Automático</b> — o diagnóstico mais completo: consistência matemática de cada linha, onde divergem, causa provável, comparação campo a campo com ícones de status, e se aquele mesmo problema já aconteceu antes com aquele banco ("Casos parecidos"). Use o ícone 🖨️ ao lado do título pra imprimir ou salvar o laudo em PDF.</p>
 <p><b>Gerador / Validador</b> — monta uma linha digitável a partir dos dados de cadastro, aplicando as fórmulas públicas da FEBRABAN.</p>
-<p><b>Análise Guiada</b> — um fluxo mais simples que o Laudo Automático, pra uma resposta rápida.</p>
+<p><b>Análise Guiada</b> — a resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) pra já saber se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão.</p>
 
 <h3>Como ler os resultados</h3>
 <table>
@@ -300,12 +300,10 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 
 <h3>Outros serviços (nesta mesma gaveta)</h3>
 <table>
-<tr><td><b>Diagnóstico</b></td><td>Checklist de cadastro por banco antes de emitir um boleto.</td></tr>
-<tr><td><b>CNAB Explorer / CNAB Inteligente</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400.</td></tr>
-<tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras e templates versionados por banco, com fonte oficial.</td></tr>
+<tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento e busca por termo/posição.</td></tr>
+<tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
 <tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador.</td></tr>
-<tr><td><b>Teste da Plataforma</b></td><td>Suíte interna que valida a matemática do motor (módulo 10, módulo 11, fator de vencimento).</td></tr>
 </table>
 
 <h3>Perguntas frequentes</h3>
@@ -314,22 +312,6 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <p><b>O código de barras gerado pode ser escaneado de verdade?</b><br>Sim — usa o padrão 2 de 5 Intercalado (ITF), o mesmo dos boletos impressos.</p>
 <p><b>Preciso ter as duas linhas (Sankhya e banco) pra usar o LexBank?</b><br>Pro Laudo Automático e o Comparador, sim. Pra só entender o que tem dentro de uma linha, use a Decodificação com uma linha só.</p>
 </div></section>
-
-<section id="diagnostico" class="tab">
-<div class="grid"><div>
-<div class="card"><h1>Diagnóstico de configuração bancária<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Objetivo: identificar quais dados precisam ser conferidos antes de reproduzir o boleto no Sankhya. O sistema não presume uma regra bancária que não esteja cadastrada.</div>
-<h3>Conta / cobrança</h3><div class="form">
-<div class="field"><label>Banco</label><select id="bank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
-<div class="field"><label>Agência</label><input id="agency"></div><div class="field"><label>Conta + DV</label><input id="account"></div>
-<div class="field"><label>Convênio</label><input id="agreement"></div><div class="field"><label>Carteira</label><input id="wallet"></div><div class="field"><label>Modalidade</label><input id="modality"></div>
-<div class="field"><label>Beneficiário / Nº Beneficiário</label><input id="beneficiary"></div><div class="field"><label>Posto</label><input id="posto"></div><div class="field"><label>Nosso Número</label><input id="our"></div>
-<div class="field"><label>Valor</label><input id="amount" type="number" step="0.01"></div><div class="field"><label>Vencimento</label><input id="due" type="date"></div><div class="field"><label>Referência do caso</label><input id="reference" placeholder="Chamado / cliente / análise"></div>
-<div class="field full"><label>Linha digitável (opcional)</label><textarea id="digitline" placeholder="Cole a linha gerada pelo Sankhya ou pelo banco"></textarea></div>
-</div><div class="actions"><button class="btn primary" onclick="runDiagnosis()">EXECUTAR DIAGNÓSTICO</button><button class="btn secondary" onclick="exportCase()">EXPORTAR CASO JSON</button><button class="btn secondary" onclick="clearDiagnosis()">Limpar</button></div></div>
-<div class="card"><h2>Laudo técnico</h2><div id="diagResult"><div class="muted">Nenhuma análise executada.</div></div></div>
-</div>
-<div><div class="card"><h2>Checklist</h2><div id="checklist"></div></div><div class="card"><h2>Campos críticos</h2><div id="critical"></div></div><div class="card"><h2>Regras disponíveis</h2><div id="ruleStatus"></div></div></div></div>
-</section>
 
 <section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cmpBank"><option value="">Não informado</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Modalidade</label><input id="cmpMod"></div><div class="field"><label>Carteira</label><input id="cmpWallet"></div></div>
@@ -342,9 +324,9 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div id="decodResult"><div class="muted">Nenhuma linha decodificada ainda.</div></div>
 </div></section>
 
-<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. A busca destaca as ocorrências do termo direto na amostra.</div>
-<div class="form"><div class="field"><label>Banco</label><select id="cnabBank"><option value="">Automático</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Formato</label><select id="cnabFormat"><option>Automático</option><option>CNAB 240</option><option>CNAB 400</option></select></div><div class="field"><label>Pesquisar termo</label><input id="cnabSearch" placeholder="Ex.: 0001234567"></div><div class="field"><label>Posição inicial</label><input id="cnabPosStart" type="number" min="1"></div><div class="field"><label>Posição final</label><input id="cnabPosEnd" type="number" min="1"></div><div class="field full"><label>Arquivo / conteúdo</label><input id="cnabFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="cnabText" placeholder="Cole o CNAB aqui..."></textarea></div></div>
-<div class="actions"><button class="btn primary" onclick="analyzeCNAB()">ANALISAR ARQUIVO</button><button class="btn secondary" onclick="findPosition()">CONSULTAR POSIÇÃO</button></div><div id="cnabResult"></div></div></section>
+<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. Identifica tipo de registro e segmento por posição, e a busca destaca as ocorrências do termo direto na amostra.</div>
+<div class="form"><div class="field"><label>Banco</label><select id="cnabBank"><option value="">Automático</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Formato</label><select id="cnabFormat"><option>Automático</option><option>CNAB 240</option><option>CNAB 400</option></select></div><div class="field"><label>Tipo</label><select id="cnabType"><option>Automático</option><option>Remessa</option><option>Retorno</option></select></div><div class="field"><label>Segmento esperado</label><input id="cnabSeg" placeholder="Ex.: P"></div><div class="field"><label>Pesquisar termo</label><input id="cnabSearch" placeholder="Ex.: 0001234567"></div><div class="field"><label>Posição inicial</label><input id="cnabPosStart" type="number" min="1"></div><div class="field"><label>Posição final</label><input id="cnabPosEnd" type="number" min="1"></div><div class="field full"><label>Arquivo / conteúdo</label><input id="cnabFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="cnabText" placeholder="Cole o CNAB aqui..."></textarea></div></div>
+<div class="actions"><button class="btn primary" onclick="analyzeCNAB()">ANALISAR ARQUIVO</button><button class="btn secondary" onclick="findPosition()">CONSULTAR POSIÇÃO</button><button class="btn secondary" onclick="exportCNABReport()">EXPORTAR LAUDO</button></div><div id="cnabResult"></div></div></section>
 
 <section id="regras" class="tab"><div class="card lbComingSoonWrap"><h1>Catálogo de regras bancárias</h1><div class="muted">Estrutura preparada para cadastrar regras por banco, modalidade, carteira e versão. A regra deve ter fonte oficial e data/versão do manual.</div><div id="rules"></div><div class="lbComingSoon">Em breve</div></div></section>
 
@@ -353,7 +335,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <section id="historico" class="tab"><div class="card"><h1>Casos analisados</h1><div class="muted">Histórico local do navegador. Idealmente, a versão corporativa deverá usar banco de dados para compartilhamento da equipe.</div><div class="actions"><button class="btn danger" onclick="clearHistory()">Apagar casos locais</button></div><div id="history"></div></div></section>
 
 <section id="motor" class="tab">
-<div class="card">
+<div class="card lbComingSoonWrap">
 <h1>Motor de Diagnóstico Bancário</h1>
 <div class="muted">Central de regras versionadas. Cada regra deve ser vinculada a banco, produto, modalidade/carteira, versão do manual e fonte oficial. O sistema não considera uma regra "validada" apenas porque o cálculo fecha.</div>
 <div class="form">
@@ -367,6 +349,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </div>
 <div class="actions"><button class="btn primary" onclick="saveRule()">SALVAR REGRA LOCAL</button><button class="btn secondary" onclick="exportRules()">EXPORTAR REGRAS</button></div>
 <div id="engineList"></div>
+<div class="lbComingSoon">Em breve</div>
 </div>
 <div class="card">
 <h2>Fluxo de decisão</h2>
@@ -447,7 +430,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 <section id="laudo" class="tab">
 <div class="card">
 <h1>Laudo Automático de Divergência<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
-<div class="muted">Cole a linha do Sankhya e a linha de referência do banco. O motor valida os dígitos verificadores de cada linha isoladamente, decodifica valor e vencimento, compara posição a posição e aponta a causa provável — exatamente como uma análise manual de linha digitável. O laudo é atualizado automaticamente enquanto você cola/edita as linhas.</div>
+<div class="muted">O laudo completo, para quando você já tem as duas linhas (Sankhya e banco): valida os dígitos verificadores de cada linha isoladamente, decodifica valor e vencimento, compara posição a posição, aponta a causa provável e mostra casos parecidos já analisados — pronto para anexar ao chamado ou imprimir. O laudo é atualizado automaticamente enquanto você cola/edita as linhas. Só tem a linha do Sankhya? Use a <a class="link" onclick="document.querySelector('nav button[data-tab=painel]').click()">Análise Guiada</a> para uma resposta mais rápida.</div>
 <div class="form">
 <div class="field"><label>Banco</label><select id="reportBank"><option value="237">237 — Bradesco</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
 <div class="field"><label>Modalidade / Carteira</label><input id="reportMode"></div>
@@ -458,33 +441,6 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="actions"><button class="btn primary" onclick="generateReport()">GERAR LAUDO</button></div>
 </div>
 <div class="card"><div id="reportResult"><div class="muted">Nenhum laudo gerado.</div></div></div>
-</section>
-
-<section id="cnabint" class="tab">
-<div class="card">
-<h1>CNAB Inteligente — Analisador Posicional<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
-<div class="muted">Cole um arquivo CNAB 240/400 ou uma linha isolada. O analisador identifica o tipo de registro, segmento quando possível, conta posições e permite consultar o mapa cadastrado para o banco.</div>
-<div class="form">
-<div class="field"><label>Banco</label><select id="cnabBank2"><option value="237">237 — Bradesco</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
-<div class="field"><label>Formato</label><select id="cnabFmt"><option>CNAB 240</option><option>CNAB 400</option><option>Automático</option></select></div>
-<div class="field"><label>Tipo</label><select id="cnabType"><option>Remessa</option><option>Retorno</option></select></div>
-<div class="field"><label>Segmento esperado</label><input id="cnabSeg" placeholder="Ex.: P"></div>
-<div class="field full"><label>Arquivo / linha CNAB</label><textarea id="cnabText2" rows="10" placeholder="Cole aqui uma ou mais linhas do arquivo."></textarea></div>
-</div>
-<div class="actions"><button class="btn primary" onclick="analyzeCNABInt()">ANALISAR CNAB</button><button class="btn secondary" onclick="loadCNABExample()">CARREGAR EXEMPLO</button><button class="btn secondary" onclick="exportCNABReport()">EXPORTAR LAUDO</button></div>
-</div>
-<div class="card"><div id="cnabResult2"><div class="muted">Nenhum arquivo analisado.</div></div></div>
-
-<div class="card">
-<h2>Consulta rápida de posição</h2>
-<div class="form">
-<div class="field"><label>Posição inicial</label><input id="posStart" type="number" min="1"></div>
-<div class="field"><label>Posição final</label><input id="posEnd" type="number" min="1"></div>
-<div class="field full"><label>Descrição do campo (opcional)</label><input id="posDesc" placeholder="Ex.: Código de Mora"></div>
-</div>
-<div class="actions"><button class="btn primary" onclick="inspectPositions()">CONSULTAR POSIÇÃO</button></div>
-<div id="posResult"></div>
-</div>
 </section>
 
 <section id="mapas" class="tab">
@@ -507,19 +463,10 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="card"><div class="status ok">Mapa inicial: Bradesco CNAB 240 — Header de Lote.</div><div id="mapResult"></div></div>
 </section>
 
-<section id="testes" class="tab">
-<div class="card">
-<h1>Teste da Plataforma</h1>
-<div class="muted">Smoke tests locais dos principais módulos: fórmulas de módulo 10 / módulo 11, geração e validação de linha digitável, fator de vencimento e comparador. O teste não consulta bancos externos nem representa homologação bancária.</div>
-<div class="actions"><button class="btn primary" onclick="abiRunTests()">EXECUTAR TODOS OS TESTES</button></div>
-<div id="testResult"></div>
-</div>
-</section>
-
 <section id="painel" class="tab">
 <div class="card">
 <h1>Diagnóstico Guiado<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
-<div class="muted">Fluxo rápido para descobrir onde está a divergência: cadastro → título → composição → dígitos verificadores → CNAB → causa provável → ação recomendada. A análise roda sozinha assim que você cola a linha (ou pressione Enter).</div>
+<div class="muted">A resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) e já veja se o erro é matemático, cadastral ou uma divergência com o banco. Fluxo: cadastro → título → composição → dígitos verificadores → CNAB → causa provável → ação recomendada. A análise roda sozinha assim que você cola a linha (ou pressione Enter). Precisa do laudo formal para anexar a um chamado, com casos parecidos e impressão? Use o <a class="link" onclick="document.querySelector('nav button[data-tab=laudo]').click()">Laudo Automático</a>.</div>
 
 <div class="stepper">
   <div class="step active"><b>1</b><span>Dados</span></div>
@@ -569,14 +516,14 @@ LAUDO DE DIVERGÊNCIA</pre>
 </div>
 <script>
 const banks={
-"001":{name:"Banco do Brasil",critical:["Agência","Conta + DV","Convênio","Carteira","Nosso Número"]},
-"033":{name:"Santander",critical:["Agência","Conta + DV","Convênio","Carteira","Nosso Número"]},
-"104":{name:"Caixa",critical:["Agência","Conta + DV","Convênio","Carteira","Nosso Número"]},
-"237":{name:"Bradesco",critical:["Agência","Conta + DV","Carteira","Convênio","Nosso Número"]},
-"341":{name:"Itaú",critical:["Agência","Conta + DV","Carteira","Convênio","Nosso Número"]},
-"422":{name:"Safra",critical:["Agência","Conta + DV","Carteira","Convênio","Nosso Número"]},
-"748":{name:"Sicredi",critical:["Agência","Conta + DV","Modalidade","Posto/Convênio","Carteira","Número do Beneficiário"]},
-"756":{name:"Sicoob",critical:["Agência","Conta + DV","Convênio","Carteira","Modalidade","Nosso Número"]}
+"001":{name:"Banco do Brasil"},
+"033":{name:"Santander"},
+"104":{name:"Caixa"},
+"237":{name:"Bradesco"},
+"341":{name:"Itaú"},
+"422":{name:"Safra"},
+"748":{name:"Sicredi"},
+"756":{name:"Sicoob"}
 };
 const rules=[
 ["001","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal BB"],
@@ -1216,51 +1163,6 @@ function setBankTemplate(bank,tmpl){ const t=getBankTemplates(); t[bank]=tmpl; l
 
 /* ===== Diagnóstico simples (aba Diagnóstico) ===== */
 function factor(d){ return lbDateToFactor(d) } // mantido por compatibilidade
-function renderCritical(){
-  const code=$("bank").value, b=banks[code];
-  $("critical").innerHTML="<b>"+b.name+"</b><ul>"+b.critical.map(x=>"<li>"+x+"</li>").join("")+"</ul>";
-  const r=rules.filter(x=>x[0]===code);
-  let html=r.map(x=>`<div style="padding:7px 0;border-bottom:1px solid #eee"><span class="badge">${x[2]}</span><br>${x[3]}<br><span class="muted">Fonte: ${x[4]}</span></div>`).join("");
-  const custom=(typeof getEngineRules==="function"?getEngineRules():[]).filter(x=>x.banco===code);
-  if(custom.length) html += "<h3>Cadastradas no Motor de Diagnóstico</h3>"+custom.map(x=>`<div style="padding:7px 0;border-bottom:1px solid #eee"><span class="badge">${x.formato}</span>${x.versao?` <span class="muted">(${x.versao})</span>`:""}<br>${x.regra}${x.fonte?`<br><span class="muted">Fonte: <a class="link" href="${x.fonte}" target="_blank" rel="noopener">abrir</a></span>`:""}</div>`).join("");
-  $("ruleStatus").innerHTML=html||"<p class='muted'>Nenhuma regra específica cadastrada ainda para este banco.</p>";
-}
-function renderChecklist(){let arr=[["Agência",$("agency").value],["Conta + DV",$("account").value],["Convênio",$("agreement").value],["Carteira",$("wallet").value],["Modalidade",$("modality").value],["Beneficiário",$("beneficiary").value],["Posto",$("posto").value],["Nosso Número",$("our").value],["Valor",$("amount").value],["Vencimento",$("due").value]];$("checklist").innerHTML=arr.map(x=>`<div style="padding:7px 0;border-bottom:1px solid #eee">${x[1]?"✅":"⚠️"} <b>${x[0]}</b> <span class="muted">${x[1]?"preenchido":"não informado"}</span></div>`).join("")}
-function runDiagnosis(save){
-  if(save===undefined)save=true;
-  renderChecklist();let b=$("bank").value,info=banks[b],errors=[],warn=[];
-  if(!$("agency").value)errors.push("Agência não informada.");
-  if(!$("account").value)errors.push("Conta + DV não informada.");
-  if(!$("our").value)warn.push("Nosso Número não informado.");
-  if(!$("amount").value)warn.push("Valor não informado.");
-  if(!$("due").value)warn.push("Vencimento não informado.");
-  if(b==="748"&&!$("beneficiary").value)errors.push("Sicredi: Número do Beneficiário não informado.");
-  const rawLine=$("digitline").value, line=clean(rawLine), f=factor($("due").value), amount=$("amount").value?Number($("amount").value):null;
-  let parsedLine=null;
-  if(line){
-    parsedLine=lbDiagnoseLine(rawLine);
-    if(!parsedLine.ok) warn.push(parsedLine.error);
-    else{
-      const selfErr=lbSelfErrors(parsedLine);
-      if(selfErr.length) errors.push(`A linha informada tem ${selfErr.length} dígito(s) verificador(es) que não conferem (${selfErr.map(x=>x.name).join(", ")}).`);
-      if(parsedLine.valor!=null && amount!=null && Math.abs(parsedLine.valor-amount)>0.001) warn.push(`O valor decodificado da linha (${parsedLine.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}) difere do valor informado no cadastro.`);
-      if(parsedLine.banco && parsedLine.banco!==b) warn.push(`O código de banco na linha (${parsedLine.banco}) difere do banco selecionado (${b}).`);
-    }
-  }
-  let status=errors.length?"bad":warn.length?"warn":"ok";
-  let html=`<div class="headline ${status}">${errors.length?"🔴":warn.length?"🟠":"🟢"} <div><b>${errors.length?"Divergência bloqueante: "+errors[0]:warn.length?"Análise parcial: "+warn[0]:"Estrutura inicial consistente."}</b>${errors.length&&errors.length>1?`Há mais ${errors.length-1} problema(s) listado(s) abaixo.`:""}</div></div><div class="kpis"><div class="kpi">Banco<b>${b}</b></div><div class="kpi">Fator<b>${f??"—"}</b></div><div class="kpi">Valor<b>${amount!=null?amount.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"—"}</b></div><div class="kpi">Linha<b>${line?line.length+" dígitos":"—"}</b></div></div>`;
-  if(errors.length)html+="<h3>Erros</h3><ul>"+errors.map(x=>"<li>❌ "+x+"</li>").join("")+"</ul>";
-  if(warn.length)html+="<h3>Alertas</h3><ul>"+warn.map(x=>"<li>⚠️ "+x+"</li>").join("")+"</ul>";
-  html+=`<h3>Conclusão</h3><p>O banco selecionado é <b>${info.name}</b>. A plataforma deve aplicar uma regra específica somente quando banco, produto, modalidade/carteira e versão do manual estiverem identificados. Isso evita diagnósticos falsos.</p>`;
-  if(b==="748")html+="<p><b>Referência Sankhya:</b> a documentação orienta conferir Agência, Conta Bancária com DV, Modalidade, Posto/Convênio, Carteira e Número do Beneficiário no caso Sicredi.</p>";
-  if(parsedLine&&parsedLine.ok)html+="<h3>Validação estrutural da linha</h3>"+lbRenderFields(parsedLine);
-  $("diagResult").innerHTML=html;
-  if(save)saveCase();
-}
-function saveCase(){let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");let statusEl=$("diagResult").querySelector(".status");h.unshift({data:new Date().toLocaleString("pt-BR"),banco:banks[$("bank").value].name,ref:$("reference").value||"Sem referência",status:statusEl?statusEl.textContent.trim():"—"});localStorage.setItem("lexbank_cases",JSON.stringify(h.slice(0,200)));renderHistory()}
-function exportCase(){let data={produto:"LexBank",data:new Date().toISOString(),banco:$("bank").value,agencia:$("agency").value,conta:$("account").value,convenio:$("agreement").value,carteira:$("wallet").value,modalidade:$("modality").value,beneficiario:$("beneficiary").value,posto:$("posto").value,nossoNumero:$("our").value,valor:$("amount").value,vencimento:$("due").value,linhaDigitavel:$("digitline").value,referencia:$("reference").value};let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="caso-analise-bancaria.json";a.click()}
-function clearDiagnosis(){document.querySelectorAll("#diagnostico input,#diagnostico textarea").forEach(x=>x.value="");$("diagResult").innerHTML='<div class="muted">Nenhuma análise executada.</div>';renderChecklist()}
-
 /* ===== Comparador ===== */
 function compare(){
   const a=clean($("line1").value), b=clean($("line2").value);
@@ -1304,7 +1206,8 @@ function analyzeCNAB(){
   const text=$("cnabText").value.replace(/\r/g,""), lines=text.split("\n").filter(Boolean);
   if(!lines.length){ $("cnabResult").innerHTML="<div class='muted'>Cole ou carregue um arquivo CNAB para analisar.</div>"; return; }
   const lens=[...new Set(lines.map(x=>x.length))];
-  const guess=lens.includes(240)?"CNAB 240":lens.includes(400)?"CNAB 400":"Não identificado";
+  const fmt=$("cnabFormat").value;
+  const guess = fmt&&fmt!=="Automático" ? fmt : (lens.includes(240)?"CNAB 240":lens.includes(400)?"CNAB 400":"Não identificado");
   const okStruct=lens.every(x=>x===240||x===400);
   const term=$("cnabSearch").value.trim();
   let html=`<div class="status ${okStruct?"ok":"warn"}">${okStruct?"✅ Estrutura compatível com 240/400":"⚠️ Existem registros com tamanho diferente de 240/400"}</div><div class="kpis"><div class="kpi">Linhas<b>${lines.length}</b></div><div class="kpi">Formato<b>${guess}</b></div><div class="kpi">Tamanhos<b>${lens.join(", ")}</b></div><div class="kpi">Banco<b>${$("cnabBank").value||"Auto"}</b></div></div>`;
@@ -1315,10 +1218,15 @@ function analyzeCNAB(){
     html+=`<div class="status ${hits.length?"ok":"warn"}">${hits.length?`🔎 "${lbEsc(term)}" encontrado ${hits.length} vez(es)`:`🔎 "${lbEsc(term)}" não encontrado`}</div>`;
     if(hits.length) html+="<table><tr><th>Linha</th><th>Posição</th></tr>"+hits.slice(0,100).map(h=>`<tr><td>${h.line}</td><td>${h.pos}</td></tr>`).join("")+"</table>";
   }
-  html+="<h3>Amostra</h3><table><tr><th>Linha</th><th>Tamanho</th><th>Posições 1–40</th></tr>"+lines.slice(0,25).map((x,i)=>{
+  const seg=$("cnabSeg").value.trim().toUpperCase();
+  if(seg){
+    const hits=lines.filter(l=>l[13]===seg);
+    html+=`<p class="muted">Linhas com Segmento "${lbEsc(seg)}" na posição 14 (heurística CNAB 240, confirme contra o layout do banco): ${hits.length}.</p>`;
+  }
+  html+="<h3>Registros</h3><table><tr><th>Linha</th><th>Tamanho</th><th>Tipo de Registro (pos. 8)</th><th>Amostra (1–40)</th></tr>"+lines.slice(0,30).map((x,i)=>{
     let sample=lbEsc(x.slice(0,40));
     if(term){ const esc=term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); sample=sample.replace(new RegExp(esc,"gi"),m=>`<mark>${m}</mark>`); }
-    return `<tr><td>${i+1}</td><td>${x.length}</td><td class="pos">${sample}</td></tr>`;
+    return `<tr><td>${i+1}</td><td>${x.length}</td><td>${x[7]||"—"}</td><td class="pos">${sample}</td></tr>`;
   }).join("")+"</table>";
   $("cnabResult").innerHTML=html;
 }
@@ -1331,59 +1239,22 @@ function findPosition(){
   lines.slice(0,50).forEach((l,i)=>html+=`<tr><td>${i+1}</td><td class="pos">${lbEsc(l.slice(s-1,e))}</td></tr>`);
   $("cnabResult").innerHTML=html+"</table><p class='muted'>A interpretação do campo depende do banco, registro/segmento e versão do layout.</p></div>";
 }
-$("cnabFile").onchange=e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=()=>{$("cnabText").value=r.result;analyzeCNAB();lbToast("Arquivo carregado e analisado.","ok")};r.readAsText(f)}};
-const lbCnabAuto=lbDebounce(()=>{ if($("cnabText").value.trim()) analyzeCNAB(); },350);
-$("cnabText").addEventListener("input",lbCnabAuto);
-$("cnabSearch").addEventListener("input",lbCnabAuto);
-$("cnabBank").addEventListener("change",lbCnabAuto);
-$("cnabFormat").addEventListener("change",lbCnabAuto);
-
-/* ===== CNAB Inteligente ===== */
-function analyzeCNABInt(){
-  const text=$("cnabText2").value.replace(/\r/g,""), lines=text.split("\n").filter(Boolean);
-  const lens=[...new Set(lines.map(l=>l.length))];
-  const fmt=$("cnabFmt").value;
-  const guess = fmt!=="Automático" ? fmt : (lens.includes(240)?"CNAB 240":lens.includes(400)?"CNAB 400":"Não identificado");
-  const okStruct = lines.length>0 && lines.every(l=>l.length===240||l.length===400);
-  let html=`<div class="status ${okStruct?"ok":"warn"}">${okStruct?"✅ Estrutura compatível com 240/400":"⚠️ Existem linhas com tamanho diferente de 240/400"}</div>
-  <div class="kpis"><div class="kpi">Linhas<b>${lines.length}</b></div><div class="kpi">Formato<b>${guess}</b></div><div class="kpi">Tamanhos<b>${lens.join(", ")||"—"}</b></div><div class="kpi">Banco<b>${$("cnabBank2").value||"Auto"}</b></div></div>`;
-  if(lines.length){
-    html+="<h3>Registros</h3><table><tr><th>Linha</th><th>Tamanho</th><th>Tipo de Registro (pos. 8)</th><th>Amostra (1-40)</th></tr>"+
-      lines.slice(0,30).map((l,i)=>`<tr><td>${i+1}</td><td>${l.length}</td><td>${l[7]||"—"}</td><td class="pos">${l.slice(0,40)}</td></tr>`).join("")+"</table>";
-  }
-  const seg=$("cnabSeg").value.trim().toUpperCase();
-  if(seg&&lines.length){
-    const hits=lines.filter(l=>l[13]===seg);
-    html+=`<p class="muted">Linhas com Segmento "${seg}" na posição 14 (heurística CNAB 240, confirme contra o layout do banco): ${hits.length}.</p>`;
-  }
-  $("cnabResult2").innerHTML=html;
-}
-function loadCNABExample(){
-  $("cnabResult2").innerHTML="<div class='status info'>🔵 Cole um arquivo CNAB real do Sankhya ou do banco para análise. A plataforma não gera um CNAB fictício automaticamente, para evitar confusão com dados reais de produção.</div>";
-  lbToast("Cole um CNAB real no campo acima.","info");
-}
 function exportCNABReport(){
-  const content=$("cnabResult2").innerHTML;
+  const content=$("cnabResult").innerHTML;
   if(!content){lbToast("Nenhuma análise para exportar.","warn");return}
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([`<!doctype html><meta charset="utf-8"><body>${content}</body>`],{type:"text/html"}));
   a.download="laudo-cnab.html";a.click();
   lbToast("Laudo exportado.","ok");
 }
-function inspectPositions(){
-  const s=Number($("posStart").value), e=Number($("posEnd").value||s), desc=$("posDesc").value;
-  const lines=$("cnabText2").value.replace(/\r/g,"").split("\n").filter(Boolean);
-  if(!lines.length){lbToast("Cole um CNAB antes de consultar uma posição.","warn");return}
-  if(!s){lbToast("Informe a posição inicial.","warn");return}
-  let html=`<h3>Consulta de posição ${s}${e!==s?"-"+e:""} ${desc?"— "+lbEsc(desc):""}</h3><table><tr><th>Linha</th><th>Valor</th></tr>`+
-    lines.slice(0,50).map((l,i)=>`<tr><td>${i+1}</td><td class="pos">${lbEsc(l.slice(s-1,e))}</td></tr>`).join("")+"</table>";
-  $("posResult").innerHTML=html;
-}
-const lbCnabIntAuto=lbDebounce(()=>{ if($("cnabText2").value.trim()) analyzeCNABInt(); },350);
-$("cnabText2").addEventListener("input",lbCnabIntAuto);
-$("cnabSeg").addEventListener("input",lbCnabIntAuto);
-$("cnabBank2").addEventListener("change",lbCnabIntAuto);
-$("cnabFmt").addEventListener("change",lbCnabIntAuto);
+$("cnabFile").onchange=e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=()=>{$("cnabText").value=r.result;analyzeCNAB();lbToast("Arquivo carregado e analisado.","ok")};r.readAsText(f)}};
+const lbCnabAuto=lbDebounce(()=>{ if($("cnabText").value.trim()) analyzeCNAB(); },350);
+$("cnabText").addEventListener("input",lbCnabAuto);
+$("cnabSearch").addEventListener("input",lbCnabAuto);
+$("cnabSeg").addEventListener("input",lbCnabAuto);
+$("cnabBank").addEventListener("change",lbCnabAuto);
+$("cnabFormat").addEventListener("change",lbCnabAuto);
+$("cnabType").addEventListener("change",lbCnabAuto);
 
 /* ===== Regras / Biblioteca / Histórico ===== */
 function renderRules(){$("rules").innerHTML="<table><tr><th>Banco</th><th>Produto</th><th>Layout</th><th>Regra atual</th><th>Fonte</th></tr>"+rules.map(r=>`<tr><td>${r[0]} — ${banks[r[0]].name}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")+"</table>"}
@@ -1397,7 +1268,7 @@ function saveRule(){
   const r={banco:$("engineBank").value,produto:$("engineProduct").value,formato:$("engineFormat").value,modalidade:$("engineMode").value,versao:$("engineVersion").value,fonte:$("engineSource").value,regra:$("engineRule").value,data:new Date().toLocaleString("pt-BR")};
   if(!r.regra){lbToast("Descreva a regra/observação técnica antes de salvar.","warn");return}
   const list=getEngineRules();list.unshift(r);localStorage.setItem("lexbank_engine_rules",JSON.stringify(list));
-  $("engineRule").value="";renderEngineList();renderCritical();
+  $("engineRule").value="";renderEngineList();
   lbToast("Regra salva localmente.","ok");
 }
 function exportRules(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(getEngineRules(),null,2)],{type:"application/json"}));a.download="lexbank-regras-motor.json";a.click()}
@@ -1652,45 +1523,6 @@ function renderMaps(){
   $("mapResult").innerHTML=html||"<p class='muted'>Nenhum campo cadastrado ainda.</p>";
 }
 
-/* ===== Teste da Plataforma ===== */
-function abiRunTests(){
-  const tests=[]; const t=(name,cond)=>tests.push({name,ok:!!cond});
-
-  t("mod10('123456789') deve ser 7 (cálculo manual de referência)", lbMod10("123456789")===7);
-
-  const template="110NNNNNNNND005712345700Z";
-  const campoLivre=lbBuildFreeField(template,"1234567","0","Z","digits");
-  const bank="237",currency="9";
-  const due=new Date(Date.now()+5*86400000).toISOString().slice(0,10);
-  const fator=String(lbDateToFactor(due)).padStart(4,"0");
-  const valorDigits=String(Math.round(150.25*100)).padStart(10,"0");
-  const c1=bank+currency+campoLivre.slice(0,5), dv1=lbMod10(c1);
-  const c2=campoLivre.slice(5,15), dv2=lbMod10(c2);
-  const c3=campoLivre.slice(15,25), dv3=lbMod10(c3);
-  const base43=bank+currency+fator+valorDigits+campoLivre, dvGeral=lbMod11General(base43);
-  const linha=c1+dv1+c2+dv2+c3+dv3+dvGeral+fator+valorDigits;
-  const parsed=lbParseCobranca(linha);
-  t("Linha de 47 dígitos gerada é auto-consistente (todos os DVs corretos)", lbSelfErrors(parsed).length===0);
-
-  const corrompida=linha.slice(0,20)+(linha[20]==="9"?"8":"9")+linha.slice(21);
-  t("Corrupção de 1 dígito no Campo 2 é detectada", lbSelfErrors(lbParseCobranca(corrompida)).length>0);
-
-  t("Fator → Data (regra vigente) recompõe o vencimento original", lbFactorToDates(fator).nova.toISOString().slice(0,10)===due);
-
-  t("Linha com tamanho inválido é rejeitada pelo diagnóstico", lbDiagnoseLine("123").ok===false);
-
-  const arrec=(()=>{const blocks=[];for(let i=0;i<4;i++){const content=("126"+String(i).padStart(8,"0")).slice(0,11);blocks.push(content+lbMod10(content))}return blocks.join("")})(); // 3º dígito '6' => regra módulo 10
-  t("Linha de arrecadação (48 dígitos) auto-gerada é consistente", lbParseArrecadacao(arrec).ok===true);
-
-  const cmp1="1234567890",cmp2="1234567891";let diffPos=-1;for(let i=0;i<cmp1.length;i++)if(cmp1[i]!==cmp2[i]){diffPos=i+1;break}
-  t("Comparador identifica a posição exata da divergência", diffPos===10);
-
-  const okCount=tests.filter(x=>x.ok).length;
-  $("testResult").innerHTML=`<div class="card"><div class="status ${okCount===tests.length?"ok":"bad"}">${okCount}/${tests.length} testes aprovados</div>
-  <table><tr><th>Teste</th><th>Resultado</th></tr>${tests.map(x=>`<tr><td>${x.name}</td><td>${x.ok?"✅ OK":"❌ FALHOU"}</td></tr>`).join("")}</table>
-  <p class="muted">Estes testes validam a matemática do motor (módulo 10, módulo 11, fator de vencimento e comparador). Não substituem homologação com o banco.</p></div>`;
-}
-
 /* ===== Diagnóstico Guiado ===== */
 function abiHints(bank,obs){
   const h=[],o=(obs||"").toLowerCase();
@@ -1815,10 +1647,6 @@ function lbAutosaveInit(){
 
 /* ===== Boot ===== */
 lbAutosaveInit();
-$("bank").onchange=()=>{renderCritical();renderChecklist()};
-document.querySelectorAll("#diagnostico input,#diagnostico textarea").forEach(x=>x.addEventListener("input",renderChecklist));
-const lbDiagAuto=lbDebounce(()=>{ if($("digitline").value.trim()) runDiagnosis(false); },400);
-$("digitline").addEventListener("input",lbDiagAuto);
 /* ===== Menu lateral discreto (espelha as mesmas opções do menu de cima) ===== */
 function lbBuildSideNav(){
   const side=$("lbSideNav");
@@ -1843,6 +1671,6 @@ function lbToggleSideNav(){ $("lbSideNav").classList.contains("open") ? lbCloseS
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") lbCloseSideNav(); });
 lbBuildSideNav();
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(`nav button[data-tab="${b.dataset.tab}"]`).forEach(x=>x.classList.add("active"));$(b.dataset.tab).classList.add("active");lbCloseSideNav();});
-renderCritical();renderChecklist();renderRules();renderDocs();renderHistory();renderEngineList();renderMaps();
+renderRules();renderDocs();renderHistory();renderEngineList();renderMaps();
 </script>
 </body></html>
