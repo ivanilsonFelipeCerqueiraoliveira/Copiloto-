@@ -1255,17 +1255,84 @@ function lbCnabParseLine(bank,linha){
   registro.campos=lbCnabExtractFields(linha,mapa);
   return registro;
 }
+function lbCnabStripLeadingZeros(s){
+  const v=String(s||"").replace(/^0+(?=\d)/,"");
+  return v===""?"0":v;
+}
+function lbCnabFormatCNPJ(raw){
+  const v=String(raw||"").replace(/\D/g,"");
+  if(v.length!==14) return raw;
+  return `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8,12)}-${v.slice(12,14)}`;
+}
+function lbCnabFormatContaDv(raw){
+  const v=lbCnabStripLeadingZeros(raw);
+  return v.length<2 ? v : v.slice(0,-1)+"-"+v.slice(-1);
+}
+function lbCnabFormatHora(raw){
+  const v=String(raw||"").trim();
+  return /^\d{6}$/.test(v) ? `${v.slice(0,2)}:${v.slice(2,4)}:${v.slice(4,6)}` : v;
+}
+function lbCnabFormatCEP(cep,compl){
+  const c=String(cep||"").trim(), k=String(compl||"").trim();
+  if(!c) return null;
+  return k ? `${c}-${k}` : c;
+}
+function lbCnabFormatMoeda(v){
+  return typeof v==="number" ? v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}) : "—";
+}
+function lbCnabMontarResumo(bank,registros){
+  const header0=registros.find(r=>r.tipoRegistro==="0"&&r.campos);
+  const header1=registros.find(r=>r.tipoRegistro==="1"&&r.campos);
+  const segmentosO=registros.filter(r=>r.tipoRegistro==="3"&&r.segmento==="O"&&r.campos);
+  if(!header0&&!header1&&!segmentosO.length) return "";
+  let html="<h3>Resumo da remessa</h3>";
+  if(header0||header1){
+    const c0=header0?header0.campos:{}, c1=header1?header1.campos:{};
+    const cnpj=c1.cnpj_empresa||c0.cnpj_empresa, convenio=c1.convenio||c0.convenio;
+    const agencia=c1.agencia||c0.agencia, conta=c1.conta||c0.conta, nome=c1.nome_empresa||c0.nome_empresa;
+    const endereco = c1.logradouro ? `${c1.logradouro}, ${lbCnabStripLeadingZeros(c1.numero_endereco||"")} — ${c1.cidade||""}/${c1.estado||""}, CEP ${lbCnabFormatCEP(c1.cep,c1.complemento_cep)||"—"}` : null;
+    const rows=[
+      ["Empresa pagadora", nome||"—"],
+      ["CNPJ", cnpj?lbCnabFormatCNPJ(cnpj):"—"],
+      ["Banco", `${bank} — ${banks[bank]?banks[bank].name:"desconhecido"}`],
+      ["Convênio", convenio||"—"],
+      ["Agência / Conta", (agencia||conta)?`${agencia||"—"} / ${conta?lbCnabFormatContaDv(conta):"—"}`:"—"],
+    ];
+    if(endereco) rows.push(["Endereço", endereco]);
+    if(c1.tipo_servico) rows.push(["Tipo de serviço (código)", c1.tipo_servico]);
+    if(c1.forma_lancamento) rows.push(["Forma de lançamento (código)", c1.forma_lancamento]);
+    if(c0.data_geracao_arquivo) rows.push(["Arquivo gerado em", `${c0.data_geracao_arquivo}${c0.hora_geracao_arquivo?" às "+lbCnabFormatHora(c0.hora_geracao_arquivo):""}`]);
+    html+="<div class='card'><table><tr><th>Dado</th><th>Valor</th></tr>"+rows.map(([k,v])=>`<tr><td>${lbEsc(k)}</td><td>${lbEsc(String(v))}</td></tr>`).join("")+"</table></div>";
+  }
+  segmentosO.forEach(r=>{
+    const c=r.campos;
+    const rows=[
+      ["Beneficiário (concessionária)", c.nome_concessionaria||"—"],
+      ["Código de barras", c.codigo_de_barras||"—"],
+      ["Valor do pagamento", lbCnabFormatMoeda(c.valor_pagamento)],
+      ["Data de vencimento", c.data_vencimento||"—"],
+      ["Data de pagamento agendada", c.data_pagamento||"—"],
+      ["Seu número (identificação da empresa para esse título)", c.seu_numero||"—"],
+    ];
+    html+=`<div class='card'><h3>O que está sendo pago (linha ${r._linha} — segmento O)</h3><table><tr><th>Dado</th><th>Valor</th></tr>`+rows.map(([k,v])=>`<tr><td>${lbEsc(k)}</td><td>${lbEsc(String(v))}</td></tr>`).join("")+"</table></div>";
+  });
+  if((header1&&header1.campos)&&(header1.campos.tipo_servico||header1.campos.forma_lancamento)) html+="<p class='muted'>Tipo de serviço e Forma de lançamento aparecem como o código bruto da linha — a tradução de cada código depende da tabela do manual oficial do banco, ainda não cadastrada aqui para não arriscar uma descrição errada.</p>";
+  return html;
+}
 function decodeCNABFields(){
   const lines=$("cnabText").value.replace(/\r/g,"").split("\n").filter(Boolean);
   if(!lines.length){ lbToast("Cole ou carregue um arquivo CNAB antes de decodificar.","warn"); return; }
   const bank=$("cnabBank").value||lines[0].slice(0,3);
   const bankName=banks[bank]?banks[bank].name:bank;
   const hasMaps=!!LB_CNAB240_FIELD_MAPS[bank];
-  let html=`<h3>Campos decodificados</h3><p class="muted">Banco identificado: <b>${lbEsc(bank||"—")} — ${lbEsc(bankName||"desconhecido")}</b>. ${hasMaps?`Mapas de campo com fonte oficial (<a class="link" href="${LB_CNAB240_SOURCE_BRADESCO}" target="_blank" rel="noopener">manual do banco</a>).`:"Nenhum mapa de campos cadastrado ainda para este banco — hoje só o Bradesco (237) está mapeado."}</p>`;
   const cap=Math.min(lines.length,30);
-  for(let i=0;i<cap;i++){
-    const reg=lbCnabParseLine(bank,lines[i]);
-    const titulo=`Linha ${i+1} — ${reg.tipoRegistro} · ${reg.tipoRegistroDesc}${reg.segmento?` (Segmento ${lbEsc(reg.segmento)})`:""}`;
+  const registros=[];
+  for(let i=0;i<cap;i++){ const reg=lbCnabParseLine(bank,lines[i]); reg._linha=i+1; registros.push(reg); }
+  let html=`<p class="muted">Banco identificado: <b>${lbEsc(bank||"—")} — ${lbEsc(bankName||"desconhecido")}</b>. ${hasMaps?`Mapas de campo com fonte oficial (<a class="link" href="${LB_CNAB240_SOURCE_BRADESCO}" target="_blank" rel="noopener">manual do banco</a>).`:"Nenhum mapa de campos cadastrado ainda para este banco — hoje só o Bradesco (237) está mapeado."}</p>`;
+  html+=lbCnabMontarResumo(bank,registros);
+  html+="<h3>Detalhamento técnico, campo a campo</h3>";
+  registros.forEach(reg=>{
+    const titulo=`Linha ${reg._linha} — ${reg.tipoRegistro} · ${reg.tipoRegistroDesc}${reg.segmento?` (Segmento ${lbEsc(reg.segmento)})`:""}`;
     if(reg.aviso){
       html+=`<div class="diagnostic-row info"><b>${titulo}</b><span class="muted">${reg.aviso}</span></div>`;
     } else {
@@ -1273,7 +1340,7 @@ function decodeCNABFields(){
         Object.entries(reg.campos).map(([k,v])=>`<tr><td class="pos">${lbEsc(k)}</td><td>${v===null||v===undefined||v===""?"—":lbEsc(String(v))}</td></tr>`).join("")+
         "</table></div>";
     }
-  }
+  });
   if(lines.length>cap) html+=`<p class="muted">Mostrando as primeiras ${cap} de ${lines.length} linhas.</p>`;
   $("cnabFieldsResult").innerHTML=html;
 }
