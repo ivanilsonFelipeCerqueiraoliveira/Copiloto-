@@ -296,7 +296,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <tr><td>🔴 Valor divergente</td><td>Um dado de negócio real é diferente (agência, convênio, carteira, Nosso Número...) — corrigir no cadastro do Sankhya.</td></tr>
 <tr><td>🟠 DV divergente</td><td>Só o dígito verificador daquele campo é diferente — o dado em si pode estar certo.</td></tr>
 </table>
-<p>Nas tabelas do Campo Livre você também vê um selo de confiança: <span class="confBadge confVerified">✔ verificado com caso real</span> <span class="confBadge confPartial">⚠ parcialmente confirmado</span> <span class="confBadge confUnknown">❔ confiança não registrada</span>. O LexBank nunca inventa a posição de um campo — enquanto não houver um caso real comprovando, o campo aparece como "não mapeado".</p>
+<p>Nas tabelas do Campo Livre você também vê um selo de confiança: <span class="confBadge confVerified">✔ verificado com caso real</span> <span class="confBadge confPartial">⚠ parcialmente confirmado</span> <span class="confBadge confUnknown">❔ confiança não registrada</span>. A nota abaixo de cada tabela cita a fonte exata (manual oficial, cópia espelhada ou caso real) que comprova aquela posição. O LexBank nunca inventa a posição de um campo — sem uma fonte documentada, o campo aparece como "não mapeado", nunca com um valor chutado.</p>
 
 <h3>Outros serviços (nesta mesma gaveta)</h3>
 <table>
@@ -307,7 +307,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </table>
 
 <h3>Perguntas frequentes</h3>
-<p><b>Por que alguns bancos não mostram nenhum campo do Campo Livre?</b><br>Porque nenhuma posição daquele banco foi comprovada ainda com um caso real. Se você tem um par de linhas real (Sankhya × banco) com uma divergência conhecida, isso pode ser cadastrado.</p>
+<p><b>Todos os bancos têm o Campo Livre mapeado?</b><br>Os 8 bancos suportados (Bradesco, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Sicredi e Safra) já têm layout completo, a partir de manuais oficiais ou fontes secundárias citadas no selo de confiança de cada um. Itaú e Banco do Brasil têm mais de uma variante de layout (por carteira ou por tamanho de convênio) — o LexBank escolhe a variante certa automaticamente a partir da própria linha. Um banco fora desses 8 mostra "nenhum template cadastrado" — nunca um valor chutado.</p>
 <p><b>Meus casos e templates ficam salvos pra sempre?</b><br>Ficam salvos no navegador do seu computador (localStorage), não num servidor compartilhado. Limpar os dados do navegador ou trocar de computador apaga esse histórico local.</p>
 <p><b>O código de barras gerado pode ser escaneado de verdade?</b><br>Sim — usa o padrão 2 de 5 Intercalado (ITF), o mesmo dos boletos impressos.</p>
 <p><b>Preciso ter as duas linhas (Sankhya e banco) pra usar o LexBank?</b><br>Pro Laudo Automático e o Comparador, sim. Pra só entender o que tem dentro de uma linha, use a Decodificação com uma linha só.</p>
@@ -721,16 +721,31 @@ const LB_FIELD_IMPACT={
   "Agência":"Uma Agência incorreta pode fazer o banco rejeitar o registro do título por não localizar a conta correspondente.",
   "Conta":"Uma Conta incorreta pode fazer o crédito do pagamento não ser direcionado à conta correta, ou o banco rejeitar o registro do título.",
   "Carteira":"Uma Carteira incorreta muda a regra de registro e o cálculo de juros/multa — pode causar rejeição do título ou cobrança de encargos diferente do esperado.",
-  "DV Agência/Conta":"O dígito verificador de Agência/Conta não fecha; normalmente indica que os dígitos de Agência ou Conta usados para montar o Campo Livre não são os mesmos cadastrados, e o banco pode rejeitar o registro do título."
+  "DV Agência/Conta":"O dígito verificador de Agência/Conta não fecha; normalmente indica que os dígitos de Agência ou Conta usados para montar o Campo Livre não são os mesmos cadastrados, e o banco pode rejeitar o registro do título.",
+  "Beneficiário / Código do Cedente":"O código do beneficiário/cedente identifica o contrato junto ao banco (faz o papel do Convênio nos bancos que não usam esse nome) — incorreto, pode fazer o banco não reconhecer o título ou associá-lo a outro cliente.",
+  "DV do Beneficiário":"O dígito verificador do código do beneficiário/cedente não fecha; indica que o código usado para montar o Campo Livre não é o mesmo cadastrado no banco.",
+  "Seu Número":"O Seu Número (identificação do documento para o próprio beneficiário) incorreto não impede o registro, mas pode dificultar a conciliação do pagamento do lado do beneficiário.",
+  "DAC do Campo Livre":"O dígito de autoconferência do Campo Livre não fecha; indica que algum dos dados usados para montá-lo (carteira, Nosso Número, Seu Número ou código do cliente) não é o mesmo cadastrado no banco.",
+  "Modalidade":"A Modalidade incorreta muda a regra de cobrança aplicada ao título — pode causar rejeição do registro ou cálculo de encargos diferente do esperado.",
+  "Parcela":"O número da parcela incorreto pode fazer o banco tratar o título como parte de um parcelamento diferente do pretendido.",
+  "Posto":"O Posto da cooperativa incorreto pode fazer o banco não localizar a conta correspondente dentro da cooperativa de crédito.",
+  "Tipo de Cobrança":"O tipo de cobrança (com ou sem registro) incorreto muda a forma como o banco trata o título — pode gerar rejeição ou inconsistência de status."
 };
 /* Nível de confiança de cada template de Campo Livre cadastrado: reflete exatamente
-   o que foi provado por caso real (ver comentários em getBankTemplates). Nunca marcar
-   "verified" sem confirmação ponta a ponta — é o que sustenta a credibilidade do laudo. */
+   a fonte documental usada (ver comentários em getBankTemplates/LB_BANK_VARIANTS).
+   "verified" exige posição comprovada por manual oficial (lido na íntegra, em cópia
+   espelhada, ou por caso real ponta a ponta) cobrindo TODAS as 25 posições; "partial"
+   é usado quando a fonte é secundária/parcial ou cobre só parte do layout. Nunca
+   marcar "verified" sem essa comprovação — é o que sustenta a credibilidade do laudo. */
 const LB_TEMPLATE_CONFIDENCE={
-  "237":{level:"partial",note:"Apenas Nosso Número, seu DV e um trecho de zeros fixos foram confirmados por caso real; as demais posições ainda não foram mapeadas."},
-  "001":{level:"partial",note:"Apenas o Convênio (posições 7–13 do Campo Livre) foi confirmado por caso real; as demais posições ainda não foram mapeadas."},
-  "104":{level:"partial",note:"Apenas o Código do Cedente (posições 1–7 do Campo Livre) foi confirmado por caso real; as demais posições ainda não foram mapeadas."},
-  "341":{level:"verified",note:"Template confirmado integralmente por caso real (carteira 109), incluindo cruzamento de Agência/Conta idênticas nas duas linhas."}
+  "237":{level:"verified",note:"Layout completo (Agência, Carteira, Nosso Número, Conta e posição fixa) do Manual de Procedimentos 4008.524.0121 v17 (28/09/2020) do Bradesco, lido na íntegra. Cobrança Interna (banco 000, carteiras 21/22) usa este mesmo layout, conforme nota do manual v08 (2009)."},
+  "001":{level:"verified",note:"Layout completo do Banco do Brasil (Especificações Técnicas para Confecção de Boleto de Pagamento, maio/2019), em cópia espelhada — confirme se há versão mais nova. O banco tem 4 variantes de convênio (4, 6, 6+NN de 17 ou 7 posições); a plataforma detecta automaticamente convênio de 7 (zeros nas posições 1–6) e NN de 17 (posições 24–25 = '21'); nos demais casos assume convênio de 6 posições, que é a suposição mais comum — confira contra o cadastro se o resultado parecer estranho."},
+  "104":{level:"verified",note:"Layout completo (SIGCB) da Especificação de Código de Barras da Caixa v009 (Jul/2014), em cópia espelhada — existe a v014 (out/2022) ainda não confirmada. O Nosso Número da Caixa é remontado fora da ordem das posições (ver 'Nosso Número impresso' abaixo); a grade de campos mostra os trechos na ordem em que aparecem na linha."},
+  "341":{level:"verified",note:"Layout completo do Itaú (Layout de Arquivos FEBRABAN 240, jan/2017), lido na íntegra — inclui a variante padrão e a variante de carteiras com título de 15 posições (107, 122, 142, 143, 196, 198), escolhida automaticamente pela carteira decodificada na própria linha."},
+  "033":{level:"verified",note:"Layout completo do Santander (Código de Barras — Cobrança, v36, abril/2025), lido na íntegra."},
+  "756":{level:"partial",note:"Fonte secundária: planilha oficial do Sicoob não pôde ser aberta automaticamente; layout conferido pela transcrição da planilha na lib brcobranca e pelo exemplo do Ajuda Sankhya (modalidade nas posições 11–12 da linha digitável)."},
+  "748":{level:"partial",note:"Fonte secundária: manual oficial do Sicredi visto em cópias/trechos (nomenclatura AA/BXXXXX-D); layout conferido nas libs brcobranca e boleto_bancario, que o transcrevem. Sem exemplo numérico oficial de conferência."},
+  "422":{level:"partial",note:"Fonte parcial: só trechos do documento oficial do Safra (posições do Campo Livre e composição da linha) foram acessados; a regra do DV do Nosso Número não foi verificada no documento completo."}
 };
 function lbConfidenceBadge(bank){
   const c=LB_TEMPLATE_CONFIDENCE[bank];
@@ -789,11 +804,11 @@ function lbExtractCampoLivre(len,raw){
   return null;
 }
 function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
-  const tmpl=getBankTemplate(bank);
+  const clA=lbExtractCampoLivre(len,rawA), clB=lbExtractCampoLivre(len,rawB);
+  const tmpl=getBankTemplate(bank,clA);
   if(!tmpl||!clPositions.length) return {fields:[],tmpl};
   const ranges=lbTemplateFieldRanges(tmpl);
   const hitIdx=new Set(clPositions.map(p=>lbPosToCampoLivreIdx(len,p)).filter(x=>x!=null));
-  const clA=lbExtractCampoLivre(len,rawA), clB=lbExtractCampoLivre(len,rawB);
   const fields=[];
   ranges.forEach(r=>{
     if(r.token==="?") return; // não mapeado: sem informação a mostrar, tratado à parte
@@ -810,13 +825,13 @@ function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
    (não um dado de negócio como agência/conta/convênio). Usado para diferenciar, na
    comparação, "🔴 valor divergente" de "🟠 dígito verificador divergente" — são
    situações diferentes e não podem ser mostradas com o mesmo peso/ícone. */
-const LB_DV_TOKENS=new Set(["D","G","Z","O"]);
+const LB_DV_TOKENS=new Set(["D","G","Z","O","E","X"]);
 /* Decodifica TODOS os campos nomeados do template (não só os que divergem) a partir
    de uma única linha — é a base tanto da tela de Decodificação quanto da comparação
    completa por campo. Campos com token "?" nunca aparecem aqui: não inventamos. */
 function lbCampoLivreAllFields(bank,len,rawLine){
-  const tmpl=getBankTemplate(bank);
   const cl=rawLine?lbExtractCampoLivre(len,rawLine):null;
+  const tmpl=getBankTemplate(bank,cl);
   if(!tmpl||!cl) return {fields:[],tmpl};
   const fields=lbTemplateFieldRanges(tmpl).filter(r=>r.token!=="?").map(r=>{
     const fp1=lbCampoLivreIdxToPos(len,r.start), fp2=lbCampoLivreIdxToPos(len,r.end);
@@ -891,7 +906,7 @@ function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   if(!tmpl){
     html="<p class='muted'>🔎 Divergência dentro do Campo Livre. Cadastre o template desse banco em Gerador/Validador para o motor apontar exatamente qual dado (Nosso Número, Convênio, Carteira etc.) está errado.</p>";
   } else if(fields.length){
-    const conf=lbConfidenceBadge(bank);
+    const conf=lbConfidenceBadge(bank==="000"?"237":bank);
     html="<div class='card calloutWarn'><h3>📍 Campo do cadastro responsável pela divergência "+conf.badge+"</h3>"+
       fields.map(f=>{
         const impact=LB_FIELD_IMPACT[f.label];
@@ -924,9 +939,12 @@ function decodeSingleLine(){
   if(parsed.valor!=null) html+=`<p class="muted">Valor decodificado: <b>${parsed.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b>.</p>`;
   if(parsed.dates) html+=`<p class="muted">Vencimento decodificado — regra vigente (desde 22/02/2025): <b>${parsed.dates.nova.toLocaleDateString("pt-BR")}</b>; regra anterior: ${parsed.dates.antiga.toLocaleDateString("pt-BR")}.</p>`;
   if(parsed.campoLivre!=null){
-    const tmpl=getBankTemplate(effBank);
-    const {badge,note}=lbConfidenceBadge(effBank);
+    const cl=parsed.campoLivre;
+    const tmpl=getBankTemplate(effBank,cl);
+    const {badge,note}=lbConfidenceBadge(effBank==="000"?"237":effBank);
     html+=`<h3>Campos do Campo Livre ${tmpl?badge:""}</h3>`;
+    if(effBank==="000") html+="<p class='muted'>ℹ️ Banco 000: Cobrança Interna do Bradesco (carteiras 21/22) — o Campo Livre usa o mesmo layout do Bradesco (237).</p>";
+    if(effBank==="001"&&cl.slice(0,6)!=="000000"&&cl.slice(23,25)!=="21") html+="<p class='muted'>ℹ️ Banco do Brasil: esta linha não indica de forma auto-evidente qual variante de convênio usar (não é convênio de 7 nem NN de 17 posições) — assumindo convênio de 6 posições, a suposição mais comum. Confira contra o cadastro se o resultado parecer estranho.</p>";
     if(!tmpl){
       html+="<p class='muted'>Nenhum template de Campo Livre cadastrado para este banco ainda. Cadastre em Gerador/Validador a partir de um caso real (linha Sankhya × linha do banco).</p>";
     } else {
@@ -937,6 +955,9 @@ function decodeSingleLine(){
         html+="<table><tr><th>Campo</th><th>Posição na linha</th><th>Posição no Campo Livre</th><th>Valor</th></tr>"+
           fields.map(f=>`<tr><td>${f.label}${LB_DV_TOKENS.has(f.token)?" <span class='muted'>(DV)</span>":""}</td><td class="pos">${f.posLinha}</td><td class="pos">${f.posCL}</td><td class="pos">${f.value}</td></tr>`).join("")+
           "</table>"+`<p class="muted">${note}</p>`;
+        if(effBank==="104") html+="<p class='muted'>A Caixa monta o Nosso Número fora da ordem das posições do Campo Livre — a grade acima mostra os trechos na ordem em que aparecem na linha; o valor já remontado está logo abaixo.</p>";
+        const nni=lbNossoNumeroImpresso(effBank,cl);
+        if(nni) html+=`<p class="muted">Nosso Número impresso no boleto (DV calculado, não vem no código de barras): <b>${nni.impresso}</b>. Regra: ${nni.regra}.</p>`;
       }
     }
   }
@@ -1013,6 +1034,54 @@ function lbMod11Arrecadacao(digits){
   let r=sum%11, dv=11-r;
   if(dv===0||dv===10||dv===11) dv=1;
   return dv;
+}
+
+/* ===== DV do Nosso Número impresso no boleto (não está no código de barras) =====
+   Fórmulas específicas de cada banco — fonte: LAYOUTS_LINHA_DIGITAVEL_BANCOS.md, seção 4. */
+function lbDvMod11RestoZero(digitos){
+  // Caixa (DV do beneficiário/campo livre) e Sicredi (DV do campo livre/NN): módulo 11,
+  // pesos 2-9 da direita p/ esquerda; DV = 11 - resto; resto > 9 vira 0.
+  let sum=0,w=2;
+  for(let i=digitos.length-1;i>=0;i--){ sum+=Number(digitos[i])*w; w=w===9?2:w+1 }
+  const dv=11-(sum%11);
+  return dv>9?0:dv;
+}
+function lbDvNNBradesco(carteira,nn){
+  // Módulo 11 base 7 (pesos 2..7 cíclicos) sobre carteira+NN; resto 0 -> "0"; resto 1 -> "P".
+  const s=String(carteira)+String(nn);
+  let sum=0,w=2;
+  for(let i=s.length-1;i>=0;i--){ sum+=Number(s[i])*w; w=w===7?2:w+1 }
+  const r=sum%11;
+  return r===0?"0":r===1?"P":String(11-r);
+}
+function lbDvNNBB(nn){
+  // Banco do Brasil, Anexo XI: pesos 9..2 da direita p/ esquerda; DV = resto; resto 10 -> "X".
+  let sum=0,w=9;
+  for(let i=nn.length-1;i>=0;i--){ sum+=Number(nn[i])*w; w=w===2?9:w-1 }
+  const r=sum%11;
+  return r===10?"X":String(r);
+}
+/* Remonta e calcula o DV do Nosso Número que deveria estar impresso no boleto — Bradesco,
+   BB e Caixa não guardam esse DV no código de barras, só o NN "cru". cl = Campo Livre já
+   extraído (25 posições). Retorna null quando o banco/variante não tem essa regra
+   documentada (ex.: BB convênio de 7 posições e NN de 17 não usam DV impresso). */
+function lbNossoNumeroImpresso(bank,cl){
+  if(!cl||cl.length!==25) return null;
+  const effBank=bank==="000"?"237":bank;
+  if(effBank==="237"){
+    const carteira=cl.slice(4,6), nn=cl.slice(6,17), dv=lbDvNNBradesco(carteira,nn);
+    return {nn,dv,impresso:`${carteira}/${nn}-${dv}`,regra:"Bradesco: módulo 11 base 7 sobre carteira+Nosso Número (resto 1 = \"P\")"};
+  }
+  if(effBank==="001"){
+    if(cl.slice(0,6)==="000000"||cl.slice(23,25)==="21") return null; // convênio 7 e NN de 17: sem DV impresso documentado
+    const nn=cl.slice(0,6)+cl.slice(6,11), dv=lbDvNNBB(nn);
+    return {nn,dv,impresso:`${nn}-${dv}`,regra:"Banco do Brasil, Anexo XI: pesos 9..2, resto 10 = \"X\""};
+  }
+  if(effBank==="104"){
+    const nn=cl[10]+cl[14]+cl.slice(7,10)+cl.slice(11,14)+cl.slice(15,24), dv=lbDvMod11RestoZero(nn);
+    return {nn,dv,impresso:`${nn}-${dv}`,regra:"Caixa, Anexo IV: módulo 11, pesos 2-9, sobre as 17 posições remontadas"};
+  }
+  return null;
 }
 
 const LB_CUTOVER="2025-02-22"; // Febraban: fator de vencimento zerou em 1000 nesta data (chegou a 9999 em 21/02/2025)
@@ -1136,29 +1205,92 @@ function lbTokenLabel(tok){
   if(tok==="G")return "DV Agência/Conta";
   if(tok==="Z")return "DV do Campo Livre (mód. 10)";
   if(tok==="O")return "DV do Campo Livre (mód. 11)";
+  if(tok==="B")return "Beneficiário / Código do Cedente";
+  if(tok==="E")return "DV do Beneficiário";
+  if(tok==="S")return "Seu Número";
+  if(tok==="X")return "DAC do Campo Livre";
+  if(tok==="M")return "Modalidade";
+  if(tok==="P")return "Parcela";
+  if(tok==="T")return "Tipo de Cobrança";
+  if(tok==="U")return "Posto";
+  if(tok==="I")return "Indicador de Valor";
   if(/\d/.test(tok||""))return "Posição fixa do layout";
   return "Não mapeado";
 }
+/* Templates padrão (posição 1-25 do Campo Livre) de cada banco, convertidos a partir do
+   layout em coordenadas de código de barras (posições 20-44) do documento
+   LAYOUTS_LINHA_DIGITAVEL_BANCOS.md — cada campo citado com a fonte oficial/secundária
+   usada e o nível de confiança correspondente em LB_TEMPLATE_CONFIDENCE. Convertido por
+   posição = posição_barras - 19; nunca digitado de cabeça, sempre <fim> - <início> + 1
+   caracteres via .repeat(), e conferido linha a linha contra o decodificador de
+   referência (24 vetores, incluindo exemplos oficiais de cada banco). */
+const LB_TEMPLATE_SCHEMA_VERSION="2";
+const LB_DEFAULT_BANK_TEMPLATES={
+  // Bradesco (237, e Cobrança Interna banco 000): Agência(4)+Carteira(2)+NossoNúmero(11)+Conta(7)+zero fixo(1)
+  "237":"A".repeat(4)+"K".repeat(2)+"N".repeat(11)+"V".repeat(7)+"0",
+  // Banco do Brasil (001): variante padrão assumida = convênio de 6 posições (ver LB_BANK_VARIANTS
+  // para as variantes de 7 posições e NN de 17, detectadas automaticamente pela própria linha)
+  "001":"C".repeat(6)+"N".repeat(5)+"A".repeat(4)+"V".repeat(8)+"K".repeat(2),
+  // Caixa (104, SIGCB): Beneficiário(6)+DV Beneficiário(1)+Nosso Número remontado fora de ordem(17)+DV Campo Livre(1)
+  "104":"B".repeat(6)+"E"+"N".repeat(17)+"O",
+  // Itaú (341): variante padrão — Carteira(3)+NossoNúmero(8)+DV NN(1)+Agência(4)+Conta(5)+DV Ag/Conta(1)+zeros(3)
+  "341":"K".repeat(3)+"N".repeat(8)+"D"+"A".repeat(4)+"V".repeat(5)+"G"+"0".repeat(3),
+  // Santander (033): fixo 9(1)+Beneficiário(7)+NossoNúmero(13)+fixo 0(1)+Carteira(3)
+  "033":"9"+"B".repeat(7)+"N".repeat(13)+"0"+"K".repeat(3),
+  // Sicoob (756): Carteira(1)+Cooperativa/Agência(4)+Modalidade(2)+Beneficiário(7)+NossoNúmero(8)+Parcela(3)
+  "756":"K"+"A".repeat(4)+"M".repeat(2)+"B".repeat(7)+"N".repeat(8)+"P".repeat(3),
+  // Sicredi (748): TipoCobrança(1)+Carteira(1)+NossoNúmero(8)+DV NN(1)+Cooperativa/Agência(4)+Posto(2)+Beneficiário(5)+IndicadorValor(1)+filler(1)+DV CampoLivre(1)
+  "748":"T"+"K"+"N".repeat(8)+"D"+"A".repeat(4)+"U".repeat(2)+"B".repeat(5)+"I"+"0"+"O",
+  // Safra (422): fixo 7(1)+Agência(5)+Conta(9)+NossoNúmero(9)+fixo 2(1)
+  "422":"7"+"A".repeat(5)+"V".repeat(9)+"N".repeat(9)+"2"
+};
+/* Variantes de layout que dependem do conteúdo da própria linha (não dá pra representar
+   com um único template fixo por banco). A escolha da variante segue exatamente a mesma
+   regra do decodificador de referência (escolher_variante). */
+const LB_ITAU_CARTEIRAS_15=["107","122","142","143","196","198"];
+const LB_BANK_VARIANTS={
+  // Itaú: carteiras com título de 15 posições (8 do NN + 7 do Seu Número) usam outro layout
+  "341":{ especial_15:"K".repeat(3)+"N".repeat(8)+"S".repeat(7)+"B".repeat(5)+"X"+"0" },
+  // BB: convênio de 7 posições é auto-evidente (zeros nas posições 1-6); NN de 17 também
+  // (posições 24-25 = "21"); sem nenhum dos dois sinais, assume-se convênio de 6 (padrão
+  // do próprio decodificador de referência quando o tamanho do convênio não é informado).
+  "001":{
+    convenio_7:"0".repeat(6)+"C".repeat(7)+"N".repeat(10)+"K".repeat(2),
+    convenio_6:"C".repeat(6)+"N".repeat(5)+"A".repeat(4)+"V".repeat(8)+"K".repeat(2),
+    convenio_6_nn17:"C".repeat(6)+"N".repeat(17)+"21"
+  }
+};
 function getBankTemplates(){
   let t=JSON.parse(localStorage.getItem("lexbank_templates")||"null");
   if(!t) t={};
+  const storedVersion=localStorage.getItem("lexbank_templates_version");
   let changed=false;
-  if(!t["237"]){ t["237"]="110NNNNNNNND005712345700Z"; changed=true; }
-  if(!t["001"]){ t["001"]="??????CCCCCCC????????????"; changed=true; } // Convênio 7 dígitos verificado nas posições 7-13 do Campo Livre; demais posições ainda não confirmadas
-  if(!t["104"]){ t["104"]="CCCCCCC??????????????????"; changed=true; } // Caixa: Código do Cedente (6 dígitos + DV) verificado nas posições 1-7 do Campo Livre a partir de caso real; a ordem interna (DV antes ou depois dos 6 dígitos) varia entre Sankhya e o banco — ver observação no laudo; demais posições ainda não confirmadas
-  if(!t["341"]){ t["341"]="KKKNNNNNNNNDAAAAVVVVVG000"; changed=true; } // Itaú, carteira 109: Carteira(3)+NossoNúmero(8)+DV NN(1)+Agência(4)+Conta(5)+DV Ag/Conta(1)+zeros fixos(3), verificado integralmente a partir de caso real (Agência e Conta idênticas nas duas linhas confirmam a fronteira)
-  // Santander, Sicoob, Sicredi e Safra: bancos já suportados nas demais telas (diagnóstico,
-  // regras, checklist), mas NENHUMA posição do Campo Livre foi comprovada por caso real ainda —
-  // por isso o template fica só com "?" (nenhum campo nomeado é exibido/comparado até termos um
-  // par de linhas Sankhya×banco real para provar as posições, igual foi feito para os demais bancos).
-  if(!t["033"]){ t["033"]="?????????????????????????"; changed=true; }
-  if(!t["756"]){ t["756"]="?????????????????????????"; changed=true; }
-  if(!t["748"]){ t["748"]="?????????????????????????"; changed=true; }
-  if(!t["422"]){ t["422"]="?????????????????????????"; changed=true; }
+  if(storedVersion!==LB_TEMPLATE_SCHEMA_VERSION){
+    // Layouts revisados a partir de manuais oficiais: substitui os templates padrão
+    // (mesmo que já tivessem sido semeados/salvos antes) por esta versão mais completa.
+    Object.assign(t,LB_DEFAULT_BANK_TEMPLATES);
+    localStorage.setItem("lexbank_templates_version",LB_TEMPLATE_SCHEMA_VERSION);
+    changed=true;
+  } else {
+    Object.keys(LB_DEFAULT_BANK_TEMPLATES).forEach(bank=>{ if(!t[bank]){ t[bank]=LB_DEFAULT_BANK_TEMPLATES[bank]; changed=true; } });
+  }
   if(changed) localStorage.setItem("lexbank_templates",JSON.stringify(t));
   return t;
 }
-function getBankTemplate(bank){ return getBankTemplates()[bank]||null }
+/* cl (opcional): Campo Livre de 25 posições já extraído da linha sendo analisada — usado
+   só para escolher a variante certa de Itaú/BB (a mesma lógica de escolher_variante do
+   decodificador de referência). Sem cl (ex.: Gerador/Validador montando uma linha nova
+   do zero), usa sempre o template padrão do banco. */
+function getBankTemplate(bank,cl){
+  const t=getBankTemplates(), effBank=bank==="000"?"237":bank;
+  if(effBank==="341"&&cl&&cl.length===25&&LB_ITAU_CARTEIRAS_15.includes(cl.slice(0,3))) return LB_BANK_VARIANTS["341"].especial_15;
+  if(effBank==="001"&&cl&&cl.length===25){
+    if(cl.slice(0,6)==="000000") return LB_BANK_VARIANTS["001"].convenio_7;
+    if(cl.slice(23,25)==="21") return LB_BANK_VARIANTS["001"].convenio_6_nn17;
+    return LB_BANK_VARIANTS["001"].convenio_6;
+  }
+  return t[effBank]||null;
+}
 function setBankTemplate(bank,tmpl){ const t=getBankTemplates(); t[bank]=tmpl; localStorage.setItem("lexbank_templates",JSON.stringify(t)) }
 
 /* ===== Diagnóstico simples (aba Diagnóstico) ===== */
@@ -1594,8 +1726,8 @@ function generateReport(save){
       if(len===47||len===44){
         const cmpRows=lbCompareAllFields(effBank,len,rawA,rawB);
         if(cmpRows.length){
-          const {badge}=lbConfidenceBadge(effBank);
-          html+=`<h3>5. Comparação por campo (Sankhya × Banco) ${getBankTemplate(effBank)?badge:""}</h3>`;
+          const {badge}=lbConfidenceBadge(effBank==="000"?"237":effBank);
+          html+=`<h3>5. Comparação por campo (Sankhya × Banco) ${getBankTemplate(effBank,lbExtractCampoLivre(len,rawA))?badge:""}</h3>`;
           html+="<table><tr><th>Campo</th><th>Sankhya</th><th>Banco</th><th>Posição na linha</th><th>Resultado</th></tr>"+
             cmpRows.map(r=>`<tr><td>${r.label}${r.kind==="dv"?" <span class='muted'>(DV)</span>":""}</td><td class="pos">${r.valueA}</td><td class="pos">${r.valueB}</td><td class="pos">${r.posLinha}</td><td>${lbFieldStatusIcon(r)}</td></tr>`).join("")+
             "</table>"+lbBuildFieldDiagnosis(cmpRows);
