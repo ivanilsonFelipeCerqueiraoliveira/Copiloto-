@@ -161,7 +161,7 @@ footer p{color:var(--muted);font-size:13px;margin:4px 0}
 <table>
 <tr><th>Onde</th><th>O que faz</th></tr>
 <tr><td>Menu de cima</td><td>Os 5 serviços mais usados no dia a dia: Decodificação, Comparador, Laudo Automático, Gerador/Validador e Análise Guiada.</td></tr>
-<tr><td>Seta na borda esquerda</td><td>Abre uma gaveta com os demais serviços (CNAB Explorer, Regras Bancárias, Motor de Diagnóstico, Mapas Oficiais, Casos, entre outros).</td></tr>
+<tr><td>Seta na borda esquerda</td><td>Abre uma gaveta com os demais serviços (CNAB Explorer, Homologador de Remessa, Regras Bancárias, Motor de Diagnóstico, Mapas Oficiais, Casos, entre outros).</td></tr>
 <tr><td>Ícone 🌙 / ☀️</td><td>Alterna entre tema claro e escuro. Abre sempre no claro por padrão.</td></tr>
 <tr><td>Iniciais no canto superior direito</td><td>Seu menu de usuário — nome, e-mail, perfil e opção de sair.</td></tr>
 </table>
@@ -246,6 +246,7 @@ footer p{color:var(--muted);font-size:13px;margin:4px 0}
 <p>Pela seta na borda esquerda você também acessa:</p>
 <table>
 <tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo (hoje cobre Bradesco: Header de Arquivo, Header de Lote, Segmento O, Segmento W, Trailer de Lote e Trailer de Arquivo).</td></tr>
+<tr><td><b>Homologador de Remessa</b></td><td>Simula, sem gravar nada e só no seu navegador, como o banco reagiria a um arquivo de remessa (CNAB 240/400) dos 8 bancos suportados: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. É um layout transcrito de biblioteca open-source (conferido só em parte contra manuais oficiais) — não tem tabela de código de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno; e não verifica duplicidade entre remessas diferentes, porque isso exige um estado compartilhado que o LexBank (só cliente, sem servidor) não guarda. Use também o canal de teste do próprio banco antes de produção.</td></tr>
 <tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
 <tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador.</td></tr>
