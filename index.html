@@ -300,7 +300,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 
 <h3>Outros serviços (nesta mesma gaveta)</h3>
 <table>
-<tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo (hoje cobre Bradesco: Header de Arquivo, Header de Lote, Segmento O, Segmento W, Trailer de Lote e Trailer de Arquivo).</td></tr>
+<tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo dos 8 bancos suportados (Bradesco 240 a partir do manual oficial; os demais, incluindo Bradesco 400, com o mesmo layout transcrito de biblioteca open-source já usado no Homologador de Remessa).</td></tr>
 <tr><td><b>Homologador de Remessa</b></td><td>Simula, sem gravar nada e só no seu navegador, como o banco reagiria a um arquivo de remessa (CNAB 240/400) dos 8 bancos suportados: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. É um layout transcrito de biblioteca open-source (conferido só em parte contra manuais oficiais) — não tem tabela de código de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno; e não verifica duplicidade entre remessas diferentes, porque isso exige um estado compartilhado que o LexBank (só cliente, sem servidor) não guarda. Use também o canal de teste do próprio banco antes de produção.</td></tr>
 <tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
@@ -325,7 +325,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div id="decodResult"><div class="muted">Nenhuma linha decodificada ainda.</div></div>
 </div></section>
 
-<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. Identifica tipo de registro e segmento por posição, e a busca destaca as ocorrências do termo direto na amostra. Use "DECODIFICAR CAMPOS" para ver cada campo com nome e valor — hoje cobre Bradesco (237): Header de Arquivo, Header de Lote, Segmento O, Segmento W, Trailer de Lote e Trailer de Arquivo, com posições tiradas do manual oficial.</div>
+<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. Identifica tipo de registro e segmento por posição, e a busca destaca as ocorrências do termo direto na amostra. Use "DECODIFICAR CAMPOS" para ver cada campo com nome e valor nos 8 bancos suportados: Bradesco 240 (Header de Arquivo, Header de Lote, Segmento O, Segmento W, Trailer de Lote e Trailer de Arquivo) com posições tiradas do manual oficial; os demais — Bradesco 400, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Sicredi e Safra (só 400) — usam o mesmo layout transcrito de biblioteca open-source já validado no Homologador de Remessa, conferido só em parte contra manuais oficiais.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cnabBank"><option value="">Automático</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Formato</label><select id="cnabFormat"><option>Automático</option><option>CNAB 240</option><option>CNAB 400</option></select></div><div class="field"><label>Tipo</label><select id="cnabType"><option>Automático</option><option>Remessa</option><option>Retorno</option></select></div><div class="field"><label>Segmento esperado</label><input id="cnabSeg" placeholder="Ex.: P"></div><div class="field"><label>Pesquisar termo</label><input id="cnabSearch" placeholder="Ex.: 0001234567"></div><div class="field"><label>Posição inicial</label><input id="cnabPosStart" type="number" min="1"></div><div class="field"><label>Posição final</label><input id="cnabPosEnd" type="number" min="1"></div><div class="field full"><label>Arquivo / conteúdo</label><input id="cnabFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="cnabText" placeholder="Cole o CNAB aqui..."></textarea></div></div>
 <div class="actions"><button class="btn primary" onclick="analyzeCNAB()">ANALISAR ARQUIVO</button><button class="btn secondary" onclick="findPosition()">CONSULTAR POSIÇÃO</button><button class="btn secondary" onclick="decodeCNABFields()">DECODIFICAR CAMPOS</button><button class="btn secondary" onclick="exportCNABReport()">EXPORTAR LAUDO</button></div><div id="cnabResult"></div><div id="cnabFieldsResult"></div></div></section>
 
@@ -1469,29 +1469,105 @@ function lbCnabMontarResumo(bank,registros){
   return html;
 }
 function decodeCNABFields(){
-  const lines=$("cnabText").value.replace(/\r/g,"").split("\n").filter(Boolean);
+  const lines=$("cnabText").value.replace(/\x1a/g,"").replace(/\x00/g,"").replace(/\r/g,"").split("\n").filter(Boolean);
   if(!lines.length){ lbToast("Cole ou carregue um arquivo CNAB antes de decodificar.","warn"); return; }
-  const bank=$("cnabBank").value||lines[0].slice(0,3);
-  const bankName=banks[bank]?banks[bank].name:bank;
-  const hasMaps=!!LB_CNAB240_FIELD_MAPS[bank];
+  const bankSel=$("cnabBank").value, fmtSel=$("cnabFormat").value;
+  const lens=[...new Set(lines.map(x=>x.length))];
+  const tamGuess = fmtSel==="CNAB 240"?240 : fmtSel==="CNAB 400"?400 : (lens.includes(400)?400:240);
+  const bankGuess=bankSel||(tamGuess===240?lines[0].slice(0,3):"");
+  if((bankGuess==="237"||bankGuess==="000") && tamGuess===240){
+    const bankName=banks[bankGuess]?banks[bankGuess].name:bankGuess;
+    const cap=Math.min(lines.length,30);
+    const registros=[];
+    for(let i=0;i<cap;i++){ const reg=lbCnabParseLine(bankGuess,lines[i]); reg._linha=i+1; registros.push(reg); }
+    let html=`<p class="muted">Banco identificado: <b>${lbEsc(bankGuess)} — ${lbEsc(bankName||"desconhecido")}</b>. Mapas de campo com fonte oficial (<a class="link" href="${LB_CNAB240_SOURCE_BRADESCO}" target="_blank" rel="noopener">manual do banco</a>).</p>`;
+    html+=lbCnabMontarResumo(bankGuess,registros);
+    html+="<h3>Detalhamento técnico, campo a campo</h3>";
+    registros.forEach(reg=>{
+      const titulo=`Linha ${reg._linha} — ${reg.tipoRegistro} · ${reg.tipoRegistroDesc}${reg.segmento?` (Segmento ${lbEsc(reg.segmento)})`:""}`;
+      if(reg.aviso){
+        html+=`<div class="diagnostic-row info"><b>${titulo}</b><span class="muted">${reg.aviso}</span></div>`;
+      } else {
+        html+=`<div class="card"><h3>${titulo}</h3><table><tr><th>Campo</th><th>Valor</th></tr>`+
+          Object.entries(reg.campos).map(([k,v])=>`<tr><td class="pos">${lbEsc(k)}</td><td>${v===null||v===undefined||v===""?"—":lbEsc(String(v))}</td></tr>`).join("")+
+          "</table></div>";
+      }
+    });
+    if(lines.length>cap) html+=`<p class="muted">Mostrando as primeiras ${cap} de ${lines.length} linhas.</p>`;
+    $("cnabFieldsResult").innerHTML=html;
+    return;
+  }
+
+  // ===== Caminho genérico (Bradesco 400 + os outros 7 bancos): reaproveita as mesmas
+  // specs já cross-validadas do Homologador de Remessa (layout transcrito da biblioteca
+  // open-source eduardokum/laravel-boleto, conferido só em parte contra manuais oficiais).
+  // O Bradesco 240 acima continua com o mapa próprio, tirado do manual oficial. =====
+  let spec = bankSel ? lbHomSpec(bankSel+"_"+tamGuess) : null;
+  if(!spec) spec = lbHomDetectarSpec(lines);
+  if(!spec){
+    const bankLabel = bankSel ? `${lbEsc(bankSel)} — ${lbEsc(banks[bankSel]?banks[bankSel].name:"banco desconhecido")}, ${lbEsc(fmtSel&&fmtSel!=="Automático"?fmtSel:("CNAB "+tamGuess))}` : "esta combinação";
+    const dica = (bankSel==="422"&&tamGuess===240)
+      ? "Não existe layout de cobrança CNAB 240 publicado para o Safra — só o CNAB 400 está coberto."
+      : "Selecione o banco e o formato certos acima, ou cole a partir da própria linha de header do arquivo (a detecção automática lê o cabeçalho da remessa).";
+    $("cnabFieldsResult").innerHTML=`<p class="muted">Não há layout campo a campo cadastrado para ${bankLabel}. ${dica}</p>`;
+    return;
+  }
+  const bankName=banks[spec.banco]?banks[spec.banco].name:spec.banco;
   const cap=Math.min(lines.length,30);
-  const registros=[];
-  for(let i=0;i<cap;i++){ const reg=lbCnabParseLine(bank,lines[i]); reg._linha=i+1; registros.push(reg); }
-  let html=`<p class="muted">Banco identificado: <b>${lbEsc(bank||"—")} — ${lbEsc(bankName||"desconhecido")}</b>. ${hasMaps?`Mapas de campo com fonte oficial (<a class="link" href="${LB_CNAB240_SOURCE_BRADESCO}" target="_blank" rel="noopener">manual do banco</a>).`:"Nenhum mapa de campos cadastrado ainda para este banco — hoje só o Bradesco (237) está mapeado."}</p>`;
-  html+=lbCnabMontarResumo(bank,registros);
+  let html=`<p class="muted">Banco identificado: <b>${lbEsc(spec.banco)} — ${lbEsc(bankName||"desconhecido")}</b>, ${lbEsc(spec.layout||("CNAB "+spec.tamanho))}. Layout transcrito de biblioteca open-source — mesma fonte usada no <a class="link" onclick="document.querySelector('nav button[data-tab=homologador]').click()">Homologador de Remessa</a> — conferido só em parte contra manuais oficiais; confirme posições críticas no manual do banco antes de uso em produção.</p>`;
   html+="<h3>Detalhamento técnico, campo a campo</h3>";
-  registros.forEach(reg=>{
-    const titulo=`Linha ${reg._linha} — ${reg.tipoRegistro} · ${reg.tipoRegistroDesc}${reg.segmento?` (Segmento ${lbEsc(reg.segmento)})`:""}`;
-    if(reg.aviso){
-      html+=`<div class="diagnostic-row info"><b>${titulo}</b><span class="muted">${reg.aviso}</span></div>`;
+  for(let i=0;i<cap;i++){
+    const {nome,campos}=lbCnabParseLineGenerico(spec,lines[i]);
+    const titulo=`Linha ${i+1} — ${nome?lbCnabHumanizeName(nome):"registro não identificado"}`;
+    if(!nome){
+      html+=`<div class="diagnostic-row info"><b>${titulo}</b><span class="muted">Não foi possível identificar o tipo de registro desta linha pelo layout transcrito deste banco/formato — confira se o arquivo é uma remessa de cobrança (não retorno) e se o banco/formato selecionados estão corretos.</span></div>`;
     } else {
       html+=`<div class="card"><h3>${titulo}</h3><table><tr><th>Campo</th><th>Valor</th></tr>`+
-        Object.entries(reg.campos).map(([k,v])=>`<tr><td class="pos">${lbEsc(k)}</td><td>${v===null||v===undefined||v===""?"—":lbEsc(String(v))}</td></tr>`).join("")+
+        campos.map(([k,v])=>`<tr><td class="pos">${lbEsc(k)}</td><td>${v===null||v===undefined||v===""?"—":lbEsc(String(v))}</td></tr>`).join("")+
         "</table></div>";
     }
-  });
+  }
   if(lines.length>cap) html+=`<p class="muted">Mostrando as primeiras ${cap} de ${lines.length} linhas.</p>`;
   $("cnabFieldsResult").innerHTML=html;
+}
+/* Decodificação campo a campo genérica (7 bancos além do Bradesco 240 + Bradesco 400),
+   reaproveitando as specs e os mesmos helpers de formatação (data/decimal) já
+   cross-validados no motor do Homologador de Remessa. */
+const LB_CNAB_DATA_PAPEIS=new Set(["vencimento","emissao","data_remessa","data_desconto","data_multa","data_juros"]);
+function lbCnabHumanizeName(nome){
+  return String(nome||"").replace(/_/g," ").replace(/([a-zA-Z])(\d)/g,"$1 $2").replace(/\b\w/g,l=>l.toUpperCase());
+}
+function lbCnabGenericLabel(c){
+  return (c.papel && LB_HOM_ROTULO[c.papel]) ? LB_HOM_ROTULO[c.papel] : lbCnabHumanizeName(c.nome);
+}
+function lbCnabFormatGenericField(spec,nomeRegistro,c,raw){
+  const t=raw.trim();
+  if(c.tipo==="N"){
+    if(!t) return null;
+    if(c.formato_data || (c.papel && LB_CNAB_DATA_PAPEIS.has(c.papel))){
+      const d=lbHomData(spec,{nome:nomeRegistro},c,t);
+      if(d) return d.toLocaleDateString("pt-BR");
+    }
+    if(c.dec!=null){
+      const dec=lbHomDec(t,c);
+      if(dec!=null) return dec.toLocaleString("pt-BR",{minimumFractionDigits:c.dec,maximumFractionDigits:c.dec});
+    }
+    return t;
+  }
+  return t===""?null:raw.replace(/\s+$/,"");
+}
+function lbCnabParseLineGenerico(spec,linha){
+  const tam=spec.tamanho;
+  const x=linha.length>=tam?linha.slice(0,tam):linha.padEnd(tam," ");
+  const chave = tam===400 ? [x[0]] : (x[7]==="3" ? [x[7],x[13]] : [x[7],null]);
+  const nome=spec.indice[JSON.stringify(chave)];
+  if(nome===undefined) return {nome:null,campos:[]};
+  const lay=spec.layouts[nome];
+  const campos=lay.filter(c=>c.fixo==null).map(c=>{
+    const raw=x.slice(c.ini-1,c.fim);
+    return [lbCnabGenericLabel(c),lbCnabFormatGenericField(spec,nome,c,raw)];
+  });
+  return {nome,campos};
 }
 
 /* ===== CNAB Explorer ===== */
