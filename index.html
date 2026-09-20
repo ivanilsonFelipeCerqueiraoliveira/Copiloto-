@@ -440,7 +440,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 <tr><td><b>O</b></td><td>DV de autocheck do Campo Livre pelo módulo 11.</td></tr>
 <tr><td><b>?</b></td><td>Posição ainda não mapeada — vira "0" na geração e aparece como "Não mapeado" nos laudos.</td></tr>
 <tr><td>números</td><td>São posições fixas da composição.</td></tr></table>
-<p class="muted">O template do banco 001 (Banco do Brasil) já vem pré-cadastrado com o Convênio nas posições 7-13 do Campo Livre — verificado a partir de um caso real de divergência analisado nesta conversa. As demais posições ainda estão como "?" (não confirmadas) até serem conferidas com o manual oficial da BB.</p>
+<p class="muted">O template já vem preenchido automaticamente ao trocar o banco acima, com o layout completo e verificado de cada um dos 8 bancos suportados (Bradesco, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Sicredi e Safra) — sem posições "?" pendentes. Só edite manualmente se precisar testar uma variante diferente do template padrão do banco.</p>
 </div>
 </section>
 
@@ -1100,6 +1100,37 @@ function lbNossoNumeroImpresso(bank,cl){
   }
   return null;
 }
+/* Verificações de DV específicas de banco EMBUTIDAS no próprio Campo Livre (diferente
+   do "Nosso Número impresso" acima, que é um DV que não está na linha/código de
+   barras). Cobre só os casos com fórmula documentada em manual oficial ou cópia
+   oficial e com posição já comprovada no template do banco: Itaú variante padrão
+   (DAC do Nosso Número — aceita as duas fórmulas do próprio manual, e DAC
+   Agência/Conta) e Caixa (DV do código do beneficiário e DV do Campo Livre). Ficam de
+   fora, por não terem vetor de teste oficial confirmado na fonte usada (mesma
+   ressalva já registrada nela): Itaú variante especial de 15 posições (DAC do Campo
+   Livre) e Sicredi (DV do Campo Livre e do Nosso Número) — não arriscamos marcar
+   "❌ divergente" numa conta ainda não confirmada. Santander, Sicoob e Safra não têm
+   nenhuma fórmula de DV documentada na fonte usada para o Campo Livre. */
+function lbCampoLivreDvChecks(bank,len,cl){
+  const out=[];
+  if(!cl||cl.length!==25) return out;
+  const effBank=bank==="000"?"237":bank;
+  const posOf=idx1=>String(lbCampoLivreIdxToPos(len,idx1)||"—");
+  if(effBank==="341" && !LB_ITAU_CARTEIRAS_15.includes(cl.slice(0,3))){
+    const carteira=cl.slice(0,3), nn=cl.slice(3,11), dacNN=cl[11], agencia=cl.slice(12,16), conta=cl.slice(16,21), dacAgConta=cl[21];
+    const calcPadrao=lbMod10(agencia+conta+carteira+nn), calcExcecao=lbMod10(carteira+nn);
+    out.push({name:"DV do Nosso Número (Itaú)",pos:posOf(12),value:dacNN,calc:String(calcPadrao),
+      ok:dacNN===String(calcPadrao)||dacNN===String(calcExcecao),
+      obs:`Padrão (Agência+Conta+Carteira+NN): ${calcPadrao}. Carteiras diretas/escriturais (Carteira+NN): ${calcExcecao}.`});
+    out.push({name:"DV Agência/Conta (Itaú)",pos:posOf(22),value:dacAgConta,calc:String(lbMod10(agencia+conta)),ok:dacAgConta===String(lbMod10(agencia+conta))});
+  }
+  if(effBank==="104"){
+    const codigoBenef=cl.slice(0,6), dvBenef=cl[6], base=cl.slice(0,24), dvCL=cl[24];
+    out.push({name:"DV do Beneficiário (Caixa)",pos:posOf(7),value:dvBenef,calc:String(lbDvMod11RestoZero(codigoBenef)),ok:dvBenef===String(lbDvMod11RestoZero(codigoBenef))});
+    out.push({name:"DV do Campo Livre (Caixa)",pos:posOf(25),value:dvCL,calc:String(lbDvMod11RestoZero(base)),ok:dvCL===String(lbDvMod11RestoZero(base))});
+  }
+  return out;
+}
 
 const LB_CUTOVER="2025-02-22"; // Febraban: fator de vencimento zerou em 1000 nesta data (chegou a 9999 em 21/02/2025)
 function lbDateToFactor(dateStr){
@@ -1144,7 +1175,8 @@ function lbParseCobranca(lineRaw){
       {name:"DV Campo 3",pos:"32",value:String(dv3),calc:String(calc3),ok:calc3===dv3},
       {name:"DV Geral",pos:"33",value:String(dvGeral),calc:String(calcDvGeral),ok:calcDvGeral===dvGeral},
       {name:"Fator de Vencimento",pos:"34-37",value:fator},
-      {name:"Valor",pos:"38-47",value:valorDigits}
+      {name:"Valor",pos:"38-47",value:valorDigits},
+      ...lbCampoLivreDvChecks(banco,47,campoLivre)
     ]};
 }
 function lbParseBarcode(lineRaw){
@@ -1161,7 +1193,8 @@ function lbParseBarcode(lineRaw){
       {name:"DV Geral",pos:"5",value:String(dvGeral),calc:String(calcDvGeral),ok:calcDvGeral===dvGeral},
       {name:"Fator de Vencimento",pos:"6-9",value:fator},
       {name:"Valor",pos:"10-19",value:valorDigits},
-      {name:"Campo Livre",pos:"20-44",value:campoLivre}
+      {name:"Campo Livre",pos:"20-44",value:campoLivre},
+      ...lbCampoLivreDvChecks(banco,44,campoLivre)
     ]};
 }
 function lbParseArrecadacao(lineRaw){
@@ -1193,7 +1226,7 @@ function lbSelfErrors(parsed){ return parsed&&parsed.fields ? parsed.fields.filt
 function lbRenderFields(parsed){
   if(!parsed||!parsed.fields) return "<p class='muted'>Sem dados estruturais para exibir.</p>";
   return "<table><tr><th>Campo</th><th>Posição</th><th>Informado</th><th>Calculado</th><th>Situação</th></tr>"+
-    parsed.fields.map(f=>`<tr><td>${f.name}</td><td class="pos">${f.pos}</td><td class="pos">${f.value}</td><td class="pos">${f.calc??"—"}</td><td>${f.calc!==undefined?(f.ok?"✅ OK":"❌ Divergente"):"—"}</td></tr>`).join("")+"</table>"
+    parsed.fields.map(f=>`<tr><td>${f.name}</td><td class="pos">${f.pos}</td><td class="pos">${f.value}</td><td class="pos">${f.calc??"—"}</td><td>${f.calc!==undefined?(f.ok?"✅ OK":"❌ Divergente"):"—"}${f.obs?`<br><span class="muted" style="font-size:.85em">${f.obs}</span>`:""}</td></tr>`).join("")+"</table>"
     +(parsed.note?`<p class="muted">${parsed.note}</p>`:"");
 }
 function lbFieldMap(len){
