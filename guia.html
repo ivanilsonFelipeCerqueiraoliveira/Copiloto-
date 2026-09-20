@@ -239,13 +239,14 @@ footer p{color:var(--muted);font-size:13px;margin:4px 0}
 <span class="badge bad">❔ confiança não registrada</span>
 </p>
 <p class="muted">O LexBank nunca inventa a posição de um campo. Um banco aparece como "verificado" quando o layout completo tem fonte documentada (manual oficial lido na íntegra, cópia espelhada, ou caso real ponta a ponta) — a nota abaixo de cada tabela cita a fonte exata. Sem essa comprovação, o campo aparece como "não mapeado" em vez de arriscar um chute.</p>
+<p>Na tabela "Estrutura geral" (Decodificação e Laudo Automático) você também vê ✅ OK / ❌ Divergente — diferente da comparação Sankhya × Banco, aqui é a própria linha se autoconferindo. Além dos 3 blocos de DV e do DV Geral (iguais em todos os bancos), o LexBank também confere dígitos verificadores embutidos no Campo Livre e específicos de cada banco, quando a fórmula é documentada: DV do Nosso Número e DV Agência/Conta no Itaú; DV do Beneficiário e DV do Campo Livre na Caixa. Para Bradesco, Banco do Brasil e Caixa, o LexBank também calcula o "Nosso Número impresso" — o dígito que sai impresso no boleto mas não está na linha/código de barras, útil pra conferir contra o papel.</p>
 </section>
 
 <section id="outros">
 <h2><span class="num">05</span> Outros serviços</h2>
 <p>Pela seta na borda esquerda você também acessa:</p>
 <table>
-<tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo dos 8 bancos suportados (Bradesco 240 a partir do manual oficial; os demais, incluindo Bradesco 400, com o mesmo layout transcrito de biblioteca open-source já usado no Homologador de Remessa).</td></tr>
+<tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo dos 8 bancos suportados (Bradesco 240 a partir do manual oficial; os demais, incluindo Bradesco 400, com o mesmo layout transcrito de biblioteca open-source já usado no Homologador de Remessa). Pra remessas Bradesco também monta um "Resumo da remessa" em linguagem de negócio: empresa pagadora, CNPJ, convênio, agência/conta e o que está sendo pago em cada título.</td></tr>
 <tr><td><b>Homologador de Remessa</b></td><td>Simula, sem gravar nada e só no seu navegador, como o banco reagiria a um arquivo de remessa (CNAB 240/400) dos 8 bancos suportados: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. É um layout transcrito de biblioteca open-source (conferido só em parte contra manuais oficiais) — não tem tabela de código de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno; e não verifica duplicidade entre remessas diferentes, porque isso exige um estado compartilhado que o LexBank (só cliente, sem servidor) não guarda. Use também o canal de teste do próprio banco antes de produção.</td></tr>
 <tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
@@ -270,6 +271,10 @@ footer p{color:var(--muted);font-size:13px;margin:4px 0}
 <details>
 <summary>Preciso ter as duas linhas (Sankhya e banco) pra usar o LexBank?</summary>
 <p>Para o Laudo Automático e o Comparador, sim — é a comparação entre as duas que aponta a divergência exata. Pra só entender o que tem dentro de uma linha, use a Decodificação com uma linha só.</p>
+</details>
+<details>
+<summary>O LexBank confere o dígito verificador do Nosso Número?</summary>
+<p>Depende do banco. Bradesco, Banco do Brasil e Caixa: o DV é calculado e mostrado como "Nosso Número impresso" (não está na linha, só no papel do boleto). Itaú e Caixa: o DV já vem embutido no Campo Livre e o LexBank confere se bate com a fórmula do próprio manual, sinalizando ✅/❌ na Estrutura Geral. Santander, Sicoob, Sicredi e Safra: a fonte usada não documenta essa fórmula com confiança suficiente, então o LexBank não arrisca marcar "divergente" numa conta não confirmada.</p>
 </details>
 </section>
 
