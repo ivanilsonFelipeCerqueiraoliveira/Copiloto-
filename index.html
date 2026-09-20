@@ -52,6 +52,8 @@ nav{background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:
 .lbSideNav{position:fixed;top:0;left:0;height:100vh;width:250px;background:var(--card);border-right:1px solid var(--line);box-shadow:4px 0 24px #0004;z-index:40;display:flex;flex-direction:column;gap:2px;padding:18px 10px;overflow-y:auto;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .lbSideNav.open{transform:translateX(0)}
 .lbSideNavTitle{font-family:var(--font-head);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 12px 10px}
+.lbSideNavGroup{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:12px 12px 4px;margin-top:4px;border-top:1px solid var(--line)}
+.lbSideNavGroup:first-of-type{margin-top:0;border-top:none}
 .lbSideNav button{display:block;width:100%;text-align:left;border-radius:9px;padding:11px 12px}
 @media(max-width:720px){.lbSideNavHandle{width:20px;height:56px}.lbSideNav{width:82vw;max-width:280px}.lbSideNavHandle.open{left:82vw}}
 @media(prefers-reduced-motion:reduce){.lbSideNavHandle,.lbSideNav,.lbSideNavOverlay,.lbSideNavArrow{transition:none}}
@@ -260,7 +262,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <button class="active" data-tab="decodificacao">Decodificação</button><button data-tab="comparador">Comparador</button><button data-tab="laudo">Laudo Automático</button><button data-tab="gerador">Gerador / Validador</button><button data-tab="painel">Análise Guiada</button>
 </nav>
 <nav id="lbMoreServices" hidden>
-<button data-tab="ajuda">Conhecendo o LexBank</button><button data-tab="cnab">CNAB Explorer</button><button data-tab="homologador">Homologador de Remessa</button><button data-tab="regras">Regras Bancárias</button><button data-tab="biblioteca">Biblioteca Oficial</button><button data-tab="motor">Motor de Diagnóstico</button><button data-tab="mapas">Mapas Oficiais</button><button data-tab="historico">Casos</button>
+<button data-tab="ajuda" data-group="Guia">Conhecendo o LexBank</button><button data-tab="cnab" data-group="Remessa e CNAB">CNAB Explorer</button><button data-tab="homologador" data-group="Remessa e CNAB">Homologador de Remessa</button><button data-tab="regras" data-group="Referência bancária">Regras Bancárias</button><button data-tab="biblioteca" data-group="Referência bancária">Biblioteca Oficial</button><button data-tab="motor" data-group="Referência bancária">Motor de Diagnóstico</button><button data-tab="mapas" data-group="Referência bancária">Mapas Oficiais</button><button data-tab="historico" data-group="Histórico">Casos</button>
 </nav>
 <main>
 <section id="ajuda" class="tab"><div class="card">
@@ -343,7 +345,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div class="field full"><label>Carteiras contratadas</label><input id="homCarteiras" placeholder="Ex.: 09, 21 (separadas por vírgula)"></div>
 <div class="field full"><label>Arquivo de remessa</label><input id="homFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="homText" rows="10" placeholder="Cole aqui o conteúdo do arquivo .REM gerado pelo Sankhya..."></textarea></div>
 </div>
-<div class="actions"><button class="btn primary" onclick="homSimular()">SIMULAR (SEM GRAVAR)</button></div>
+<div class="actions"><button class="btn primary" onclick="homSimular()">SIMULAR (SEM GRAVAR)</button><button class="btn secondary" onclick="exportHomologadorReport()">EXPORTAR SIMULAÇÃO</button></div>
 <div id="homResult"><div class="muted">Nenhum arquivo simulado ainda.</div></div>
 </div></section>
 
@@ -1530,6 +1532,7 @@ function decodeCNABFields(){
     });
     if(lines.length>cap) html+=`<p class="muted">Mostrando as primeiras ${cap} de ${lines.length} linhas.</p>`;
     $("cnabFieldsResult").innerHTML=html;
+    lbSaveCase({origem:"CNAB Explorer",banco:bankName,ref:"CNAB 240",status:`CNAB Explorer: ${lines.length} linha(s) decodificada(s)`});
     return;
   }
 
@@ -1564,6 +1567,7 @@ function decodeCNABFields(){
   }
   if(lines.length>cap) html+=`<p class="muted">Mostrando as primeiras ${cap} de ${lines.length} linhas.</p>`;
   $("cnabFieldsResult").innerHTML=html;
+  lbSaveCase({origem:"CNAB Explorer",banco:bankName,ref:spec.layout||("CNAB "+spec.tamanho),status:`CNAB Explorer: ${lines.length} linha(s) decodificada(s)`});
 }
 /* Decodificação campo a campo genérica (7 bancos além do Bradesco 240 + Bradesco 400),
    reaproveitando as specs e os mesmos helpers de formatação (data/decimal) já
@@ -1668,7 +1672,7 @@ $("cnabType").addEventListener("change",lbCnabAuto);
 /* ===== Regras / Biblioteca / Histórico ===== */
 function renderRules(){$("rules").innerHTML="<table><tr><th>Banco</th><th>Produto</th><th>Layout</th><th>Regra atual</th><th>Fonte</th></tr>"+rules.map(r=>`<tr><td>${r[0]} — ${banks[r[0]].name}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")+"</table>"}
 function renderDocs(){$("docs").innerHTML="<table><tr><th>Origem</th><th>Documento</th><th>Referência</th></tr>"+docs.map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td><a class='link' href='${d[2]}' target='_blank' rel='noopener'>Abrir fonte</a></td></tr>`).join("")+"</table>"}
-function renderHistory(){let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");$("history").innerHTML=h.length?"<table><tr><th>Data</th><th>Banco</th><th>Referência</th><th>Status</th></tr>"+h.map(x=>`<tr><td>${x.data}</td><td>${x.banco}</td><td>${x.ref}</td><td>${x.status}</td></tr>`).join("")+"</table>":"<p class='muted'>Nenhum caso salvo.</p>"}
+function renderHistory(){let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");$("history").innerHTML=h.length?"<table><tr><th>Data</th><th>Origem</th><th>Banco</th><th>Referência</th><th>Status</th></tr>"+h.map(x=>`<tr><td>${x.data}</td><td>${x.origem||"Laudo Automático"}</td><td>${x.banco}</td><td>${x.ref}</td><td>${x.status}</td></tr>`).join("")+"</table>":"<p class='muted'>Nenhum caso salvo.</p>"}
 function clearHistory(){localStorage.removeItem("lexbank_cases");renderHistory()}
 
 /* ===== Motor de Diagnóstico — regras versionadas ===== */
@@ -1874,12 +1878,18 @@ function generateReport(save){
   if(save)saveReportCase(effBank,ref,errsA.length?"Divergência interna na linha do Sankhya":"Estrutura da linha do Sankhya OK",mainDiv?mainDiv.label:null);
 }
 function lbPrint(){ window.print() }
-function saveReportCase(bank,ref,status,campo){
+/* Grava um caso genérico em "Casos" — mesmo mecanismo usado pelo Laudo Automático
+   desde sempre, agora também reaproveitado pelo Homologador de Remessa e pelo CNAB
+   Explorer, pra não deixar essas duas ferramentas fora do histórico. */
+function lbSaveCase(entry){
   let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");
-  const entry={data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Sem referência",status:"Laudo: "+status};
-  if(campo) entry.campo=campo;
-  h.unshift(entry);
+  h.unshift({data:new Date().toLocaleString("pt-BR"),...entry});
   localStorage.setItem("lexbank_cases",JSON.stringify(h.slice(0,200)));renderHistory();
+}
+function saveReportCase(bank,ref,status,campo){
+  const entry={origem:"Laudo Automático",banco:banks[bank]?banks[bank].name:bank,ref:ref||"Sem referência",status:"Laudo: "+status};
+  if(campo) entry.campo=campo;
+  lbSaveCase(entry);
 }
 /* ===== Casos parecidos: usa o próprio histórico local para mostrar se essa combinação
    banco+campo já apareceu antes, virando o log passivo de "Casos" em contexto ativo
@@ -2628,15 +2638,34 @@ function homSimular(){
   }
   html+=`<p class="muted">ℹ️ ${lbEsc(res.aviso)}</p>`;
   $("homResult").innerHTML=html;
+  const vereditoLabel={ARQUIVO_ACEITO_NA_SIMULACAO:"aceito na simulação",ARQUIVO_REJEICAO_PROVAVEL:"rejeição provável",ARQUIVO_REJEITADO:"rejeitado"}[vArq]||vArq;
+  lbSaveCase({origem:"Homologador de Remessa",banco:res.banco.nome,ref:res.banco.layout,
+    status:`Homologador: arquivo ${vereditoLabel} — ${res.resumo.titulos} título(s), ${res.resumo.rejeicaoProvavel+res.resumo.rejeitados} rejeição(ões)`});
 }
 $("homFile").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ $("homText").value=r.result; }; r.readAsText(f,"latin1"); });
+function exportHomologadorReport(){
+  const content=$("homResult").innerHTML;
+  if(!content||content.includes("Nenhum arquivo simulado ainda")){lbToast("Nenhuma simulação para exportar.","warn");return}
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([`<!doctype html><meta charset="utf-8"><body>${content}</body>`],{type:"text/html"}));
+  a.download="homologador-remessa.html";a.click();
+  lbToast("Simulação exportada.","ok");
+}
 
 /* ===== Boot ===== */
 lbAutosaveInit();
 /* ===== Menu lateral discreto (espelha as mesmas opções do menu de cima) ===== */
 function lbBuildSideNav(){
   const side=$("lbSideNav");
+  let lastGroup=null;
   document.querySelectorAll("#lbMoreServices button").forEach(b=>{
+    const group=b.dataset.group;
+    if(group && group!==lastGroup){
+      const h=document.createElement("div");
+      h.className="lbSideNavGroup"; h.textContent=group;
+      side.appendChild(h);
+      lastGroup=group;
+    }
     const clone=document.createElement("button");
     clone.dataset.tab=b.dataset.tab; clone.textContent=b.textContent;
     if(b.classList.contains("active")) clone.classList.add("active");
