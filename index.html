@@ -184,6 +184,27 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lbVerdictModal .muted{font-size:12.5px;margin:12px 0 20px}
 .lbVerdictModal .btn{width:100%}
 @media(prefers-reduced-motion:reduce){.lbVerdictOverlay,.lbVerdictModal{transition:none}}
+/* ===== Ícones padronizados (sprite SVG em #lbIconSprite) — substituem os emojis
+   nativos usados antes para status/ações, que rendiam diferente entre
+   Windows/Mac/Linux. Dois formatos: .lbIcon (glyph simples, herda a cor do
+   texto ao redor) e .lbIconBadge (o mesmo glyph dentro de um círculo colorido,
+   usado nos status mais importantes — headline e células de tabela). */
+.lbIcon{display:inline-flex;width:1em;height:1em;vertical-align:-.14em;flex:0 0 auto}
+.lbIcon svg{width:100%;height:100%;display:block}
+.lbIcon.ok{color:var(--green)}.lbIcon.bad{color:var(--red)}.lbIcon.warn{color:var(--yellow)}.lbIcon.info{color:var(--blue)}.lbIcon.unknown{color:var(--muted)}
+.lbIconBadge{display:inline-flex;align-items:center;justify-content:center;width:1.6em;height:1.6em;border-radius:50%;vertical-align:-.42em;flex:0 0 auto}
+.lbIconBadge svg{width:60%;height:60%}
+.lbIconBadge.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.lbIconBadge.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.lbIconBadge.warn{background:var(--warn-bg);color:var(--warn-fg)}
+.lbIconBadge.info{background:var(--blue-tint);color:var(--blue-dark)}
+.lbIconBadge.unknown{background:var(--surface-2);color:var(--muted)}
+.lbIconBadge.sm{width:1.3em;height:1.3em;vertical-align:-.3em}
+/* ===== Status visual nas tabelas: zebra striping sutil (funciona em ambos os
+   temas por ser um overlay neutro semi-transparente, não uma cor fixa) +
+   realce leve no hover pra facilitar escaneamento de laudos longos. */
+table tr:nth-child(even){background:rgba(127,127,127,.06)}
+table tr:hover td{background:rgba(127,127,127,.09)}
 .lbComingSoonWrap{position:relative;overflow:hidden}
 .lbComingSoon{position:absolute;inset:0;background:var(--card);display:flex;align-items:center;justify-content:center;z-index:5;border-radius:var(--radius);font-family:var(--font-head);font-weight:700;font-size:20px;color:var(--muted)}
 @media print{
@@ -195,6 +216,23 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </style>
 </head>
 <body>
+<svg id="lbIconSprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" focusable="false">
+<defs>
+<symbol id="lbi-ok" viewBox="0 0 20 20"><path d="M4.2 10.6 8.3 14.7 16 5.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+<symbol id="lbi-bad" viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></symbol>
+<symbol id="lbi-warn" viewBox="0 0 20 20"><path d="M10 2.8 18 17.2H2L10 2.8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/><path d="M10 8.2v4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1.1" fill="currentColor"/></symbol>
+<symbol id="lbi-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M10 9.2v4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="6.2" r="1.1" fill="currentColor"/></symbol>
+<symbol id="lbi-unknown" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M7.8 8a2.2 2.2 0 1 1 3.3 1.9c-.75.45-1.1.85-1.1 1.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="10" cy="14.3" r="1.1" fill="currentColor"/></symbol>
+<symbol id="lbi-print" viewBox="0 0 20 20"><path d="M6 8V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/><rect x="3.3" y="8" width="13.4" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" fill="none"/><rect x="6.5" y="12" width="7" height="4.6" stroke="currentColor" stroke-width="1.4" fill="none"/></symbol>
+<symbol id="lbi-repeat" viewBox="0 0 20 20"><path d="M5.3 7.4h7.4a2.8 2.8 0 0 1 2.8 2.8v.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M4 9.2 2.8 7.4l2-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M14.7 12.6H7.3a2.8 2.8 0 0 1-2.8-2.8v-.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M16 10.8l1.2 1.8-2 1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+<symbol id="lbi-pin" viewBox="0 0 20 20"><path d="M10 2.6a5.4 5.4 0 0 0-5.4 5.4c0 4.3 5.4 9.4 5.4 9.4s5.4-5.1 5.4-9.4A5.4 5.4 0 0 0 10 2.6Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/><circle cx="10" cy="8" r="1.9" stroke="currentColor" stroke-width="1.3" fill="none"/></symbol>
+<symbol id="lbi-mail" viewBox="0 0 20 20"><rect x="3" y="5" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M4 6.3 10 11l6-4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+<symbol id="lbi-copy" viewBox="0 0 20 20"><rect x="7" y="7" width="9" height="10" rx="1.3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M4.5 13V5.3A1.3 1.3 0 0 1 5.8 4h6.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></symbol>
+<symbol id="lbi-search" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="lbi-moon" viewBox="0 0 20 20"><path d="M15.6 12.4A6.3 6.3 0 0 1 7.7 4.5a6.3 6.3 0 1 0 7.9 7.9Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="currentColor" fill-opacity=".15"/></symbol>
+<symbol id="lbi-sun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.4" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M10 2.8v1.7M10 15.5v1.7M17.2 10h-1.7M4.5 10H2.8M15.1 4.9l-1.2 1.2M6.1 13.9l-1.2 1.2M15.1 15.1l-1.2-1.2M6.1 6.1 4.9 4.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+</defs>
+</svg>
 <div id="lbLogin">
 <div class="lbLoginMesh" aria-hidden="true"></div>
 <div class="lbLoginWaves" aria-hidden="true"><svg viewBox="0 0 1600 480" preserveAspectRatio="none">
@@ -239,7 +277,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <div class="field">
 <label for="lbLoginEmail">E-mail</label>
 <div class="lbInputIcon">
-<span>✉️</span>
+<span><svg class="lbIcon"><use href="#lbi-mail"></use></svg></span>
 <input id="lbLoginEmail" name="email" type="email" placeholder="nome.sobrenome@sankhya.com.br" autocomplete="email" autofocus>
 <span id="lbLoginCheck" class="lbInputStatus"></span>
 </div>
@@ -259,7 +297,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </nav>
 <header><div class="brandBlock"><div class="brandMark">S</div><div><div class="brand">LexBank<span class="brandTag">Sankhya</span></div><div class="sub">Diagnóstico bancário • Boletos • Linha Digitável • CNAB 240/400</div></div></div><div class="headerRight">
 <div class="sub">v12 — identidade Sankhya</div>
-<button class="lbIconBtn" id="lbThemeToggle" onclick="lbToggleTheme()" title="Mudar tema" aria-label="Mudar tema claro/escuro">🌙</button>
+<button class="lbIconBtn" id="lbThemeToggle" onclick="lbToggleTheme()" title="Mudar tema" aria-label="Mudar tema claro/escuro"><svg class="lbIcon"><use href="#lbi-moon"></use></svg></button>
 <div class="userMenu" id="lbUserMenu" hidden>
 <button class="userAvatarBtn" onclick="lbToggleUserMenu(event)" title="Sua conta" aria-label="Menu do usuário"><span class="userAvatar" id="lbUserAvatar"></span></button>
 <div class="userDropdown" id="lbUserDropdown" hidden>
@@ -279,7 +317,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 </nav>
 <main>
 <section id="ajuda" class="tab"><div class="card">
-<h1>Conhecendo o LexBank<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
+<h1>Conhecendo o LexBank<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1>
 <div class="muted">Guia rápido de uso do LexBank — como acessar, navegar pela interface e interpretar os laudos de divergência de linha digitável. <a class="link" href="guia.html" target="_blank" rel="noopener">Ver versão completa, com capturas de tela ↗</a></div>
 
 <h3>O que é o LexBank</h3>
@@ -293,26 +331,26 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <tr><th>Onde</th><th>O que faz</th></tr>
 <tr><td>Menu de cima</td><td>Os 5 serviços mais usados: Decodificação, Comparador, Laudo Automático, Gerador/Validador e Análise Guiada.</td></tr>
 <tr><td>Seta na borda esquerda</td><td>Abre a gaveta com os demais serviços, incluindo este guia.</td></tr>
-<tr><td>Ícone 🌙 / ☀️</td><td>Alterna entre tema claro e escuro (abre sempre no claro por padrão).</td></tr>
+<tr><td>Ícone de lua/sol</td><td>Alterna entre tema claro e escuro (abre sempre no claro por padrão).</td></tr>
 <tr><td>Iniciais no canto superior direito</td><td>Seu menu de usuário — nome, e-mail, perfil e opção de sair.</td></tr>
 </table>
 
 <h3>Serviços principais</h3>
 <p><b>Decodificação</b> — cola uma linha digitável (44, 47 ou 48 dígitos) e mostra o que está codificado em cada posição, incluindo o código de barras reconstruído e escaneável.</p>
 <p><b>Comparador</b> — cola a linha do Sankhya e a do banco lado a lado e mostra rapidamente em quais posições elas divergem, dígito a dígito.</p>
-<p><b>Laudo Automático</b> — o diagnóstico mais completo: consistência matemática de cada linha, onde divergem, causa provável, comparação campo a campo com ícones de status, e se aquele mesmo problema já aconteceu antes com aquele banco ("Casos parecidos"). Use o ícone 🖨️ ao lado do título pra imprimir ou salvar o laudo em PDF.</p>
+<p><b>Laudo Automático</b> — o diagnóstico mais completo: consistência matemática de cada linha, onde divergem, causa provável, comparação campo a campo com ícones de status, e se aquele mesmo problema já aconteceu antes com aquele banco ("Casos parecidos"). Use o ícone de impressora ao lado do título pra imprimir ou salvar o laudo em PDF.</p>
 <p><b>Gerador / Validador</b> — monta uma linha digitável a partir dos dados de cadastro, aplicando as fórmulas públicas da FEBRABAN.</p>
 <p><b>Análise Guiada</b> — a resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) pra já saber se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão.</p>
 
 <h3>Como ler os resultados</h3>
 <table>
 <tr><th>Ícone</th><th>Significado</th></tr>
-<tr><td>🟢 Igual</td><td>O campo é idêntico nas duas linhas.</td></tr>
-<tr><td>🔴 Valor divergente</td><td>Um dado de negócio real é diferente (agência, convênio, carteira, Nosso Número...) — corrigir no cadastro do Sankhya.</td></tr>
-<tr><td>🟠 DV divergente</td><td>Só o dígito verificador daquele campo é diferente — o dado em si pode estar certo.</td></tr>
+<tr><td><span class="lbIconBadge ok sm"><svg class="lbIcon ok"><use href="#lbi-ok"></use></svg></span> Igual</td><td>O campo é idêntico nas duas linhas.</td></tr>
+<tr><td><span class="lbIconBadge bad sm"><svg class="lbIcon bad"><use href="#lbi-bad"></use></svg></span> Valor divergente</td><td>Um dado de negócio real é diferente (agência, convênio, carteira, Nosso Número...) — corrigir no cadastro do Sankhya.</td></tr>
+<tr><td><span class="lbIconBadge warn sm"><svg class="lbIcon warn"><use href="#lbi-warn"></use></svg></span> DV divergente</td><td>Só o dígito verificador daquele campo é diferente — o dado em si pode estar certo.</td></tr>
 </table>
-<p>Nas tabelas do Campo Livre você também vê um selo de confiança: <span class="confBadge confVerified">✔ verificado com caso real</span> <span class="confBadge confPartial">⚠ parcialmente confirmado</span> <span class="confBadge confUnknown">❔ confiança não registrada</span>. A nota abaixo de cada tabela cita a fonte exata (manual oficial, cópia espelhada ou caso real) que comprova aquela posição. O LexBank nunca inventa a posição de um campo — sem uma fonte documentada, o campo aparece como "não mapeado", nunca com um valor chutado.</p>
-<p>Na tabela "Estrutura geral" (Decodificação e Laudo Automático) você também vê ✅ OK / ❌ Divergente — diferente da comparação Sankhya × Banco, aqui é a própria linha se autoconferindo. Além dos 3 blocos de DV e do DV Geral (iguais em todos os bancos), o LexBank também confere dígitos verificadores que ficam embutidos no Campo Livre e são específicos de cada banco, quando a fórmula é documentada: DV do Nosso Número e DV Agência/Conta no Itaú; DV do Beneficiário e DV do Campo Livre na Caixa. Para Bradesco, Banco do Brasil e Caixa, o LexBank também calcula o "Nosso Número impresso" — o dígito que sai impresso no boleto mas não está na linha/código de barras, útil pra conferir contra o papel.</p>
+<p>Nas tabelas do Campo Livre você também vê um selo de confiança: <span class="confBadge confVerified"><svg class="lbIcon ok"><use href="#lbi-ok"></use></svg> verificado com caso real</span> <span class="confBadge confPartial"><svg class="lbIcon warn"><use href="#lbi-warn"></use></svg> parcialmente confirmado</span> <span class="confBadge confUnknown"><svg class="lbIcon unknown"><use href="#lbi-unknown"></use></svg> confiança não registrada</span>. A nota abaixo de cada tabela cita a fonte exata (manual oficial, cópia espelhada ou caso real) que comprova aquela posição. O LexBank nunca inventa a posição de um campo — sem uma fonte documentada, o campo aparece como "não mapeado", nunca com um valor chutado.</p>
+<p>Na tabela "Estrutura geral" (Decodificação e Laudo Automático) você também vê <span class="lbIconBadge ok sm"><svg class="lbIcon ok"><use href="#lbi-ok"></use></svg></span> OK / <span class="lbIconBadge bad sm"><svg class="lbIcon bad"><use href="#lbi-bad"></use></svg></span> Divergente — diferente da comparação Sankhya × Banco, aqui é a própria linha se autoconferindo. Além dos 3 blocos de DV e do DV Geral (iguais em todos os bancos), o LexBank também confere dígitos verificadores que ficam embutidos no Campo Livre e são específicos de cada banco, quando a fórmula é documentada: DV do Nosso Número e DV Agência/Conta no Itaú; DV do Beneficiário e DV do Campo Livre na Caixa. Para Bradesco, Banco do Brasil e Caixa, o LexBank também calcula o "Nosso Número impresso" — o dígito que sai impresso no boleto mas não está na linha/código de barras, útil pra conferir contra o papel.</p>
 
 <h3>Outros serviços (nesta mesma gaveta)</h3>
 <table>
@@ -328,25 +366,25 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 <p><b>Meus casos e templates ficam salvos pra sempre?</b><br>Ficam salvos no navegador do seu computador (localStorage), não num servidor compartilhado. Limpar os dados do navegador ou trocar de computador apaga esse histórico local.</p>
 <p><b>O código de barras gerado pode ser escaneado de verdade?</b><br>Sim — usa o padrão 2 de 5 Intercalado (ITF), o mesmo dos boletos impressos.</p>
 <p><b>Preciso ter as duas linhas (Sankhya e banco) pra usar o LexBank?</b><br>Pro Laudo Automático e o Comparador, sim. Pra só entender o que tem dentro de uma linha, use a Decodificação com uma linha só.</p>
-<p><b>O LexBank confere o dígito verificador do Nosso Número?</b><br>Depende do banco. Bradesco, Banco do Brasil e Caixa: o DV é calculado e mostrado como "Nosso Número impresso" (não está na linha, só no papel do boleto). Itaú e Caixa: o DV já vem embutido no Campo Livre e o LexBank confere se bate com a fórmula do próprio manual, sinalizando ✅/❌. Santander, Sicoob, Sicredi e Safra: a fonte usada não documenta essa fórmula com confiança suficiente, então o LexBank não arrisca marcar "divergente" numa conta não confirmada.</p>
+<p><b>O LexBank confere o dígito verificador do Nosso Número?</b><br>Depende do banco. Bradesco, Banco do Brasil e Caixa: o DV é calculado e mostrado como "Nosso Número impresso" (não está na linha, só no papel do boleto). Itaú e Caixa: o DV já vem embutido no Campo Livre e o LexBank confere se bate com a fórmula do próprio manual, sinalizando OK ou divergente. Santander, Sicoob, Sicredi e Safra: a fonte usada não documenta essa fórmula com confiança suficiente, então o LexBank não arrisca marcar "divergente" numa conta não confirmada.</p>
 </div></section>
 
-<section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
+<section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cmpBank"><option value="">Não informado</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Modalidade</label><input id="cmpMod"></div><div class="field"><label>Carteira</label><input id="cmpWallet"></div></div>
 <div class="two"><div class="field"><label>Sankhya</label><textarea id="line1"></textarea></div><div class="field"><label>Banco / referência</label><textarea id="line2"></textarea></div></div><div class="actions"><button class="btn primary" onclick="compare();lbShowVerdictFromResult('cmpResult')">COMPARAR</button></div><div id="cmpResult"></div></div></section>
 
-<section id="decodificacao" class="tab active"><div class="card"><h1>Decodificação da linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
+<section id="decodificacao" class="tab active"><div class="card"><h1>Decodificação da linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
 <div class="form"><div class="field"><label>Banco (contexto)</label><select id="decodBank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div></div>
 <div class="field full"><label>Linha digitável</label><textarea id="decodLine" placeholder="Cole a linha digitável, o código de barras ou a linha de arrecadação"></textarea></div>
 <div class="actions"><button class="btn primary" onclick="decodeSingleLine()">DECODIFICAR</button></div>
 <div id="decodResult"><div class="muted">Nenhuma linha decodificada ainda.</div></div>
 </div></section>
 
-<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. Identifica tipo de registro e segmento por posição, e a busca destaca as ocorrências do termo direto na amostra. Use "DECODIFICAR CAMPOS" para ver cada campo com nome e valor nos 8 bancos suportados: Bradesco 240 (Header de Arquivo, Header de Lote, Segmento O, Segmento W, Trailer de Lote e Trailer de Arquivo) com posições tiradas do manual oficial; os demais — Bradesco 400, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Sicredi e Safra (só 400) — usam o mesmo layout transcrito de biblioteca open-source já validado no Homologador de Remessa, conferido só em parte contra manuais oficiais.</div>
+<section id="cnab" class="tab"><div class="card"><h1>CNAB Explorer<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1><div class="muted">Leitura local do arquivo. Analisa automaticamente ao colar/carregar. Identifica tipo de registro e segmento por posição, e a busca destaca as ocorrências do termo direto na amostra. Use "DECODIFICAR CAMPOS" para ver cada campo com nome e valor nos 8 bancos suportados: Bradesco 240 (Header de Arquivo, Header de Lote, Segmento O, Segmento W, Trailer de Lote e Trailer de Arquivo) com posições tiradas do manual oficial; os demais — Bradesco 400, Itaú, Santander, Banco do Brasil, Caixa, Sicoob, Sicredi e Safra (só 400) — usam o mesmo layout transcrito de biblioteca open-source já validado no Homologador de Remessa, conferido só em parte contra manuais oficiais.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cnabBank"><option value="">Automático</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Formato</label><select id="cnabFormat"><option>Automático</option><option>CNAB 240</option><option>CNAB 400</option></select></div><div class="field"><label>Tipo</label><select id="cnabType"><option>Automático</option><option>Remessa</option><option>Retorno</option></select></div><div class="field"><label>Segmento esperado</label><input id="cnabSeg" placeholder="Ex.: P"></div><div class="field"><label>Pesquisar termo</label><input id="cnabSearch" placeholder="Ex.: 0001234567"></div><div class="field"><label>Posição inicial</label><input id="cnabPosStart" type="number" min="1"></div><div class="field"><label>Posição final</label><input id="cnabPosEnd" type="number" min="1"></div><div class="field full"><label>Arquivo / conteúdo</label><input id="cnabFile" type="file" accept=".txt,.rem,.ret,.cnab"><textarea id="cnabText" placeholder="Cole o CNAB aqui..."></textarea></div></div>
 <div class="actions"><button class="btn primary" onclick="analyzeCNAB()">ANALISAR ARQUIVO</button><button class="btn secondary" onclick="findPosition()">CONSULTAR POSIÇÃO</button><button class="btn secondary" onclick="decodeCNABFields()">DECODIFICAR CAMPOS</button><button class="btn secondary" onclick="exportCNABReport()">EXPORTAR LAUDO</button></div><div id="cnabResult"></div><div id="cnabFieldsResult"></div></div></section>
 
-<section id="homologador" class="tab"><div class="card"><h1>Homologador de Remessa<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Simula, sem gravar nada, como o banco reagiria ao seu arquivo de remessa: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. Cobre os 8 bancos suportados pelo LexBank em CNAB 240/400 (Safra só 400 — não existe layout de cobrança 240 publicado). <b>É uma simulação, não o banco</b>: o layout usado aqui é transcrito de uma biblioteca open-source, conferido só em parte contra manuais oficiais — não tem a tabela de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno. Convênio ativo, faixa de Nosso Número e praça de CEP só o banco sabe. Use também o canal de teste do próprio banco antes de produção.</div>
+<section id="homologador" class="tab"><div class="card"><h1>Homologador de Remessa<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1><div class="muted">Simula, sem gravar nada, como o banco reagiria ao seu arquivo de remessa: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. Cobre os 8 bancos suportados pelo LexBank em CNAB 240/400 (Safra só 400 — não existe layout de cobrança 240 publicado). <b>É uma simulação, não o banco</b>: o layout usado aqui é transcrito de uma biblioteca open-source, conferido só em parte contra manuais oficiais — não tem a tabela de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno. Convênio ativo, faixa de Nosso Número e praça de CEP só o banco sabe. Use também o canal de teste do próprio banco antes de produção.</div>
 <h3>Cadastro do beneficiário (opcional — quanto mais completo, mais divergências o simulador consegue apontar)</h3>
 <div class="form">
 <div class="field"><label>Código da empresa / Convênio</label><input id="homCodEmpresa" placeholder="Como cadastrado no banco"></div>
@@ -463,7 +501,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 
 <section id="laudo" class="tab">
 <div class="card">
-<h1>Laudo Automático de Divergência<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
+<h1>Laudo Automático de Divergência<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1>
 <div class="muted">O laudo completo, para quando você já tem as duas linhas (Sankhya e banco): valida os dígitos verificadores de cada linha isoladamente, decodifica valor e vencimento, compara posição a posição, aponta a causa provável e mostra casos parecidos já analisados — pronto para anexar ao chamado ou imprimir. O laudo é atualizado automaticamente enquanto você cola/edita as linhas. Só tem a linha do Sankhya? Use a <a class="link" onclick="document.querySelector('nav button[data-tab=painel]').click()">Análise Guiada</a> para uma resposta mais rápida.</div>
 <div class="form">
 <div class="field"><label>Banco</label><select id="reportBank"><option value="237">237 — Bradesco</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div>
@@ -499,7 +537,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 
 <section id="painel" class="tab">
 <div class="card">
-<h1>Diagnóstico Guiado<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1>
+<h1>Diagnóstico Guiado<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF"><svg class="lbIcon"><use href="#lbi-print"></use></svg></button></h1>
 <div class="muted">A resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) e já veja se o erro é matemático, cadastral ou uma divergência com o banco. Fluxo: cadastro → título → composição → dígitos verificadores → CNAB → causa provável → ação recomendada. A análise roda sozinha assim que você cola a linha (ou pressione Enter). Precisa do laudo formal para anexar a um chamado, com casos parecidos e impressão? Use o <a class="link" onclick="document.querySelector('nav button[data-tab=laudo]').click()">Laudo Automático</a>.</div>
 
 <div class="stepper">
@@ -527,7 +565,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="field full"><label>Observação do incidente (opcional)</label><textarea id="gObs" rows="3" placeholder="Ex.: banco recusou, boleto impresso com valor incorreto, Nosso Número divergente..."></textarea></div>
 </div>
 
-<div class="status info">🔵 Regra de ouro: primeiro descubra se o erro é matemático, estrutural, cadastral ou bancário. Só depois altere o cadastro da conta.</div>
+<div class="status info"><svg class="lbIcon info"><use href="#lbi-info"></use></svg> Regra de ouro: primeiro descubra se o erro é matemático, estrutural, cadastral ou bancário. Só depois altere o cadastro da conta.</div>
 <div class="actions">
 <button class="btn primary" onclick="runGuidedDiagnosis();lbShowVerdictFromResult('guidedResult')">ANALISAR AGORA</button>
 <button class="btn secondary" onclick="clearGuidedDiagnosis()">LIMPAR</button>
@@ -539,10 +577,10 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="card">
 <h2>Como interpretar</h2>
 <div class="legend-grid">
-<div><b>🔴 Crítico</b><span>Há divergência objetiva que pode invalidar a cobrança.</span></div>
-<div><b>🟠 Atenção</b><span>Há informação insuficiente ou configuração suspeita.</span></div>
-<div><b>🟢 Validado</b><span>O teste realizado não encontrou divergência naquele ponto.</span></div>
-<div><b>🔵 Informativo</b><span>É uma orientação ou dependência de validação externa.</span></div>
+<div><b><span class="lbIconBadge bad sm"><svg class="lbIcon bad"><use href="#lbi-bad"></use></svg></span> Crítico</b><span>Há divergência objetiva que pode invalidar a cobrança.</span></div>
+<div><b><span class="lbIconBadge warn sm"><svg class="lbIcon warn"><use href="#lbi-warn"></use></svg></span> Atenção</b><span>Há informação insuficiente ou configuração suspeita.</span></div>
+<div><b><span class="lbIconBadge ok sm"><svg class="lbIcon ok"><use href="#lbi-ok"></use></svg></span> Validado</b><span>O teste realizado não encontrou divergência naquele ponto.</span></div>
+<div><b><span class="lbIconBadge info sm"><svg class="lbIcon info"><use href="#lbi-info"></use></svg></span> Informativo</b><span>É uma orientação ou dependência de validação externa.</span></div>
 </div>
 </div>
 </section>
@@ -657,7 +695,7 @@ function lbUpdateThemeIcon(){
   const btn=$("lbThemeToggle");
   if(!btn) return;
   const dark=lbEffectiveTheme()==="dark";
-  btn.textContent=dark?"☀️":"🌙";
+  btn.innerHTML=dark?lbIcon("sun"):lbIcon("moon");
   btn.title=dark?"Mudar para tema claro":"Mudar para tema escuro";
 }
 function lbApplyTheme(theme){
@@ -738,17 +776,17 @@ function lbCloseVerdictModal(){
   document.removeEventListener("keydown",lbVerdictEscHandler);
 }
 const LB_VERDICT_META={
-  bad:{icon:"🔴",title:"Possível causa encontrada"},
-  warn:{icon:"🟠",title:"Possível divergência encontrada"},
-  ok:{icon:"🟢",title:"Nenhuma divergência encontrada"}
+  bad:{icon:"bad",title:"Possível causa encontrada"},
+  warn:{icon:"warn",title:"Possível divergência encontrada"},
+  ok:{icon:"ok",title:"Nenhuma divergência encontrada"}
 };
 function lbShowVerdictModal(level,detailText){
   document.getElementById("lbVerdictOverlay")?.remove();
-  const meta=LB_VERDICT_META[level]||{icon:"❔",title:"Resultado da análise"};
+  const meta=LB_VERDICT_META[level]||{icon:"unknown",title:"Resultado da análise"};
   const ov=document.createElement("div");
   ov.id="lbVerdictOverlay"; ov.className="lbVerdictOverlay";
   ov.innerHTML=`<div class="lbVerdictModal" role="alertdialog" aria-modal="true" aria-labelledby="lbVerdictTitle">
-    <div class="lbVerdictIcon ${level}">${meta.icon}</div>
+    <div class="lbVerdictIcon ${level}">${lbIcon(meta.icon)}</div>
     <h2 id="lbVerdictTitle">${meta.title}</h2>
     ${detailText?`<p>${lbEsc(detailText)}</p>`:""}
     <p class="muted">Analise os dados abaixo para o diagnóstico completo.</p>
@@ -770,6 +808,12 @@ function lbShowVerdictFromResult(containerId){
   lbShowVerdictModal(level,boldEl?boldEl.textContent.trim():"");
 }
 function lbEsc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+/* ===== Ícones padronizados — lê os <symbol> do sprite #lbIconSprite (ver logo
+   após <body>). lbIcon: glyph simples (herda a cor do texto ao redor, ou usa
+   a classe semântica ok/bad/warn/info/unknown). lbIconBadge: o mesmo glyph
+   dentro de um círculo colorido, pra status em destaque (headline, tabelas). */
+function lbIcon(name,cls){ return `<svg class="lbIcon ${cls!=null?cls:name}" aria-hidden="true" focusable="false"><use href="#lbi-${name}"></use></svg>`; }
+function lbIconBadge(name,extra){ return `<span class="lbIconBadge ${name}${extra?" "+extra:""}">${lbIcon(name,"")}</span>`; }
 function lbDiffStrip(a,b){
   const len=Math.max(a.length,b.length);
   let top="",bot="";
@@ -781,7 +825,7 @@ function lbDiffStrip(a,b){
   }
   return `<div class="diffstrip"><div class="diffrow"><span class="diffLabel">Sankhya</span><div class="diffdigits">${top}</div></div><div class="diffrow"><span class="diffLabel">Banco</span><div class="diffdigits">${bot}</div></div></div>`;
 }
-function lbCopyBtn(text,label){ return `<button type="button" class="btn secondary small" data-copy="${lbEsc(text)}">📋 ${label||"Copiar"}</button>`; }
+function lbCopyBtn(text,label){ return `<button type="button" class="btn secondary small" data-copy="${lbEsc(text)}">${lbIcon("copy")} ${label||"Copiar"}</button>`; }
 document.addEventListener("click",e=>{
   const btn=e.target.closest("[data-copy]");
   if(!btn) return;
@@ -826,9 +870,9 @@ const LB_TEMPLATE_CONFIDENCE={
 };
 function lbConfidenceBadge(bank){
   const c=LB_TEMPLATE_CONFIDENCE[bank];
-  if(!c) return {badge:`<span class="confBadge confUnknown">❔ confiança não registrada</span>`,note:"Este template ainda não tem o nível de confiança documentado — trate os campos abaixo com cautela extra e confirme contra o manual oficial."};
+  if(!c) return {badge:`<span class="confBadge confUnknown">${lbIcon("unknown")} confiança não registrada</span>`,note:"Este template ainda não tem o nível de confiança documentado — trate os campos abaixo com cautela extra e confirme contra o manual oficial."};
   const cls=c.level==="verified"?"confVerified":"confPartial";
-  const label=c.level==="verified"?"✔ verificado com caso real":"⚠ parcialmente confirmado";
+  const label=c.level==="verified"?`${lbIcon("ok")} verificado com caso real`:`${lbIcon("warn")} parcialmente confirmado`;
   return {badge:`<span class="confBadge ${cls}">${label}</span>`,note:c.note};
 }
 function lbClassifyDiffs(len,diffs){
@@ -900,7 +944,7 @@ function lbCampoLivreFields(bank,len,clPositions,rawA,rawB){
 }
 /* Tokens do template que representam um dígito verificador dentro do Campo Livre
    (não um dado de negócio como agência/conta/convênio). Usado para diferenciar, na
-   comparação, "🔴 valor divergente" de "🟠 dígito verificador divergente" — são
+   comparação, "valor divergente" (status bad) de "dígito verificador divergente" (status warn) — são
    situações diferentes e não podem ser mostradas com o mesmo peso/ícone. */
 const LB_DV_TOKENS=new Set(["D","G","Z","O","E","X"]);
 /* Decodifica TODOS os campos nomeados do template (não só os que divergem) a partir
@@ -944,10 +988,10 @@ function lbCompareAllFields(bank,len,rawA,rawB){
   });
   return rows;
 }
-function lbFieldStatusIcon(row){ return row.equal ? "🟢" : (row.kind==="dv" ? "🟠" : "🔴"); }
+function lbFieldStatusIcon(row){ return lbIconBadge(row.equal ? "ok" : (row.kind==="dv" ? "warn" : "bad"),"sm"); }
 /* Texto de diagnóstico a partir das linhas da comparação por campo — segue a mesma
    lógica de priorização usada no resto do laudo: um campo de negócio divergente
-   (🔴) é a causa mais provável; um DV divergente sozinho (🟠) vira a causa só
+   (bad) é a causa mais provável; um DV divergente sozinho (warn) vira a causa só
    quando não há nenhum campo de negócio também divergente. */
 /* O campo de negócio divergente vem antes de um DV divergente sozinho, seguindo a
    mesma prioridade usada no resto do laudo — é o mesmo critério usado tanto no texto
@@ -960,7 +1004,7 @@ function lbMainDivergence(rows){
 }
 function lbBuildFieldDiagnosis(rows){
   const diffs=rows.filter(r=>!r.equal);
-  if(!diffs.length) return "<p class='status ok'>✅ Nenhuma divergência de campo identificada nesta comparação.</p>";
+  if(!diffs.length) return `<p class='status ok'>${lbIcon("ok")} Nenhuma divergência de campo identificada nesta comparação.</p>`;
   const main=lbMainDivergence(rows);
   const posWord=main.posLinha.includes("-")?"posições":"posição";
   if(diffs.length===1){
@@ -973,7 +1017,7 @@ function lbBankMismatchWarning(selectedBank,decodedBank){
   if(!decodedBank||!selectedBank||decodedBank===selectedBank) return "";
   const selName=banks[selectedBank]?banks[selectedBank].name:selectedBank;
   const decName=banks[decodedBank]?banks[decodedBank].name:decodedBank;
-  return `<div class="status warn">⚠️ <b>O banco selecionado no formulário (${selectedBank} — ${selName}) é diferente do banco decodificado na própria linha (${decodedBank} — ${decName}).</b> A leitura do Campo Livre abaixo usa o banco decodificado da linha (${decodedBank}), que é quem realmente define essa composição. Se a linha é mesmo de ${decName}, corrija o banco selecionado no formulário — usar o template do banco errado pode nomear o campo divergente incorretamente.</div>`;
+  return `<div class="status warn">${lbIcon("warn")} <b>O banco selecionado no formulário (${selectedBank} — ${selName}) é diferente do banco decodificado na própria linha (${decodedBank} — ${decName}).</b> A leitura do Campo Livre abaixo usa o banco decodificado da linha (${decodedBank}), que é quem realmente define essa composição. Se a linha é mesmo de ${decName}, corrija o banco selecionado no formulário — usar o template do banco errado pode nomear o campo divergente incorretamente.</div>`;
 }
 function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   const {cl,dv}=lbClassifyDiffs(len,diffs);
@@ -981,10 +1025,10 @@ function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   const {fields,tmpl}=lbCampoLivreFields(bank,len,cl,rawA,rawB);
   let html="";
   if(!tmpl){
-    html="<p class='muted'>🔎 Divergência dentro do Campo Livre. Cadastre o template desse banco em Gerador/Validador para o motor apontar exatamente qual dado (Nosso Número, Convênio, Carteira etc.) está errado.</p>";
+    html="<p class='muted'>"+lbIcon("search")+" Divergência dentro do Campo Livre. Cadastre o template desse banco em Gerador/Validador para o motor apontar exatamente qual dado (Nosso Número, Convênio, Carteira etc.) está errado.</p>";
   } else if(fields.length){
     const conf=lbConfidenceBadge(bank==="000"?"237":bank);
-    html="<div class='card calloutWarn'><h3>📍 Campo do cadastro responsável pela divergência "+conf.badge+"</h3>"+
+    html="<div class='card calloutWarn'><h3>"+lbIcon("pin")+" Campo do cadastro responsável pela divergência "+conf.badge+"</h3>"+
       fields.map(f=>{
         const impact=LB_FIELD_IMPACT[f.label];
         return `<div class="diagnostic-row bad"><b>${f.label}</b><span>Posição ${f.posLinha} da linha (posição ${f.posCL} do Campo Livre).${f.valueA!=null?` Sankhya: <code>${f.valueA}</code> × Banco: <code>${f.valueB}</code>.`:""}${impact?"<br><b>Impacto provável:</b> "+impact:""}</span></div>`;
@@ -1002,7 +1046,7 @@ function decodeSingleLine(){
   const selBank=$("decodBank").value, raw=$("decodLine").value;
   if(!clean(raw)){ $("decodResult").innerHTML="<div class='muted'>Nenhuma linha decodificada ainda.</div>"; return; }
   const parsed=lbDiagnoseLine(raw);
-  if(!parsed.ok){ $("decodResult").innerHTML=`<div class="status bad">❌ ${parsed.error}</div>`; return; }
+  if(!parsed.ok){ $("decodResult").innerHTML=`<div class="status bad">${lbIcon("bad")} ${parsed.error}</div>`; return; }
   const effBank=parsed.banco||selBank;
   let html=`<div class="kpis"><div class="kpi">Banco<b>${banks[parsed.banco]?banks[parsed.banco].name:(parsed.banco||"—")}</b></div><div class="kpi">Tipo<b>${parsed.type}</b></div><div class="kpi">Tamanho<b>${parsed.length} dígitos</b></div></div>`;
   html+=lbBankMismatchWarning(selBank,parsed.banco);
@@ -1020,8 +1064,8 @@ function decodeSingleLine(){
     const tmpl=getBankTemplate(effBank,cl);
     const {badge,note}=lbConfidenceBadge(effBank==="000"?"237":effBank);
     html+=`<h3>Campos do Campo Livre ${tmpl?badge:""}</h3>`;
-    if(effBank==="000") html+="<p class='muted'>ℹ️ Banco 000: Cobrança Interna do Bradesco (carteiras 21/22) — o Campo Livre usa o mesmo layout do Bradesco (237).</p>";
-    if(effBank==="001"&&cl.slice(0,6)!=="000000"&&cl.slice(23,25)!=="21") html+="<p class='muted'>ℹ️ Banco do Brasil: esta linha não indica de forma auto-evidente qual variante de convênio usar (não é convênio de 7 nem NN de 17 posições) — assumindo convênio de 6 posições, a suposição mais comum. Confira contra o cadastro se o resultado parecer estranho.</p>";
+    if(effBank==="000") html+=`<p class='muted'>${lbIcon("info")} Banco 000: Cobrança Interna do Bradesco (carteiras 21/22) — o Campo Livre usa o mesmo layout do Bradesco (237).</p>`;
+    if(effBank==="001"&&cl.slice(0,6)!=="000000"&&cl.slice(23,25)!=="21") html+=`<p class='muted'>${lbIcon("info")} Banco do Brasil: esta linha não indica de forma auto-evidente qual variante de convênio usar (não é convênio de 7 nem NN de 17 posições) — assumindo convênio de 6 posições, a suposição mais comum. Confira contra o cadastro se o resultado parecer estranho.</p>`;
     if(!tmpl){
       html+="<p class='muted'>Nenhum template de Campo Livre cadastrado para este banco ainda. Cadastre em Gerador/Validador a partir de um caso real (linha Sankhya × linha do banco).</p>";
     } else {
@@ -1169,7 +1213,7 @@ function lbNossoNumeroImpresso(bank,cl){
    fora, por não terem vetor de teste oficial confirmado na fonte usada (mesma
    ressalva já registrada nela): Itaú variante especial de 15 posições (DAC do Campo
    Livre) e Sicredi (DV do Campo Livre e do Nosso Número) — não arriscamos marcar
-   "❌ divergente" numa conta ainda não confirmada. Santander, Sicoob e Safra não têm
+   "divergente" numa conta ainda não confirmada. Santander, Sicoob e Safra não têm
    nenhuma fórmula de DV documentada na fonte usada para o Campo Livre. */
 function lbCampoLivreDvChecks(bank,len,cl){
   const out=[];
@@ -1286,7 +1330,7 @@ function lbSelfErrors(parsed){ return parsed&&parsed.fields ? parsed.fields.filt
 function lbRenderFields(parsed){
   if(!parsed||!parsed.fields) return "<p class='muted'>Sem dados estruturais para exibir.</p>";
   return "<table><tr><th>Campo</th><th>Posição</th><th>Informado</th><th>Calculado</th><th>Situação</th></tr>"+
-    parsed.fields.map(f=>`<tr><td>${f.name}</td><td class="pos">${f.pos}</td><td class="pos">${f.value}</td><td class="pos">${f.calc??"—"}</td><td>${f.calc!==undefined?(f.ok?"✅ OK":"❌ Divergente"):"—"}${f.obs?`<br><span class="muted" style="font-size:.85em">${f.obs}</span>`:""}</td></tr>`).join("")+"</table>"
+    parsed.fields.map(f=>`<tr><td>${f.name}</td><td class="pos">${f.pos}</td><td class="pos">${f.value}</td><td class="pos">${f.calc??"—"}</td><td>${f.calc!==undefined?(f.ok?lbIconBadge("ok","sm")+" OK":lbIconBadge("bad","sm")+" Divergente"):"—"}${f.obs?`<br><span class="muted" style="font-size:.85em">${f.obs}</span>`:""}</td></tr>`).join("")+"</table>"
     +(parsed.note?`<p class="muted">${parsed.note}</p>`:"");
 }
 function lbFieldMap(len){
@@ -1423,12 +1467,12 @@ function compare(){
     if(cl.length){ const {fields}=lbCampoLivreFields(effBank,len,cl,a,b); if(fields.length) clFieldInfo=fields[0]; }
   }
   const headline = !diffs.length
-    ? `<div class="headline ok">🟢 <div><b>Linhas idênticas.</b>Não há divergência entre Sankhya e banco nesta comparação.</div></div>`
+    ? `<div class="headline ok">${lbIconBadge("ok")} <div><b>Linhas idênticas.</b>Não há divergência entre Sankhya e banco nesta comparação.</div></div>`
     : (a.length!==b.length
-      ? `<div class="headline warn">🟠 <div><b>Tamanhos diferentes (${a.length} × ${b.length}).</b>Confirme se ambas são do mesmo tipo de documento (cobrança=47, arrecadação=48, código de barras=44) antes de confiar na comparação posição a posição.</div></div>`
+      ? `<div class="headline warn">${lbIconBadge("warn")} <div><b>Tamanhos diferentes (${a.length} × ${b.length}).</b>Confirme se ambas são do mesmo tipo de documento (cobrança=47, arrecadação=48, código de barras=44) antes de confiar na comparação posição a posição.</div></div>`
       : clFieldInfo
-        ? `<div class="headline bad">🔴 <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. Confira esse dado no cadastro do Sankhya.</div></div>`
-        : `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]}.</b>${(named[0]?"Primeiro campo afetado: "+named[0].field+".":"")}</div></div>`);
+        ? `<div class="headline bad">${lbIconBadge("bad")} <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. Confira esse dado no cadastro do Sankhya.</div></div>`
+        : `<div class="headline bad">${lbIconBadge("bad")} <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]}.</b>${(named[0]?"Primeiro campo afetado: "+named[0].field+".":"")}</div></div>`);
   let html=`<div class="card">${headline}<div class="kpis"><div class="kpi">Sankhya<b>${a.length}</b></div><div class="kpi">Banco<b>${b.length}</b></div><div class="kpi">Diferenças<b>${diffs.length}</b></div><div class="kpi">Primeira<b>${diffs[0]||"—"}</b></div></div>${bankMismatch}`;
   if(len&&diffs.length&&len<=100) html+=lbDiffStrip(a,b);
   if(named.length){
@@ -1674,12 +1718,12 @@ function analyzeCNAB(){
   const guess = fmt&&fmt!=="Automático" ? fmt : (lens.includes(240)?"CNAB 240":lens.includes(400)?"CNAB 400":"Não identificado");
   const okStruct=lens.every(x=>x===240||x===400);
   const term=$("cnabSearch").value.trim();
-  let html=`<div class="status ${okStruct?"ok":"warn"}">${okStruct?"✅ Estrutura compatível com 240/400":"⚠️ Existem registros com tamanho diferente de 240/400"}</div><div class="kpis"><div class="kpi">Linhas<b>${lines.length}</b></div><div class="kpi">Formato<b>${guess}</b></div><div class="kpi">Tamanhos<b>${lens.join(", ")}</b></div><div class="kpi">Banco<b>${$("cnabBank").value||"Auto"}</b></div></div>`;
+  let html=`<div class="status ${okStruct?"ok":"warn"}">${okStruct?lbIcon("ok")+" Estrutura compatível com 240/400":lbIcon("warn")+" Existem registros com tamanho diferente de 240/400"}</div><div class="kpis"><div class="kpi">Linhas<b>${lines.length}</b></div><div class="kpi">Formato<b>${guess}</b></div><div class="kpi">Tamanhos<b>${lens.join(", ")}</b></div><div class="kpi">Banco<b>${$("cnabBank").value||"Auto"}</b></div></div>`;
   if(term){
     const esc=term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), re=new RegExp(esc,"gi");
     const hits=[];
     lines.forEach((l,i)=>{ let m; while((m=re.exec(l))){ hits.push({line:i+1,pos:m.index+1}); if(re.lastIndex===m.index)re.lastIndex++; } });
-    html+=`<div class="status ${hits.length?"ok":"warn"}">${hits.length?`🔎 "${lbEsc(term)}" encontrado ${hits.length} vez(es)`:`🔎 "${lbEsc(term)}" não encontrado`}</div>`;
+    html+=`<div class="status ${hits.length?"ok":"warn"}">${lbIcon("search")} ${hits.length?`"${lbEsc(term)}" encontrado ${hits.length} vez(es)`:`"${lbEsc(term)}" não encontrado`}</div>`;
     if(hits.length) html+="<table><tr><th>Linha</th><th>Posição</th></tr>"+hits.slice(0,100).map(h=>`<tr><td>${h.line}</td><td>${h.pos}</td></tr>`).join("")+"</table>";
   }
   const seg=$("cnabSeg").value.trim().toUpperCase();
@@ -1694,7 +1738,7 @@ function analyzeCNAB(){
     const {tipoRegistro,segmento}=x.length>=14?lbCnabClassifyLine(x):{tipoRegistro:x[7],segmento:null};
     const desc=LB_CNAB240_TIPO_REGISTRO_DESC[tipoRegistro]||"—";
     const temMapa=!!(LB_CNAB240_FIELD_MAPS[effBankCnab]||{})[tipoRegistro+"|"+(segmento||"")];
-    const tipoLabel = tipoRegistro ? `${tipoRegistro} — ${desc}${segmento?` (Segmento ${segmento})`:""} ${temMapa?'<span class="confBadge confVerified">✔ mapeado</span>':'<span class="confBadge confUnknown">❔ sem mapa</span>'}` : "—";
+    const tipoLabel = tipoRegistro ? `${tipoRegistro} — ${desc}${segmento?` (Segmento ${segmento})`:""} ${temMapa?`<span class="confBadge confVerified">${lbIcon("ok")} mapeado</span>`:`<span class="confBadge confUnknown">${lbIcon("unknown")} sem mapa</span>`}` : "—";
     return `<tr><td>${i+1}</td><td>${x.length}</td><td>${tipoLabel}</td><td class="pos">${sample}</td></tr>`;
   }).join("")+"</table>";
   $("cnabResult").innerHTML=html;
@@ -1787,7 +1831,7 @@ function lbRenderTemplateTable(template,campoLivre){
 function generateLine(){
   const bank=$("genBank").value;
   const template=$("genTemplate").value.trim().toUpperCase();
-  if(template.length!==25){$("genResult").innerHTML=`<div class="status bad">❌ O template do Campo Livre deve ter exatamente 25 posições (tem ${template.length}).</div>`;return}
+  if(template.length!==25){$("genResult").innerHTML=`<div class="status bad">${lbIcon("bad")} O template do Campo Livre deve ter exatamente 25 posições (tem ${template.length}).</div>`;return}
   const freeRule=$("genFreeRule").value, sumMode=$("genSumMode").value;
   const our=$("genOur").value, ourDv=$("genOurDv").value;
   const amount=Number($("genAmount").value||0);
@@ -1807,7 +1851,7 @@ function generateLine(){
   const pretty=`${linha.slice(0,5)}.${linha.slice(5,10)} ${linha.slice(10,15)}.${linha.slice(15,21)} ${linha.slice(21,26)}.${linha.slice(26,32)} ${linha.slice(32,33)} ${linha.slice(33,47)}`;
   setBankTemplate(bank,template);
   const dates=lbFactorToDates(fator);
-  $("genResult").innerHTML=`<div class="headline ${incomplete?"warn":"ok"}">${incomplete?"🟠":"🟢"} <div><b>${incomplete?"Linha gerada, mas o template deste banco está incompleto.":"Linha digitável gerada com sucesso."}</b>${incomplete?'Posições marcadas com "?" foram preenchidas com zero e não representam dados reais — complete o template com o manual oficial antes de usar esta linha em produção.':"Todos os dígitos verificadores foram calculados a partir do template configurado."}</div></div>
+  $("genResult").innerHTML=`<div class="headline ${incomplete?"warn":"ok"}">${incomplete?lbIconBadge("warn"):lbIconBadge("ok")} <div><b>${incomplete?"Linha gerada, mas o template deste banco está incompleto.":"Linha digitável gerada com sucesso."}</b>${incomplete?'Posições marcadas com "?" foram preenchidas com zero e não representam dados reais — complete o template com o manual oficial antes de usar esta linha em produção.':"Todos os dígitos verificadores foram calculados a partir do template configurado."}</div></div>
   <div class="kpis"><div class="kpi">Campo Livre<b class="pos">${campoLivre}</b></div><div class="kpi">DV Geral<b>${dvGeral}</b></div><div class="kpi">Fator<b>${fator}</b></div><div class="kpi">Valor<b>${amount.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b></div></div>
   <h3>Linha digitável (47 dígitos)</h3><pre>${pretty}</pre>${lbCopyBtn(linha,"Copiar linha digitável")}
   <h3>Código de barras (44 dígitos)</h3><pre>${barcode44}</pre>${lbCopyBtn(barcode44,"Copiar código de barras")}
@@ -1820,16 +1864,16 @@ function useSankhyaExample(){
   $("genAgreement").value="0057";$("genModality").value="09";$("genOur").value="1234567";$("genOurDv").value="0";
   $("genAmount").value="100.00";$("genDue").value=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
   $("genCurrency").value="9";$("genFactor").value="";$("genTemplate").value="110NNNNNNNND005712345700Z";$("genFreeRule").value="Z";
-  $("genResult").innerHTML="<div class='status info'>🔵 Dados fictícios de exemplo carregados apenas para testar o motor — não representam um boleto real. Ajuste conforme o cadastro real antes de comparar com o banco.</div>";
+  $("genResult").innerHTML=`<div class='status info'>${lbIcon("info")} Dados fictícios de exemplo carregados apenas para testar o motor — não representam um boleto real. Ajuste conforme o cadastro real antes de comparar com o banco.</div>`;
 }
 function decomposeLine(){
   const raw=$("genDecomposeInput").value;
   if(!raw){ lbToast("Cole uma linha no campo de decomposição.","warn"); return; }
   const parsed=lbParseCobranca(raw);
-  if(!parsed.ok){$("genResult").innerHTML=`<div class="status bad">❌ ${parsed.error}</div>`;return}
+  if(!parsed.ok){$("genResult").innerHTML=`<div class="status bad">${lbIcon("bad")} ${parsed.error}</div>`;return}
   const template=$("genTemplate").value.trim().toUpperCase();
   const errs=lbSelfErrors(parsed);
-  $("genResult").innerHTML=`<div class="headline ${errs.length?"bad":"ok"}">${errs.length?"🔴":"🟢"} <div><b>${errs.length?errs.length+" divergência(s) de dígito verificador nesta linha.":"Todos os dígitos verificadores conferem."}</b>${errs.length?"Campos com problema: "+errs.map(x=>x.name).join(", ")+".":"A linha é matematicamente consistente."}</div></div>
+  $("genResult").innerHTML=`<div class="headline ${errs.length?"bad":"ok"}">${errs.length?lbIconBadge("bad"):lbIconBadge("ok")} <div><b>${errs.length?errs.length+" divergência(s) de dígito verificador nesta linha.":"Todos os dígitos verificadores conferem."}</b>${errs.length?"Campos com problema: "+errs.map(x=>x.name).join(", ")+".":"A linha é matematicamente consistente."}</div></div>
   ${lbRenderFields(parsed)}
   <h3>Campo Livre decomposto pelo template atual</h3>${template.length===25?lbRenderTemplateTable(template,parsed.campoLivre):"<p class='muted'>Configure um template de 25 posições acima para decompor o Campo Livre.</p>"}`;
 }
@@ -1841,11 +1885,11 @@ function generateReport(save){
   if(save===undefined)save=true;
   const bank=$("reportBank").value, ref=$("reportRef").value;
   const sankLine=$("reportSankhya").value, bankLineTxt=$("reportBankLine").value;
-  if(!sankLine){$("reportResult").innerHTML="<div class='status bad'>❌ Informe ao menos a linha do Sankhya.</div>";return}
+  if(!sankLine){$("reportResult").innerHTML=`<div class='status bad'>${lbIcon("bad")} Informe ao menos a linha do Sankhya.</div>`;return}
   const a=lbDiagnoseLine(sankLine);
 
   if(!a.ok){
-    $("reportResult").innerHTML=`<div class="card"><div class="headline bad">🔴 <div><b>Linha do Sankhya inválida.</b>${a.error}</div></div></div>`;
+    $("reportResult").innerHTML=`<div class="card"><div class="headline bad">${lbIconBadge("bad")} <div><b>Linha do Sankhya inválida.</b>${a.error}</div></div></div>`;
     if(save)saveReportCase(bank,ref,"Linha inválida");return;
   }
   const errsA=lbSelfErrors(a);
@@ -1857,18 +1901,18 @@ function generateReport(save){
   let headline, causeList=[], diffs=[], named=[], len=null, mainDiv=null, rawA=clean(sankLine), rawB=bankLineTxt?clean(bankLineTxt):"";
   if(!bankLineTxt){
     headline = errsA.length
-      ? `<div class="headline bad">🔴 <div><b>A linha do Sankhya tem ${errsA.length} dígito(s) verificador(es) incorretos (${errsA.map(x=>x.name).join(", ")}).</b>Isso indica erro de cálculo/posicionamento, independente do banco. Cole também a linha do banco para localizar exatamente onde as duas divergem.</div></div>`
-      : `<div class="headline ok">🟢 <div><b>A linha do Sankhya é matematicamente consistente.</b>Todos os dígitos verificadores conferem. Cole também a linha do banco para comparar posição a posição.</div></div>`;
+      ? `<div class="headline bad">${lbIconBadge("bad")} <div><b>A linha do Sankhya tem ${errsA.length} dígito(s) verificador(es) incorretos (${errsA.map(x=>x.name).join(", ")}).</b>Isso indica erro de cálculo/posicionamento, independente do banco. Cole também a linha do banco para localizar exatamente onde as duas divergem.</div></div>`
+      : `<div class="headline ok">${lbIconBadge("ok")} <div><b>A linha do Sankhya é matematicamente consistente.</b>Todos os dígitos verificadores conferem. Cole também a linha do banco para comparar posição a posição.</div></div>`;
   } else if(!bLine.ok){
-    headline = `<div class="headline bad">🔴 <div><b>A linha do banco é inválida.</b>${bLine.error}</div></div>`;
+    headline = `<div class="headline bad">${lbIconBadge("bad")} <div><b>A linha do banco é inválida.</b>${bLine.error}</div></div>`;
   } else if(rawA.length!==rawB.length){
-    headline = `<div class="headline warn">🟠 <div><b>As linhas têm tamanhos diferentes (${rawA.length} × ${rawB.length}).</b>Confirme se ambas são do mesmo tipo de documento antes de comparar posição a posição.</div></div>`;
+    headline = `<div class="headline warn">${lbIconBadge("warn")} <div><b>As linhas têm tamanhos diferentes (${rawA.length} × ${rawB.length}).</b>Confirme se ambas são do mesmo tipo de documento antes de comparar posição a posição.</div></div>`;
   } else {
     len=rawA.length;
     for(let i=0;i<len;i++)if(rawA[i]!==rawB[i])diffs.push(i+1);
     named=diffs.map(p=>({pos:p,field:(lbFieldForPos(len,p)||{name:"—"}).name,s:rawA[p-1],k:rawB[p-1]}));
     if(!diffs.length){
-      headline = `<div class="headline ok">🟢 <div><b>As linhas são idênticas dígito a dígito.</b>Não há divergência entre Sankhya e banco.</div></div>`;
+      headline = `<div class="headline ok">${lbIconBadge("ok")} <div><b>As linhas são idênticas dígito a dígito.</b>Não há divergência entre Sankhya e banco.</div></div>`;
     } else {
       const fieldsHit=[...new Set(named.map(x=>x.field))];
       const hitsBanco=fieldsHit.includes("Banco"), hitsValor=fieldsHit.includes("Valor"), hitsFator=fieldsHit.includes("Fator de Vencimento"), hitsDV=fieldsHit.some(f=>f.startsWith("DV")), hasCL=fieldsHit.includes("Campo Livre");
@@ -1882,8 +1926,8 @@ function generateReport(save){
       if(hitsDV&&!hasCL)causeList.push("Um ou mais dígitos verificadores diferem — verifique se Sankhya e banco usam a mesma regra de cálculo (módulo 10/11) e a mesma composição de campos.");
       if(!causeList.length)causeList.push("A divergência não se encaixa nos padrões automáticos reconhecidos; revise manualmente campo a campo na tabela abaixo.");
       headline = clFieldInfo
-        ? `<div class="headline bad">🔴 <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. ${LB_FIELD_IMPACT[clFieldInfo.label]||"Confira esse dado no cadastro do Sankhya."}</div></div>`
-        : `<div class="headline bad">🔴 <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]} (campo: ${named[0].field}).</b>Ação recomendada: ${causeList[0].replace(/<\/?b>/g,"")}</div></div>`;
+        ? `<div class="headline bad">${lbIconBadge("bad")} <div><b>Divergência no ${clFieldInfo.label} (posição ${clFieldInfo.posLinha} da linha).</b>Sankhya: <code>${clFieldInfo.valueA}</code> × Banco: <code>${clFieldInfo.valueB}</code>. ${LB_FIELD_IMPACT[clFieldInfo.label]||"Confira esse dado no cadastro do Sankhya."}</div></div>`
+        : `<div class="headline bad">${lbIconBadge("bad")} <div><b>${diffs.length} posição(ões) divergente(s), a partir da posição ${diffs[0]} (campo: ${named[0].field}).</b>Ação recomendada: ${causeList[0].replace(/<\/?b>/g,"")}</div></div>`;
     }
   }
 
@@ -1892,19 +1936,19 @@ function generateReport(save){
   html+=bankMismatch;
 
   html+="<h3>1. A linha do Sankhya é matematicamente consistente?</h3>";
-  html+=`<div class="status ${errsA.length?"bad":"ok"}">${errsA.length?"❌ NÃO — "+errsA.length+" dígito(s) verificador(es) não conferem":"✅ SIM — todos os dígitos verificadores conferem"}</div>`;
+  html+=`<div class="status ${errsA.length?"bad":"ok"}">${errsA.length?lbIcon("bad")+" NÃO — "+errsA.length+" dígito(s) verificador(es) não conferem":lbIcon("ok")+" SIM — todos os dígitos verificadores conferem"}</div>`;
   html+=lbRenderFields(a)+lbCopyBtn(rawA,"Copiar linha Sankhya");
   if(a.dates)html+=`<p class="muted">Vencimento decodificado — regra vigente (desde 22/02/2025): <b>${a.dates.nova.toLocaleDateString("pt-BR")}</b>; regra anterior: ${a.dates.antiga.toLocaleDateString("pt-BR")}. Confira qual regra o banco está aplicando se a data parecer incoerente.</p>`;
   if(a.valor!=null)html+=`<p class="muted">Valor decodificado da linha: <b>${a.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b>.</p>`;
 
   if(bankLineTxt&&bLine&&bLine.ok){
     const errsB=lbSelfErrors(bLine);
-    html+=`<h3>2. A linha do banco é matematicamente consistente?</h3><div class="status ${errsB.length?"bad":"ok"}">${errsB.length?"❌ NÃO":"✅ SIM"}</div>`;
+    html+=`<h3>2. A linha do banco é matematicamente consistente?</h3><div class="status ${errsB.length?"bad":"ok"}">${errsB.length?lbIcon("bad")+" NÃO":lbIcon("ok")+" SIM"}</div>`;
     html+=lbRenderFields(bLine)+lbCopyBtn(rawB,"Copiar linha do banco");
     if(len!=null){
       html+="<h3>3. Onde as duas linhas divergem</h3>";
       if(!diffs.length){
-        html+="<div class='status ok'>✅ As linhas são idênticas dígito a dígito.</div>";
+        html+=`<div class='status ok'>${lbIcon("ok")} As linhas são idênticas dígito a dígito.</div>`;
       } else {
         if(len<=100) html+=lbDiffStrip(rawA,rawB);
         html+="<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>"+named.slice(0,200).map(x=>`<tr><td>${x.pos}</td><td>${x.field}</td><td class="pos">${x.s}</td><td class="pos">${x.k}</td></tr>`).join("")+"</table>";
@@ -1925,7 +1969,7 @@ function generateReport(save){
       }
     }
   } else if(bankLineTxt&&bLine&&!bLine.ok){
-    html+=`<h3>2. A linha do banco é válida?</h3><div class="status bad">❌ ${bLine.error}</div>`;
+    html+=`<h3>2. A linha do banco é válida?</h3><div class="status bad">${lbIcon("bad")} ${bLine.error}</div>`;
   } else {
     html+="<p class='muted'>Informe também a linha do banco para obter a comparação posição a posição e a causa provável.</p>";
   }
@@ -1960,7 +2004,7 @@ function lbSimilarCasesCard(bankName,campo){
   const matches=lbFindSimilarCases(bankName,campo);
   if(!matches.length) return "";
   const sample=matches.slice(0,5).map(c=>`<li>${c.data} — ${c.ref}</li>`).join("");
-  return `<div class="card calloutWarn"><h3>🔁 Casos parecidos</h3><p>Isso já apareceu <b>${matches.length}</b> vez(es) antes com <b>${bankName}</b> no campo <b>${campo}</b>:</p><ul>${sample}</ul>${matches.length>5?`<p class="muted">+ ${matches.length-5} outro(s) caso(s) anterior(es) com essa mesma combinação.</p>`:""}</div>`;
+  return `<div class="card calloutWarn"><h3>${lbIcon("repeat")} Casos parecidos</h3><p>Isso já apareceu <b>${matches.length}</b> vez(es) antes com <b>${bankName}</b> no campo <b>${campo}</b>:</p><ul>${sample}</ul>${matches.length>5?`<p class="muted">+ ${matches.length-5} outro(s) caso(s) anterior(es) com essa mesma combinação.</p>`:""}</div>`;
 }
 
 /* ===== Mapas Oficiais ===== */
@@ -2012,9 +2056,9 @@ function runGuidedDiagnosis(save){
   const infoValueRaw=$("gValue").value;
   const infoValue = infoValueRaw ? Number(String(infoValueRaw).replace(/\./g,"").replace(",",".")) : null;
   const infoDue=$("gDue").value;
-  if(!line){$("guidedResult").innerHTML="<div class='status bad'>❌ Cole a linha digitável gerada pelo Sankhya para iniciar a análise.</div>";return}
+  if(!line){$("guidedResult").innerHTML=`<div class='status bad'>${lbIcon("bad")} Cole a linha digitável gerada pelo Sankhya para iniciar a análise.</div>`;return}
   const a=lbDiagnoseLine(line);
-  if(!a.ok){$("guidedResult").innerHTML=`<div class="card"><div class="status bad">❌ ${a.error}</div></div>`;if(save)saveGuidedCase(bank,ref,"bad");return}
+  if(!a.ok){$("guidedResult").innerHTML=`<div class="card"><div class="status bad">${lbIcon("bad")} ${a.error}</div></div>`;if(save)saveGuidedCase(bank,ref,"bad");return}
   const errsA=lbSelfErrors(a);
   const effBank=a.banco||bank; // o Campo Livre é interpretado pelo banco decodificado da própria linha, não pelo selecionado no formulário
   const hints=abiHints(bank,obs);
@@ -2032,23 +2076,23 @@ function runGuidedDiagnosis(save){
   const firstErrTitle = errors.length ? (errors[0].title||`${errors[0].name} não confere`) : "";
   const firstErrDetail = errors.length ? (errors[0].detail||`Esperado ${errors[0].calc}, encontrado ${errors[0].value} (posição ${errors[0].pos}).`) : "";
   const headline = errors.length
-    ? `<div class="headline bad">🔴 <div><b>Erro objetivo encontrado: ${firstErrTitle}.</b>${firstErrDetail}</div></div>`
-    : `<div class="headline ok">🟢 <div><b>Nenhum erro matemático encontrado na linha do Sankhya.</b>${extra.length?"Ainda assim há um alerta de conferência abaixo.":"Se o banco recusou o boleto, o motivo provavelmente é cadastral (compare com a linha do banco abaixo)."}</div></div>`;
+    ? `<div class="headline bad">${lbIconBadge("bad")} <div><b>Erro objetivo encontrado: ${firstErrTitle}.</b>${firstErrDetail}</div></div>`
+    : `<div class="headline ok">${lbIconBadge("ok")} <div><b>Nenhum erro matemático encontrado na linha do Sankhya.</b>${extra.length?"Ainda assim há um alerta de conferência abaixo.":"Se o banco recusou o boleto, o motivo provavelmente é cadastral (compare com a linha do banco abaixo)."}</div></div>`;
 
   let compareHtml="";
   if(ref){
     const b=lbDiagnoseLine(ref);
     const rawA=clean(line), rawB=clean(ref);
     if(!b.ok){
-      compareHtml=`<div class="card"><h2>Linha do banco</h2><div class="status bad">❌ ${b.error}</div></div>`;
+      compareHtml=`<div class="card"><h2>Linha do banco</h2><div class="status bad">${lbIcon("bad")} ${b.error}</div></div>`;
     } else if(rawA.length!==rawB.length){
-      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status warn">⚠️ Tamanhos diferentes (${rawA.length} × ${rawB.length}) — confirme se são o mesmo tipo de documento.</div></div>`;
+      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status warn">${lbIcon("warn")} Tamanhos diferentes (${rawA.length} × ${rawB.length}) — confirme se são o mesmo tipo de documento.</div></div>`;
     } else {
       const len=rawA.length, d=[];
       for(let i=0;i<len;i++)if(rawA[i]!==rawB[i])d.push(i+1);
       let clTag="";
       if(d.length){ const {cl}=lbClassifyDiffs(len,d); if(cl.length){ const {fields}=lbCampoLivreFields(effBank,len,cl,rawA,rawB); if(fields.length) clTag=` — ${fields.map(f=>f.label).join(", ")}`; } }
-      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status ${d.length?"bad":"ok"}">${d.length?`🔴 ${d.length} posição(ões) diferentes, a partir da posição ${d[0]}${clTag}`:"🟢 Linhas idênticas"}</div>${d.length?(len<=100?lbDiffStrip(rawA,rawB):"")+`<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>${d.slice(0,100).map(i=>`<tr><td>${i}</td><td>${(lbFieldForPos(len,i)||{name:"—"}).name}</td><td>${rawA[i-1]||"—"}</td><td>${rawB[i-1]||"—"}</td></tr>`).join("")}</table>${lbCampoLivreNote(effBank,len,d,rawA,rawB)}`:""}</div>`;
+      compareHtml=`<div class="card"><h2>Onde Sankhya e Banco divergem</h2><div class="status ${d.length?"bad":"ok"}">${d.length?`${lbIcon("bad")} ${d.length} posição(ões) diferentes, a partir da posição ${d[0]}${clTag}`:`${lbIcon("ok")} Linhas idênticas`}</div>${d.length?(len<=100?lbDiffStrip(rawA,rawB):"")+`<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>${d.slice(0,100).map(i=>`<tr><td>${i}</td><td>${(lbFieldForPos(len,i)||{name:"—"}).name}</td><td>${rawA[i-1]||"—"}</td><td>${rawB[i-1]||"—"}</td></tr>`).join("")}</table>${lbCampoLivreNote(effBank,len,d,rawA,rawB)}`:""}</div>`;
     }
   }
   $("guidedResult").innerHTML=`<div class="card">
@@ -2059,13 +2103,13 @@ function runGuidedDiagnosis(save){
   <h3>Resultado por validação</h3>${lbRenderFields(a)}
   ${extra.length?`<h3>Conferências adicionais (cadastro × linha)</h3>${extra.map(x=>`<div class="diagnostic-row ${x.level}"><b>${x.title}</b><span>${x.detail}</span></div>`).join("")}`:""}
   ${hints.length?`<h3>O que verificar no Sankhya</h3>${hints.map(x=>`<div class="diagnostic-row warn"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}`:""}
-  <div class="status info">🔵 Uma linha pode possuir DVs matematicamente válidos e ainda estar incorreta para a conta bancária. A validação cadastral depende do banco, produto, carteira/modalidade e manual vigente.</div>
+  <div class="status info">${lbIcon("info")} Uma linha pode possuir DVs matematicamente válidos e ainda estar incorreta para a conta bancária. A validação cadastral depende do banco, produto, carteira/modalidade e manual vigente.</div>
   </div>${compareHtml}`;
   if(save)saveGuidedCase(bank,ref,overall);
 }
 function saveGuidedCase(bank,ref,status){
   let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");
-  h.unshift({data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Diagnóstico guiado",status:status==="bad"?"🔴 Erro encontrado":"🟢 Sem erro matemático"});
+  h.unshift({data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Diagnóstico guiado",status:status==="bad"?lbIcon("bad")+" Erro encontrado":lbIcon("ok")+" Sem erro matemático"});
   localStorage.setItem("lexbank_cases",JSON.stringify(h.slice(0,200)));renderHistory();
 }
 function clearGuidedDiagnosis(){
@@ -2660,9 +2704,9 @@ function lbHomSimular(texto,cad){
 
 /* ===== UI: aba Homologador de Remessa ===== */
 const LB_HOM_NIVEL_ROW={ERRO:"bad",AVISO:"warn",NAO_VERIFICAVEL:"info"};
-const LB_HOM_NIVEL_ICON={ERRO:"🔴",AVISO:"🟠",NAO_VERIFICAVEL:"🔵"};
-const LB_HOM_VEREDITO_LABEL={ACEITO_NA_SIMULACAO:["🟢","Aceito na simulação"],ACEITO_COM_RESSALVAS:["🟠","Aceito com ressalvas"],
-  REJEICAO_PROVAVEL:["🟠","Rejeição provável"],REJEITADO:["🔴","Rejeitado"]};
+const LB_HOM_NIVEL_ICON={ERRO:"bad",AVISO:"warn",NAO_VERIFICAVEL:"info"};
+const LB_HOM_VEREDITO_LABEL={ACEITO_NA_SIMULACAO:["ok","Aceito na simulação"],ACEITO_COM_RESSALVAS:["warn","Aceito com ressalvas"],
+  REJEICAO_PROVAVEL:["warn","Rejeição provável"],REJEITADO:["bad","Rejeitado"]};
 function homCadastroFromForm(){
   return {codigoEmpresa:$("homCodEmpresa").value.trim(), agencia:$("homAgencia").value.trim(), agenciaDv:$("homAgenciaDv").value.trim(),
     conta:$("homConta").value.trim(), contaDv:$("homContaDv").value.trim(), cnpj:$("homCnpj").value.replace(/\D/g,""),
@@ -2671,28 +2715,28 @@ function homCadastroFromForm(){
 function homFmtMoeda(v){ return v==null?"—":Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
 function homFmtData(iso){ return iso ? new Date(iso+"T00:00:00").toLocaleDateString("pt-BR") : "—"; }
 function homRenderAchado(x){
-  return `<div class="diagnostic-row ${LB_HOM_NIVEL_ROW[x.nivel]||"info"}"><b>${LB_HOM_NIVEL_ICON[x.nivel]||"❔"} ${lbEsc(x.regra)}${x.linha?` — linha ${x.linha}`:""}${x.campo?` · ${lbEsc(x.campo)}`:""}</b><span>${lbEsc(x.mensagem)}${x.pos?` <span class="muted">(posição ${x.pos[0]}-${x.pos[1]})</span>`:""}<br><span class="muted">Certeza: ${x.certeza} — ${lbEsc(x.fonte)}</span></span></div>`;
+  return `<div class="diagnostic-row ${LB_HOM_NIVEL_ROW[x.nivel]||"info"}"><b>${lbIcon(LB_HOM_NIVEL_ICON[x.nivel]||"unknown")} ${lbEsc(x.regra)}${x.linha?` — linha ${x.linha}`:""}${x.campo?` · ${lbEsc(x.campo)}`:""}</b><span>${lbEsc(x.mensagem)}${x.pos?` <span class="muted">(posição ${x.pos[0]}-${x.pos[1]})</span>`:""}<br><span class="muted">Certeza: ${x.certeza} — ${lbEsc(x.fonte)}</span></span></div>`;
 }
 function homSimular(){
   const texto=$("homText").value;
   if(!texto.trim()){ lbToast("Cole ou carregue um arquivo de remessa antes de simular.","warn"); return; }
   const cad=homCadastroFromForm();
   const res=lbHomSimular(texto,cad);
-  if(res.erro){ $("homResult").innerHTML=`<div class="status bad">❌ ${lbEsc(res.erro)}</div>`; return; }
+  if(res.erro){ $("homResult").innerHTML=`<div class="status bad">${lbIcon("bad")} ${lbEsc(res.erro)}</div>`; return; }
   const vArq=res.veredictoArquivo, arqOk=vArq==="ARQUIVO_ACEITO_NA_SIMULACAO";
-  let html=`<div class="headline ${arqOk?"ok":"bad"}">${arqOk?"🟢":"🔴"} <div><b>Banco detectado: ${lbEsc(res.banco.codigo)} — ${lbEsc(res.banco.nome)}, ${lbEsc(res.banco.layout)}.</b>Veredito do arquivo: ${arqOk?"aceito na simulação":vArq==="ARQUIVO_REJEICAO_PROVAVEL"?"rejeição provável":"rejeitado"}.</div></div>`;
+  let html=`<div class="headline ${arqOk?"ok":"bad"}">${arqOk?lbIconBadge("ok"):lbIconBadge("bad")} <div><b>Banco detectado: ${lbEsc(res.banco.codigo)} — ${lbEsc(res.banco.nome)}, ${lbEsc(res.banco.layout)}.</b>Veredito do arquivo: ${arqOk?"aceito na simulação":vArq==="ARQUIVO_REJEICAO_PROVAVEL"?"rejeição provável":"rejeitado"}.</div></div>`;
   html+=`<div class="kpis"><div class="kpi">Títulos<b>${res.resumo.titulos}</b></div><div class="kpi">Aceitos<b>${res.resumo.aceitos}</b></div><div class="kpi">Com ressalvas<b>${res.resumo.aceitosComRessalvas}</b></div><div class="kpi">Rejeição provável<b>${res.resumo.rejeicaoProvavel}</b></div><div class="kpi">Rejeitados<b>${res.resumo.rejeitados}</b></div><div class="kpi">Valor aceito<b>${homFmtMoeda(res.resumo.valorAceito)}</b></div></div>`;
   if(res.achadosArquivo.length) html+="<h3>Achados do arquivo</h3>"+res.achadosArquivo.map(homRenderAchado).join("");
   if(res.titulos.length){
     html+="<h3>Títulos</h3>"+res.titulos.map(t=>{
-      const [icon,label]=LB_HOM_VEREDITO_LABEL[t.veredito]||["❔",t.veredito];
-      let h=`<div class="card"><h3>${icon} Linha ${t.linha} — Nosso Número ${lbEsc(t.identificacao.nossoNumero||"—")} — ${label}</h3>`;
+      const [iconName,label]=LB_HOM_VEREDITO_LABEL[t.veredito]||["unknown",t.veredito];
+      let h=`<div class="card"><h3>${lbIcon(iconName)} Linha ${t.linha} — Nosso Número ${lbEsc(t.identificacao.nossoNumero||"—")} — ${label}</h3>`;
       h+=`<div class="kpis"><div class="kpi">Seu número<b>${lbEsc(t.identificacao.seuNumero||"—")}</b></div><div class="kpi">Valor<b>${homFmtMoeda(t.identificacao.valor)}</b></div><div class="kpi">Vencimento<b>${homFmtData(t.identificacao.vencimento)}</b></div><div class="kpi">Pagador<b>${lbEsc(t.identificacao.pagador||"—")}</b></div></div>`;
-      h += t.achados.length ? t.achados.map(homRenderAchado).join("") : "<p class=\"status ok\">✅ Nenhuma divergência identificada neste título.</p>";
+      h += t.achados.length ? t.achados.map(homRenderAchado).join("") : `<p class="status ok">${lbIcon("ok")} Nenhuma divergência identificada neste título.</p>`;
       return h+"</div>";
     }).join("");
   }
-  html+=`<p class="muted">ℹ️ ${lbEsc(res.aviso)}</p>`;
+  html+=`<p class="muted">${lbIcon("info")} ${lbEsc(res.aviso)}</p>`;
   $("homResult").innerHTML=html;
   const vereditoLabel={ARQUIVO_ACEITO_NA_SIMULACAO:"aceito na simulação",ARQUIVO_REJEICAO_PROVAVEL:"rejeição provável",ARQUIVO_REJEITADO:"rejeitado"}[vArq]||vArq;
   lbSaveCase({origem:"Homologador de Remessa",banco:res.banco.nome,ref:res.banco.layout,
