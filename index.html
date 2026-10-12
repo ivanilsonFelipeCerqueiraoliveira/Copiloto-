@@ -171,6 +171,19 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lbBarcodeDigits{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:.8px;color:#000;text-align:center;margin-top:8px;white-space:nowrap}
 .lbPrintBtn{border:1px solid var(--line);background:var(--card);color:var(--muted);width:26px;height:26px;border-radius:50%;font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:9px;vertical-align:middle;transition:background .15s,color .15s,border-color .15s}
 .lbPrintBtn:hover{background:var(--blue-tint);color:var(--blue-dark);border-color:var(--blue)}
+.lbVerdictOverlay{position:fixed;inset:0;background:#0a1f1c7a;display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s}
+.lbVerdictOverlay.open{opacity:1;pointer-events:auto}
+.lbVerdictModal{background:var(--card);border-radius:18px;max-width:420px;width:100%;padding:30px 26px;text-align:center;box-shadow:0 24px 60px #00000040;transform:translateY(8px) scale(.97);transition:transform .18s}
+.lbVerdictOverlay.open .lbVerdictModal{transform:translateY(0) scale(1)}
+.lbVerdictIcon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px}
+.lbVerdictIcon.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.lbVerdictIcon.warn{background:var(--warn-bg);color:var(--warn-fg)}
+.lbVerdictIcon.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.lbVerdictModal h2{font-size:18px;margin:0 0 10px}
+.lbVerdictModal p{font-size:13.5px;color:var(--ink);margin:0 0 6px;line-height:1.5}
+.lbVerdictModal .muted{font-size:12.5px;margin:12px 0 20px}
+.lbVerdictModal .btn{width:100%}
+@media(prefers-reduced-motion:reduce){.lbVerdictOverlay,.lbVerdictModal{transition:none}}
 .lbComingSoonWrap{position:relative;overflow:hidden}
 .lbComingSoon{position:absolute;inset:0;background:var(--card);display:flex;align-items:center;justify-content:center;z-index:5;border-radius:var(--radius);font-family:var(--font-head);font-weight:700;font-size:20px;color:var(--muted)}
 @media print{
@@ -320,7 +333,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 
 <section id="comparador" class="tab"><div class="card"><h1>Comparador de linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Compara os dígitos e indica exatamente em qual campo (banco, moeda, campo livre, DV, fator de vencimento ou valor) há divergência, para linhas de 44, 47 ou 48 dígitos. A comparação roda automaticamente enquanto você cola/edita as linhas.</div>
 <div class="form"><div class="field"><label>Banco</label><select id="cmpBank"><option value="">Não informado</option><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div><div class="field"><label>Modalidade</label><input id="cmpMod"></div><div class="field"><label>Carteira</label><input id="cmpWallet"></div></div>
-<div class="two"><div class="field"><label>Sankhya</label><textarea id="line1"></textarea></div><div class="field"><label>Banco / referência</label><textarea id="line2"></textarea></div></div><div class="actions"><button class="btn primary" onclick="compare()">COMPARAR</button></div><div id="cmpResult"></div></div></section>
+<div class="two"><div class="field"><label>Sankhya</label><textarea id="line1"></textarea></div><div class="field"><label>Banco / referência</label><textarea id="line2"></textarea></div></div><div class="actions"><button class="btn primary" onclick="compare();lbShowVerdictFromResult('cmpResult')">COMPARAR</button></div><div id="cmpResult"></div></div></section>
 
 <section id="decodificacao" class="tab active"><div class="card"><h1>Decodificação da linha digitável<button class="lbPrintBtn" onclick="lbPrint()" title="Imprimir / salvar em PDF" aria-label="Imprimir ou salvar em PDF">🖨️</button></h1><div class="muted">Recebe uma única linha (44, 47 ou 48 dígitos) e decompõe cada posição em sua informação de negócio — banco, campo livre e, dentro dele, agência, conta, convênio, carteira, nosso número, DVs etc. — de acordo com o layout comprovado para o banco decodificado na própria linha. O banco selecionado abaixo é só contexto; o layout aplicado é sempre o da linha. Campo sem posição comprovada por caso real nunca aparece aqui — é mostrado como "não mapeado", nunca com um valor chutado.</div>
 <div class="form"><div class="field"><label>Banco (contexto)</label><select id="decodBank"><option value="001">001 — Banco do Brasil</option><option value="033">033 — Santander</option><option value="104">104 — Caixa</option><option value="237">237 — Bradesco</option><option value="341">341 — Itaú</option><option value="422">422 — Safra</option><option value="748">748 — Sicredi</option><option value="756">756 — Sicoob</option></select></div></div>
@@ -459,7 +472,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 <div class="field full"><label>Linha Sankhya</label><textarea id="reportSankhya"></textarea></div>
 <div class="field full"><label>Linha Banco / referência</label><textarea id="reportBankLine"></textarea></div>
 </div>
-<div class="actions"><button class="btn primary" onclick="generateReport()">GERAR LAUDO</button></div>
+<div class="actions"><button class="btn primary" onclick="generateReport();lbShowVerdictFromResult('reportResult')">GERAR LAUDO</button></div>
 </div>
 <div class="card"><div id="reportResult"><div class="muted">Nenhum laudo gerado.</div></div></div>
 </section>
@@ -516,7 +529,7 @@ LAUDO DE DIVERGÊNCIA</pre>
 
 <div class="status info">🔵 Regra de ouro: primeiro descubra se o erro é matemático, estrutural, cadastral ou bancário. Só depois altere o cadastro da conta.</div>
 <div class="actions">
-<button class="btn primary" onclick="runGuidedDiagnosis()">ANALISAR AGORA</button>
+<button class="btn primary" onclick="runGuidedDiagnosis();lbShowVerdictFromResult('guidedResult')">ANALISAR AGORA</button>
 <button class="btn secondary" onclick="clearGuidedDiagnosis()">LIMPAR</button>
 </div>
 </div>
@@ -713,6 +726,49 @@ function lbToast(msg,type){
   setTimeout(()=>{ t.style.opacity="0"; t.style.transform="translateY(6px)"; setTimeout(()=>t.remove(),320); },3200);
 }
 function lbDebounce(fn,ms){ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>fn(...a),ms); }; }
+/* ===== Popup de veredito — aparece só quando o consultor clica no botão de
+   analisar (nunca durante a auto-análise enquanto digita), reaproveitando a
+   mesma classificação ok/warn/bad já usada no headline de cada laudo. */
+function lbVerdictEscHandler(e){ if(e.key==="Escape") lbCloseVerdictModal() }
+function lbCloseVerdictModal(){
+  const ov=document.getElementById("lbVerdictOverlay");
+  if(!ov) return;
+  ov.classList.remove("open");
+  setTimeout(()=>ov.remove(),180);
+  document.removeEventListener("keydown",lbVerdictEscHandler);
+}
+const LB_VERDICT_META={
+  bad:{icon:"🔴",title:"Possível causa encontrada"},
+  warn:{icon:"🟠",title:"Possível divergência encontrada"},
+  ok:{icon:"🟢",title:"Nenhuma divergência encontrada"}
+};
+function lbShowVerdictModal(level,detailText){
+  document.getElementById("lbVerdictOverlay")?.remove();
+  const meta=LB_VERDICT_META[level]||{icon:"❔",title:"Resultado da análise"};
+  const ov=document.createElement("div");
+  ov.id="lbVerdictOverlay"; ov.className="lbVerdictOverlay";
+  ov.innerHTML=`<div class="lbVerdictModal" role="alertdialog" aria-modal="true" aria-labelledby="lbVerdictTitle">
+    <div class="lbVerdictIcon ${level}">${meta.icon}</div>
+    <h2 id="lbVerdictTitle">${meta.title}</h2>
+    ${detailText?`<p>${lbEsc(detailText)}</p>`:""}
+    <p class="muted">Analise os dados abaixo para o diagnóstico completo.</p>
+    <button class="btn primary" onclick="lbCloseVerdictModal()">OK, ANALISAR DADOS</button>
+  </div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>ov.classList.add("open"));
+  document.addEventListener("keydown",lbVerdictEscHandler);
+  ov.addEventListener("click",e=>{ if(e.target===ov) lbCloseVerdictModal() });
+}
+/* Lê o headline (ok/warn/bad) já renderizado dentro do container de resultado
+   e mostra o popup a partir dele — não recalcula nada, só reflete o mesmo
+   veredito que já está escrito no laudo abaixo. */
+function lbShowVerdictFromResult(containerId){
+  const headlineEl=document.querySelector(`#${containerId} .headline`);
+  if(!headlineEl) return;
+  const level=headlineEl.classList.contains("bad")?"bad":headlineEl.classList.contains("warn")?"warn":"ok";
+  const boldEl=headlineEl.querySelector("b");
+  lbShowVerdictModal(level,boldEl?boldEl.textContent.trim():"");
+}
 function lbEsc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function lbDiffStrip(a,b){
   const len=Math.max(a.length,b.length);
