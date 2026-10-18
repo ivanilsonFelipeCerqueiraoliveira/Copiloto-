@@ -94,6 +94,12 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .btn:active{transform:scale(.97)}
 .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
 .livehint{font-size:11px;color:var(--muted);margin-top:-6px;margin-bottom:8px}
+.gFieldHint{font-size:11.5px;margin-top:4px;line-height:1.4;display:none}
+.gFieldHint.show{display:flex;align-items:flex-start;gap:5px}
+.gFieldHint.show .lbIcon{flex:0 0 auto;margin-top:1px}
+.gFieldHint.ok{color:var(--green)}
+.gFieldHint.warn{color:var(--warn-fg)}
+.gFieldHint.pending{color:var(--muted)}
 .calloutWarn{background:var(--warn-bg);border-color:var(--warn-border)}
 
 /* ===== acesso restrito @sankhya.com.br =====
@@ -553,8 +559,8 @@ LAUDO DE DIVERGÊNCIA</pre>
 <option value="756">756 — Sicoob</option><option value="748">748 — Sicredi</option>
 <option value="422">422 — Safra</option><option value="001">001 — Banco do Brasil</option>
 </select></div>
-<div class="field"><label>Agência</label><input id="gAgency" inputmode="numeric" placeholder="Ex.: 1234-5"></div>
-<div class="field"><label>Conta</label><input id="gAccount" inputmode="numeric" placeholder="Conta + DV"></div>
+<div class="field"><label>Agência</label><input id="gAgency" inputmode="numeric" placeholder="Ex.: 1234-5"><div id="gAgencyHint" class="gFieldHint"></div></div>
+<div class="field"><label>Conta</label><input id="gAccount" inputmode="numeric" placeholder="Conta + DV"><div id="gAccountHint" class="gFieldHint"></div></div>
 <div class="field"><label>Beneficiário / Convênio</label><input id="gBenef" placeholder="Código cadastrado no banco"></div>
 <div class="field"><label>Carteira / Modalidade</label><input id="gWallet" placeholder="Ex.: carteira/modalidade"></div>
 <div class="field"><label>Nosso Número</label><input id="gOurNumber" inputmode="numeric"></div>
@@ -1398,6 +1404,59 @@ const LB_DEFAULT_BANK_TEMPLATES={
   // Safra (422): fixo 7(1)+Agência(5)+Conta(9)+NossoNúmero(9)+fixo 2(1)
   "422":"7"+"A".repeat(5)+"V".repeat(9)+"N".repeat(9)+"2"
 };
+/* Conta quantas posições de um token (ex.: "A" = Agência, "V" = Conta) o template
+   padrão de Campo Livre do banco reserva — reaproveita a MESMA fonte documental já
+   usada em LB_DEFAULT_BANK_TEMPLATES/LB_TEMPLATE_CONFIDENCE, não é um dado novo.
+   Bancos sem o token no template (ex.: Caixa e Santander não têm Agência/Conta
+   separados no Campo Livre, usam só "Beneficiário") retornam null — não inventamos
+   tamanho pra campo que a linha digitável desse banco nem carrega. */
+function lbBankFieldWidth(bank,token){
+  const tmpl=LB_DEFAULT_BANK_TEMPLATES[bank];
+  if(!tmpl) return null;
+  const n=tmpl.split("").filter(c=>c===token).length;
+  return n||null;
+}
+/* ===== Lado do zero de preenchimento (Agência/Conta) — PENDENTE =====
+   Ainda não temos, pra nenhum banco, confirmação de qual lado (esquerda/direita)
+   o Sankhya usa pra completar Agência/Conta quando o cadastro tem menos dígitos
+   que o esperado. Isso será levantado diretamente no código-fonte do Sankhya
+   (não no manual do banco, que pode não refletir o que o sistema realmente faz) e
+   preenchido aqui depois, banco a banco — formato esperado por entrada:
+   "237":{agencia:{lado:"esquerda",fonte:"código-fonte Sankhya, <módulo/arquivo>, <data>"},
+          conta:{lado:"esquerda",fonte:"..."}}
+   Enquanto uma entrada não existir aqui, o aviso de campo curto mostra só o
+   tamanho esperado (já confirmado via Campo Livre) sem arriscar dizer de que lado
+   completar — nunca adivinhamos isso. */
+const LB_BANK_PADDING_SIDE={};
+function lbPaddingHint(bank,campo,valorRaw){
+  const token=campo==="agencia"?"A":"V";
+  const label=campo==="agencia"?"Agência":"Conta";
+  const width=lbBankFieldWidth(bank,token);
+  if(!width) return null; // este banco não tem esse campo separado no Campo Livre
+  const digits=clean(valorRaw);
+  if(!digits) return null;
+  if(digits.length===width) return {level:"ok",text:`${label} com ${width} dígitos — tamanho esperado para este banco.`};
+  const regra=LB_BANK_PADDING_SIDE[bank]&&LB_BANK_PADDING_SIDE[bank][campo];
+  if(digits.length>width){
+    return {level:"warn",text:`${label} informada com ${digits.length} dígitos, mas este banco espera ${width} — confira se não sobrou dígito a mais (ex.: DV incluso por engano).`};
+  }
+  if(regra&&regra.lado){
+    const padded=regra.lado==="esquerda"?digits.padStart(width,"0"):digits.padEnd(width,"0");
+    const ladoTxt=regra.lado==="esquerda"?"à esquerda":"à direita";
+    return {level:"warn",text:`${label} precisa ter ${width} dígitos para este banco — complete com zero ${ladoTxt}: ${padded}. (${regra.fonte})`};
+  }
+  return {level:"pending",text:`${label} informada com ${digits.length} dígito(s), mas este banco espera ${width} — falta completar com zero, porém ainda não está confirmado aqui de que lado (esquerda ou direita). Confirme antes de registrar o boleto.`};
+}
+function lbRenderPaddingHints(){
+  const bank=$("gBank").value;
+  [["agencia","gAgency","gAgencyHint"],["conta","gAccount","gAccountHint"]].forEach(([campo,inputId,hintId])=>{
+    const el=$(hintId); if(!el) return;
+    const hint=lbPaddingHint(bank,campo,$(inputId).value);
+    if(!hint){ el.className="gFieldHint"; el.innerHTML=""; return; }
+    el.className=`gFieldHint show ${hint.level}`;
+    el.innerHTML=`${lbIcon(hint.level==="ok"?"ok":hint.level==="warn"?"warn":"unknown")} ${lbEsc(hint.text)}`;
+  });
+}
 /* Variantes de layout que dependem do conteúdo da própria linha (não dá pra representar
    com um único template fixo por banco). A escolha da variante segue exatamente a mesma
    regra do decodificador de referência (escolher_variante). */
@@ -2115,6 +2174,7 @@ function saveGuidedCase(bank,ref,status){
 function clearGuidedDiagnosis(){
   ["gAgency","gAccount","gBenef","gWallet","gOurNumber","gValue","gDue","gLine","gBankLine","gObs"].forEach(id=>{if($(id))$(id).value=""});
   $("guidedResult").innerHTML="";
+  lbRenderPaddingHints();
 }
 
 /* ===== Análise automática (Comparador / Laudo / Guiado) ===== */
@@ -2133,6 +2193,8 @@ $("decodBank").addEventListener("change",lbDecodAuto);
 
 const lbGuidedAuto=lbDebounce(()=>{ if($("gLine").value.trim()) runGuidedDiagnosis(false); },350);
 ["gLine","gBankLine","gValue"].forEach(id=>$(id).addEventListener("input",lbGuidedAuto));
+["gAgency","gAccount"].forEach(id=>$(id).addEventListener("input",lbRenderPaddingHints));
+$("gBank").addEventListener("change",lbRenderPaddingHints);
 ["gBank","gDue"].forEach(id=>$(id).addEventListener("change",lbGuidedAuto));
 ["gLine","gBankLine"].forEach(id=>$(id).addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); runGuidedDiagnosis(true); } }));
 
