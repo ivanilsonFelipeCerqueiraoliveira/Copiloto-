@@ -189,7 +189,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 /* ===== Textura discreta no cabeçalho — o mesmo vocabulário visual da tela de
    login (pontilhado), só que estático e bem sutil, pra não distrair durante o
    uso. Fica atrás do conteúdo real do header (z-index local). */
-header{position:relative;overflow:hidden}
+header{position:relative}
 header::before{content:"";position:absolute;inset:0;pointer-events:none;
   background-image:radial-gradient(circle,#ffffff26 1px,transparent 1.4px);
   background-size:22px 22px;opacity:.55;mask-image:linear-gradient(115deg,#000 0%,#0009 35%,transparent 72%);
