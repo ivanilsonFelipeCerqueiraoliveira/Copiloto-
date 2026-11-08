@@ -445,7 +445,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 
 <section id="biblioteca" class="tab"><div class="card"><h1>Biblioteca oficial</h1><div class="muted">Fontes iniciais. A plataforma deve armazenar a URL, documento, versão e vigência do manual usado como fonte normativa.</div><div id="docs"></div></div></section>
 
-<section id="historico" class="tab"><div class="card"><h1>Casos analisados</h1><div class="muted">Histórico local do navegador. Idealmente, a versão corporativa deverá usar banco de dados para compartilhamento da equipe.</div><div class="actions"><button class="btn danger" onclick="clearHistory()">Apagar casos locais</button></div><div id="history"></div></div></section>
+<section id="historico" class="tab"><div class="card"><h1>Casos analisados</h1><div class="muted">Histórico local do navegador. Idealmente, a versão corporativa deverá usar banco de dados para compartilhamento da equipe.</div><div class="actions"><button class="btn secondary" onclick="exportCasesCSV()">Exportar CSV (Excel)</button><button class="btn danger" onclick="clearHistory()">Apagar casos locais</button></div><div id="history"></div></div></section>
 
 <section id="motor" class="tab">
 <div class="card lbComingSoonWrap">
@@ -1868,6 +1868,25 @@ function renderRules(){$("rules").innerHTML="<table><tr><th>Banco</th><th>Produt
 function renderDocs(){$("docs").innerHTML="<table><tr><th>Origem</th><th>Documento</th><th>Referência</th></tr>"+docs.map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td><a class='link' href='${d[2]}' target='_blank' rel='noopener'>Abrir fonte</a></td></tr>`).join("")+"</table>"}
 function renderHistory(){let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");$("history").innerHTML=h.length?"<table><tr><th>Data</th><th>Origem</th><th>Banco</th><th>Referência</th><th>Status</th></tr>"+h.map(x=>`<tr><td>${x.data}</td><td>${x.origem||"Laudo Automático"}</td><td>${x.banco}</td><td>${x.ref}</td><td>${x.status}</td></tr>`).join("")+"</table>":"<p class='muted'>Nenhum caso salvo.</p>";lbRenderOverviewPanel();}
 function clearHistory(){localStorage.removeItem("lexbank_cases");renderHistory()}
+/* ===== Exportar Casos em CSV ===== */
+function lbStripHtml(s){ const d=document.createElement("div"); d.innerHTML=String(s??""); return (d.textContent||"").replace(/\s+/g," ").trim(); }
+function lbCsvCell(v){
+  const s=String(v??"");
+  return /[",;\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function exportCasesCSV(){
+  const h=lbGetCases();
+  if(!h.length){ lbToast("Não há casos no histórico para exportar.","warn"); return; }
+  const header=["Data","Origem","Banco","Referência","Campo","Status"];
+  const rows=h.map(c=>[c.data,c.origem||"Laudo Automático",c.banco,c.ref,c.campo||"",lbStripHtml(c.status)]);
+  const csv=[header,...rows].map(r=>r.map(lbCsvCell).join(";")).join("\r\n");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}); // BOM: Excel reconhece acentuação corretamente
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`lexbank-casos-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  lbToast(`${h.length} caso(s) exportado(s).`,"ok");
+}
 /* ===== Painel "Visão geral" (aba Decodificação) — lê o mesmo histórico de
    "Casos" já existente (lbGetCases) e mostra um resumo rápido: nada é
    calculado/inferido além de contar e agrupar o que já está salvo. Chamado
