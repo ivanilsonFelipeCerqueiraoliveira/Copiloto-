@@ -117,11 +117,11 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
   --blue:#0c9488;--blue-dark:#0a3b35;--blue-tint:#e3f5f1;--green:#127a55;--yellow:#a8681c;--red:#bf3728;
   --ok-bg:#e9f7f0;--ok-border:#9adcbb;--ok-fg:#0d4d34;--warn-bg:#fdf3e5;--warn-border:#f0cf9a;--warn-fg:#6b4712;--bad-bg:#fdecea;--bad-border:#f0b3ab;--bad-fg:#7c2318;
 }
-.lbLoginGrid{position:absolute;inset:0;pointer-events:none;opacity:.5;
-  background-image:linear-gradient(#8fc0ff14 1px,transparent 1px),linear-gradient(90deg,#8fc0ff14 1px,transparent 1px);
-  background-size:46px 46px;
-  mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,transparent 0%,#000 75%);
-  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,transparent 0%,#000 75%)}
+.lbLoginGrid{position:absolute;inset:0;pointer-events:none;opacity:.22;
+  background-image:linear-gradient(#8fc0ff1a 1px,transparent 1px),linear-gradient(90deg,#8fc0ff1a 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 65% 55% at 50% 45%,transparent 0%,#000 85%);
+  -webkit-mask-image:radial-gradient(ellipse 65% 55% at 50% 45%,transparent 0%,#000 85%)}
 .lbLoginMesh{position:absolute;left:-10%;right:-10%;top:-8%;height:62%;pointer-events:none;overflow:hidden;
   clip-path:polygon(0% 0%,100% 0%,100% 10%,88% 20%,75% 32%,60% 40%,50% 43%,40% 40%,25% 32%,12% 20%,0% 10%);
   -webkit-clip-path:polygon(0% 0%,100% 0%,100% 10%,88% 20%,75% 32%,60% 40%,50% 43%,40% 40%,25% 32%,12% 20%,0% 10%)}
@@ -144,24 +144,24 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lbLoginCircuit{position:absolute;right:4%;top:8%;width:360px;max-width:34%;height:auto;opacity:.55;pointer-events:none}
 @media(max-width:860px){.lbLoginCircuit{display:none}}
 .lbLoginParticles{position:absolute;inset:0;pointer-events:none}
-.lbLoginWaves{position:absolute;inset:-40%;overflow:hidden;pointer-events:none;transform:rotate(-15deg)}
-.lbLoginWaves svg{width:100%;height:100%;display:block}
-.lbWaveLine path{fill:none;stroke-linecap:round}
-.lbWaveGlow{stroke-width:46;opacity:.34;filter:url(#lbGlow)}
-.lbWaveCore{stroke-width:2.2;opacity:.95;filter:url(#lbGlowCore)}
-.lbWaveOrangeA{animation:lbWaveScrollOrangeA 26s linear infinite}
-.lbWaveOrangeB{animation:lbWaveScrollOrangeB 30s linear infinite reverse}
-.lbWaveGreen{animation:lbWaveScrollGreen 32s linear infinite}
-.lbWaveCyan{animation:lbWaveScrollCyan 34s linear infinite reverse}
-.lbWavePurple{animation:lbWaveScrollPurple 28s linear infinite}
-.lbWaveBlue{animation:lbWaveScrollBlue 29s linear infinite reverse}
-@keyframes lbWaveScrollOrangeA{from{transform:translateX(0)}to{transform:translateX(-1100px)}}
-@keyframes lbWaveScrollOrangeB{from{transform:translateX(0)}to{transform:translateX(-1300px)}}
-@keyframes lbWaveScrollGreen{from{transform:translateX(0)}to{transform:translateX(-1400px)}}
-@keyframes lbWaveScrollCyan{from{transform:translateX(0)}to{transform:translateX(-1500px)}}
-@keyframes lbWaveScrollPurple{from{transform:translateX(0)}to{transform:translateX(-1200px)}}
-@keyframes lbWaveScrollBlue{from{transform:translateX(0)}to{transform:translateX(-1350px)}}
-@media(prefers-reduced-motion:reduce){.lbWaveLine,.lbLoginMesh::before,.lbLoginMesh--br::before{animation:none}}
+.lbLoginOrbs{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.lbOrb{position:absolute;border-radius:50%;filter:blur(105px);opacity:.5;will-change:transform}
+.lbOrb--mint{width:46vmax;height:46vmax;max-width:620px;max-height:620px;left:-14%;top:-16%;
+  background:radial-gradient(circle,#2dd4bf 0%,#2dd4bf80 35%,transparent 68%);animation:lbOrbDriftA 26s ease-in-out infinite alternate}
+.lbOrb--blue{width:38vmax;height:38vmax;max-width:520px;max-height:520px;right:-10%;top:-12%;
+  background:radial-gradient(circle,#4f8dff 0%,#4f8dff80 35%,transparent 68%);animation:lbOrbDriftB 32s ease-in-out infinite alternate}
+.lbOrb--lilac{width:44vmax;height:44vmax;max-width:600px;max-height:600px;right:-14%;bottom:-18%;
+  background:radial-gradient(circle,#8b5cf6 0%,#8b5cf680 35%,transparent 68%);animation:lbOrbDriftC 30s ease-in-out infinite alternate}
+.lbOrb--teal{width:36vmax;height:36vmax;max-width:460px;max-height:460px;left:-8%;bottom:-14%;
+  background:radial-gradient(circle,#16cfe3 0%,#16cfe380 35%,transparent 68%);animation:lbOrbDriftD 24s ease-in-out infinite alternate}
+@keyframes lbOrbDriftA{to{transform:translate(6%,5%) scale(1.08)}}
+@keyframes lbOrbDriftB{to{transform:translate(-8%,6%) scale(1.05)}}
+@keyframes lbOrbDriftC{to{transform:translate(-5%,-7%) scale(1.1)}}
+@keyframes lbOrbDriftD{to{transform:translate(7%,-4%) scale(1.06)}}
+.lbLoginGrain{position:absolute;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%25" height="100%25" filter="url(%23n)"/></svg>');
+  background-size:140px 140px}
+@media(prefers-reduced-motion:reduce){.lbOrb{animation:none}.lbLoginMesh::before,.lbLoginMesh--br::before{animation:none}}
 .lbLoginStage{position:relative;z-index:1;width:100%;max-width:1180px;display:flex;align-items:center;justify-content:space-between;gap:56px}
 .lbLoginHero{flex:1 1 420px;max-width:480px;color:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:20px}
 .lbLoginHero .lbLoginMark{position:relative;width:88px;height:88px;border-radius:26px;margin:0;background:linear-gradient(135deg,#2dd4bf 0%,#4f8dff 55%,#8b5cf6 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 40px #00000060,0 0 50px #4f8dff40}
@@ -459,36 +459,13 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <circle r="3" fill="#a5ffd7"><animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#lbCircuitPathA"/></animateMotion></circle>
 <circle r="3" fill="#d8c5ff"><animateMotion dur="9s" repeatCount="indefinite" begin="1.5s" rotate="0"><mpath href="#lbCircuitPathB"/></animateMotion></circle>
 </svg>
-<div class="lbLoginWaves" aria-hidden="true"><svg viewBox="0 0 1600 480" preserveAspectRatio="none">
-<defs>
-<linearGradient id="lbGradOrangeA" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1100" y2="0" spreadMethod="repeat">
-<stop offset="0" stop-color="#39dccb"/><stop offset=".5" stop-color="#65f5b5"/><stop offset="1" stop-color="#39dccb"/>
-</linearGradient>
-<linearGradient id="lbGradOrangeB" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1300" y2="0" spreadMethod="repeat">
-<stop offset="0" stop-color="#1fb8a8"/><stop offset=".5" stop-color="#39dccb"/><stop offset="1" stop-color="#1fb8a8"/>
-</linearGradient>
-<linearGradient id="lbGradGreen" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1400" y2="0" spreadMethod="repeat">
-<stop offset="0" stop-color="#65f5b5"/><stop offset=".5" stop-color="#a5ffd7"/><stop offset="1" stop-color="#65f5b5"/>
-</linearGradient>
-<linearGradient id="lbGradCyan" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1500" y2="0" spreadMethod="repeat">
-<stop offset="0" stop-color="#39dccb"/><stop offset=".5" stop-color="#65f5b5"/><stop offset="1" stop-color="#39dccb"/>
-</linearGradient>
-<linearGradient id="lbGradPurple" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0" spreadMethod="repeat">
-<stop offset="0" stop-color="#b69aff"/><stop offset=".5" stop-color="#d8c5ff"/><stop offset="1" stop-color="#b69aff"/>
-</linearGradient>
-<linearGradient id="lbGradBlue" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1350" y2="0" spreadMethod="repeat">
-<stop offset="0" stop-color="#4f8dff"/><stop offset=".5" stop-color="#8fc0ff"/><stop offset="1" stop-color="#4f8dff"/>
-</linearGradient>
-<filter id="lbGlow" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="18"/></filter>
-<filter id="lbGlowCore" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="1"/></filter>
-</defs>
-<g class="lbWaveLine lbWaveBlue"><path class="lbWaveGlow" stroke="url(#lbGradBlue)" d="M-1700,75 Q-1275,160.0 -850,75 Q-425,-10.0 0,75 Q425,160.0 850,75 Q1275,-10.0 1700,75 Q2125,160.0 2550,75 Q2975,-10.0 3400,75 Q3825,160.0 4250,75 Q4675,-10.0 5100,75"/><path class="lbWaveCore" stroke="url(#lbGradBlue)" d="M-1700,75 Q-1275,160.0 -850,75 Q-425,-10.0 0,75 Q425,160.0 850,75 Q1275,-10.0 1700,75 Q2125,160.0 2550,75 Q2975,-10.0 3400,75 Q3825,160.0 4250,75 Q4675,-10.0 5100,75"/></g>
-<g class="lbWaveLine lbWavePurple"><path class="lbWaveGlow" stroke="url(#lbGradPurple)" d="M-1800,235 Q-1325,335.0 -850,235 Q-375,135.0 100,235 Q575,335.0 1050,235 Q1525,135.0 2000,235 Q2475,335.0 2950,235 Q3425,135.0 3900,235 Q4375,335.0 4850,235"/><path class="lbWaveCore" stroke="url(#lbGradPurple)" d="M-1800,235 Q-1325,335.0 -850,235 Q-375,135.0 100,235 Q575,335.0 1050,235 Q1525,135.0 2000,235 Q2475,335.0 2950,235 Q3425,135.0 3900,235 Q4375,335.0 4850,235"/></g>
-<g class="lbWaveLine lbWaveGreen"><path class="lbWaveGlow" stroke="url(#lbGradGreen)" d="M-1600,150 Q-1150,245.0 -700,150 Q-250,55.0 200,150 Q650,245.0 1100,150 Q1550,55.0 2000,150 Q2450,245.0 2900,150 Q3350,55.0 3800,150 Q4250,245.0 4700,150"/><path class="lbWaveCore" stroke="url(#lbGradGreen)" d="M-1600,150 Q-1150,245.0 -700,150 Q-250,55.0 200,150 Q650,245.0 1100,150 Q1550,55.0 2000,150 Q2450,245.0 2900,150 Q3350,55.0 3800,150 Q4250,245.0 4700,150"/></g>
-<g class="lbWaveLine lbWaveCyan"><path class="lbWaveGlow" stroke="url(#lbGradCyan)" d="M-1650,315 Q-1210,405.0 -770,315 Q-330,225.0 110,315 Q550,405.0 990,315 Q1430,225.0 1870,315 Q2310,405.0 2750,315 Q3190,225.0 3630,315 Q4070,405.0 4510,315 Q4950,225.0 5390,315"/><path class="lbWaveCore" stroke="url(#lbGradCyan)" d="M-1650,315 Q-1210,405.0 -770,315 Q-330,225.0 110,315 Q550,405.0 990,315 Q1430,225.0 1870,315 Q2310,405.0 2750,315 Q3190,225.0 3630,315 Q4070,405.0 4510,315 Q4950,225.0 5390,315"/></g>
-<g class="lbWaveLine lbWaveOrangeB"><path class="lbWaveGlow" stroke="url(#lbGradOrangeB)" d="M-1700,445 Q-1265,505.0 -830,445 Q-395,385.0 40,445 Q475,505.0 910,445 Q1345,385.0 1780,445 Q2215,505.0 2650,445 Q3085,385.0 3520,445 Q3955,505.0 4390,445 Q4825,385.0 5260,445"/><path class="lbWaveCore" stroke="url(#lbGradOrangeB)" d="M-1700,445 Q-1265,505.0 -830,445 Q-395,385.0 40,445 Q475,505.0 910,445 Q1345,385.0 1780,445 Q2215,505.0 2650,445 Q3085,385.0 3520,445 Q3955,505.0 4390,445 Q4825,385.0 5260,445"/></g>
-<g class="lbWaveLine lbWaveOrangeA"><path class="lbWaveGlow" stroke="url(#lbGradOrangeA)" d="M-1750,395 Q-1340,475.0 -930,395 Q-520,315.0 -110,395 Q300,475.0 710,395 Q1120,315.0 1530,395 Q1940,475.0 2350,395 Q2760,315.0 3170,395 Q3580,475.0 3990,395 Q4400,315.0 4810,395"/><path class="lbWaveCore" stroke="url(#lbGradOrangeA)" d="M-1750,395 Q-1340,475.0 -930,395 Q-520,315.0 -110,395 Q300,475.0 710,395 Q1120,315.0 1530,395 Q1940,475.0 2350,395 Q2760,315.0 3170,395 Q3580,475.0 3990,395 Q4400,315.0 4810,395"/></g>
-</svg></div>
+<div class="lbLoginOrbs" aria-hidden="true">
+<span class="lbOrb lbOrb--mint"></span>
+<span class="lbOrb lbOrb--blue"></span>
+<span class="lbOrb lbOrb--lilac"></span>
+<span class="lbOrb lbOrb--teal"></span>
+</div>
+<div class="lbLoginGrain" aria-hidden="true"></div>
 <canvas class="lbLoginParticles" aria-hidden="true"></canvas>
 <div class="lbLoginStage">
 <div class="lbLoginHero">
