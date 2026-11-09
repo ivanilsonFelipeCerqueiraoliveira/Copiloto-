@@ -111,7 +111,7 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
    escolhido no app (ou o do sistema) — redeclarar as variáveis aqui garante que
    var(--ink)/var(--muted)/etc. usadas por qualquer campo dentro do login resolvam
    pro valor claro, sem precisar sobrescrever cada propriedade uma por uma. */
-#lbLogin{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:radial-gradient(1400px 900px at 20% 0%,#123a3f 0%,#0a1f2e 40%,#050b16 100%);
+#lbLogin{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:radial-gradient(1500px 1000px at 18% 8%,#15304a 0%,#0b1b2e 42%,#05070f 100%);
   color-scheme:light;
   --bg:#f1f7f6;--card:#fff;--surface-2:#eaf4f2;--ink:#0e2622;--muted:#5b7570;--line:#dbe8e5;
   --blue:#0c9488;--blue-dark:#0a3b35;--blue-tint:#e3f5f1;--green:#127a55;--yellow:#a8681c;--red:#bf3728;
@@ -124,29 +124,40 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
   background-image:radial-gradient(circle,#4ee69bdd 1.5px,transparent 1.7px);
   background-size:24px 24px;transform:perspective(900px) rotateX(48deg);transform-origin:center top;
   opacity:.85;animation:lbMeshDrift 9s linear infinite}
+.lbLoginMesh--br{left:auto;right:-10%;top:auto;bottom:-8%;
+  clip-path:polygon(100% 100%,0% 100%,0% 90%,12% 80%,25% 68%,40% 60%,50% 57%,60% 60%,75% 68%,88% 80%,100% 90%);
+  -webkit-clip-path:polygon(100% 100%,0% 100%,0% 90%,12% 80%,25% 68%,40% 60%,50% 57%,60% 60%,75% 68%,88% 80%,100% 90%)}
+.lbLoginMesh--br::before{transform:perspective(900px) rotateX(-48deg);transform-origin:center bottom;
+  background-image:radial-gradient(circle,#b69affcc 1.5px,transparent 1.7px)}
 @keyframes lbMeshDrift{from{background-position:0 0}to{background-position:0 28px}}
-.lbLoginWaves{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.lbLoginWaves{position:absolute;inset:-18%;overflow:hidden;pointer-events:none;transform:rotate(-6deg)}
 .lbLoginWaves svg{width:100%;height:100%;display:block}
 .lbWaveLine path{fill:none;stroke-linecap:round}
-.lbWaveGlow{stroke-width:16;opacity:.32;filter:url(#lbGlow)}
-.lbWaveCore{stroke-width:2.5;opacity:.9}
+.lbWaveGlow{stroke-width:20;opacity:.38;filter:url(#lbGlow)}
+.lbWaveCore{stroke-width:3;opacity:.95}
 .lbWaveOrangeA{animation:lbWaveScrollOrangeA 26s linear infinite}
 .lbWaveOrangeB{animation:lbWaveScrollOrangeB 30s linear infinite reverse}
 .lbWaveGreen{animation:lbWaveScrollGreen 32s linear infinite}
 .lbWaveCyan{animation:lbWaveScrollCyan 34s linear infinite reverse}
 .lbWavePurple{animation:lbWaveScrollPurple 28s linear infinite}
+.lbWaveBlue{animation:lbWaveScrollBlue 29s linear infinite reverse}
 @keyframes lbWaveScrollOrangeA{from{transform:translateX(0)}to{transform:translateX(-1100px)}}
 @keyframes lbWaveScrollOrangeB{from{transform:translateX(0)}to{transform:translateX(-1300px)}}
 @keyframes lbWaveScrollGreen{from{transform:translateX(0)}to{transform:translateX(-1400px)}}
 @keyframes lbWaveScrollCyan{from{transform:translateX(0)}to{transform:translateX(-1500px)}}
 @keyframes lbWaveScrollPurple{from{transform:translateX(0)}to{transform:translateX(-1200px)}}
-@media(prefers-reduced-motion:reduce){.lbWaveLine,.lbLoginMesh::before{animation:none}}
-.lbLoginWrap{position:relative;z-index:1;width:100%;max-width:840px;min-height:480px;background:#ffffffe8;backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid #ffffff60;border-radius:22px;box-shadow:0 24px 70px #00000050;display:flex;overflow:hidden}
-.lbLoginBrand{flex:0 0 320px;background:linear-gradient(165deg,#0d3b35,#0a2622);color:#fff;padding:38px 32px;display:flex;flex-direction:column;justify-content:center}
-.lbLoginBrand .lbLoginMark{width:46px;height:46px;border-radius:13px;margin:0 0 20px;background:linear-gradient(150deg,#5fd6c4,var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px #0009}
-.lbLoginBrand h2{font-family:var(--font-head);font-size:22px;margin:0 0 8px;letter-spacing:-.01em}
-.lbLoginBrand p{font-size:13px;color:#bcd8d2;line-height:1.5;margin:0}
-.lbLoginForm{flex:1;padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
+@keyframes lbWaveScrollBlue{from{transform:translateX(0)}to{transform:translateX(-1350px)}}
+@media(prefers-reduced-motion:reduce){.lbWaveLine,.lbLoginMesh::before,.lbLoginMesh--br::before{animation:none}}
+.lbLoginStage{position:relative;z-index:1;width:100%;max-width:1180px;display:flex;align-items:center;justify-content:space-between;gap:56px}
+.lbLoginHero{flex:1 1 420px;max-width:480px;color:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.lbLoginHero .lbLoginMark{width:88px;height:88px;border-radius:24px;margin:0;background:linear-gradient(145deg,#39dccb,#65f5b5 45%,#b69aff);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 40px #00000060,0 0 50px #39dccb40}
+.lbLoginHero .lbLoginMark svg{width:46px;height:46px}
+.lbLoginHero h2{font-family:var(--font-head);font-size:50px;line-height:1.05;margin:0;font-weight:800;letter-spacing:-.02em}
+.lbLoginHero h2 .lbWordAccent{background:linear-gradient(90deg,#39dccb,#b69aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lbLoginHero p{font-size:16.5px;color:#cfe3ea;line-height:1.55;margin:0}
+.lbLoginWrap{position:relative;z-index:1;width:100%;max-width:420px;flex:0 0 420px;background:linear-gradient(160deg,#ffffffeb,#eef2ffe3);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid #ffffff70;border-radius:26px;box-shadow:0 30px 80px #00000055,0 0 60px #39dccb22;overflow:hidden}
+@media(max-width:860px){.lbLoginStage{flex-direction:column;gap:32px}.lbLoginHero{align-items:center;text-align:center;max-width:420px}.lbLoginWrap{max-width:420px}}
+.lbLoginForm{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
 .lbLoginForm h1{font-size:22px;margin:0 0 4px}
 .lbLoginForm .muted{margin-bottom:24px}
 .lbLoginForm .field{margin-bottom:6px}
@@ -163,11 +174,12 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 @keyframes lbShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 .lbRememberRow{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:10px 0 4px;cursor:pointer;user-select:none}
 .lbRememberRow input{accent-color:var(--blue);cursor:pointer}
+#lbLoginBtn{background:linear-gradient(90deg,#1fb8a8,#39dccb 45%,#8f6bff);box-shadow:0 10px 26px #39dccb40}
 #lbLoginBtn.lbBusy{opacity:.82;cursor:progress}
 #lbLoginBtn.lbBusy #lbLoginBtnLabel::after{content:"";display:inline-block;width:13px;height:13px;margin-left:8px;vertical-align:-2px;border-radius:50%;border:2px solid #ffffff80;border-top-color:#fff;animation:lbSpin .6s linear infinite}
 @keyframes lbSpin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#lbLoginBtn.lbBusy #lbLoginBtnLabel::after{animation:none}}
-@media(max-width:720px){.lbLoginWrap{flex-direction:column;max-width:420px}.lbLoginBrand{flex:none;padding:28px 28px 22px}.lbLoginForm{padding:28px}}
+@media(max-width:720px){.lbLoginForm{padding:28px}}
 /* ===== Transição de acesso (pós-login, pré-dashboard) — paleta e animação
    próprias, independentes do tema claro/escuro do app (mesmo tratamento que a
    tela de login já recebe hoje). ===== */
@@ -383,6 +395,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 </svg>
 <div id="lbLogin">
 <div class="lbLoginMesh" aria-hidden="true"></div>
+<div class="lbLoginMesh lbLoginMesh--br" aria-hidden="true"></div>
 <div class="lbLoginWaves" aria-hidden="true"><svg viewBox="0 0 1600 480" preserveAspectRatio="none">
 <defs>
 <linearGradient id="lbGradOrangeA" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1100" y2="0" spreadMethod="repeat">
@@ -400,24 +413,29 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <linearGradient id="lbGradPurple" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0" spreadMethod="repeat">
 <stop offset="0" stop-color="#b69aff"/><stop offset=".5" stop-color="#d8c5ff"/><stop offset="1" stop-color="#b69aff"/>
 </linearGradient>
+<linearGradient id="lbGradBlue" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1350" y2="0" spreadMethod="repeat">
+<stop offset="0" stop-color="#4f8dff"/><stop offset=".5" stop-color="#8fc0ff"/><stop offset="1" stop-color="#4f8dff"/>
+</linearGradient>
 <filter id="lbGlow" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="7"/></filter>
 </defs>
+<g class="lbWaveLine lbWaveBlue"><path class="lbWaveGlow" stroke="url(#lbGradBlue)" d="M-1350,255 Q-1012.5,195.0 -675.0,255 Q-337.5,315.0 0.0,255 Q337.5,195.0 675.0,255 Q1012.5,315.0 1350.0,255 Q1687.5,195.0 2025.0,255 Q2362.5,315.0 2700.0,255 Q3037.5,195.0 3375.0,255 Q3712.5,315.0 4050.0,255"/><path class="lbWaveCore" stroke="url(#lbGradBlue)" d="M-1350,255 Q-1012.5,195.0 -675.0,255 Q-337.5,315.0 0.0,255 Q337.5,195.0 675.0,255 Q1012.5,315.0 1350.0,255 Q1687.5,195.0 2025.0,255 Q2362.5,315.0 2700.0,255 Q3037.5,195.0 3375.0,255 Q3712.5,315.0 4050.0,255"/></g>
 <g class="lbWaveLine lbWavePurple"><path class="lbWaveGlow" stroke="url(#lbGradPurple)" d="M-1200,205 Q-900.0,265.0 -600.0,205 Q-300.0,145.0 0.0,205 Q300.0,265.0 600.0,205 Q900.0,145.0 1200.0,205 Q1500.0,265.0 1800.0,205 Q2100.0,145.0 2400.0,205 Q2700.0,265.0 3000.0,205 Q3300.0,145.0 3600.0,205"/><path class="lbWaveCore" stroke="url(#lbGradPurple)" d="M-1200,205 Q-900.0,265.0 -600.0,205 Q-300.0,145.0 0.0,205 Q300.0,265.0 600.0,205 Q900.0,145.0 1200.0,205 Q1500.0,265.0 1800.0,205 Q2100.0,145.0 2400.0,205 Q2700.0,265.0 3000.0,205 Q3300.0,145.0 3600.0,205"/></g>
 <g class="lbWaveLine lbWaveGreen"><path class="lbWaveGlow" stroke="url(#lbGradGreen)" d="M-1400,120 Q-1050.0,170.0 -700.0,120 Q-350.0,70.0 0.0,120 Q350.0,170.0 700.0,120 Q1050.0,70.0 1400.0,120 Q1750.0,170.0 2100.0,120 Q2450.0,70.0 2800.0,120 Q3150.0,170.0 3500.0,120 Q3850.0,70.0 4200.0,120"/><path class="lbWaveCore" stroke="url(#lbGradGreen)" d="M-1400,120 Q-1050.0,170.0 -700.0,120 Q-350.0,70.0 0.0,120 Q350.0,170.0 700.0,120 Q1050.0,70.0 1400.0,120 Q1750.0,170.0 2100.0,120 Q2450.0,70.0 2800.0,120 Q3150.0,170.0 3500.0,120 Q3850.0,70.0 4200.0,120"/></g>
 <g class="lbWaveLine lbWaveCyan"><path class="lbWaveGlow" stroke="url(#lbGradCyan)" d="M-1500,300 Q-1125.0,210.0 -750.0,300 Q-375.0,390.0 0.0,300 Q375.0,210.0 750.0,300 Q1125.0,390.0 1500.0,300 Q1875.0,210.0 2250.0,300 Q2625.0,390.0 3000.0,300 Q3375.0,210.0 3750.0,300 Q4125.0,390.0 4500.0,300"/><path class="lbWaveCore" stroke="url(#lbGradCyan)" d="M-1500,300 Q-1125.0,210.0 -750.0,300 Q-375.0,390.0 0.0,300 Q375.0,210.0 750.0,300 Q1125.0,390.0 1500.0,300 Q1875.0,210.0 2250.0,300 Q2625.0,390.0 3000.0,300 Q3375.0,210.0 3750.0,300 Q4125.0,390.0 4500.0,300"/></g>
 <g class="lbWaveLine lbWaveOrangeB"><path class="lbWaveGlow" stroke="url(#lbGradOrangeB)" d="M-1300,405 Q-975.0,460.0 -650.0,405 Q-325.0,350.0 0.0,405 Q325.0,460.0 650.0,405 Q975.0,350.0 1300.0,405 Q1625.0,460.0 1950.0,405 Q2275.0,350.0 2600.0,405 Q2925.0,460.0 3250.0,405 Q3575.0,350.0 3900.0,405"/><path class="lbWaveCore" stroke="url(#lbGradOrangeB)" d="M-1300,405 Q-975.0,460.0 -650.0,405 Q-325.0,350.0 0.0,405 Q325.0,460.0 650.0,405 Q975.0,350.0 1300.0,405 Q1625.0,460.0 1950.0,405 Q2275.0,350.0 2600.0,405 Q2925.0,460.0 3250.0,405 Q3575.0,350.0 3900.0,405"/></g>
 <g class="lbWaveLine lbWaveOrangeA"><path class="lbWaveGlow" stroke="url(#lbGradOrangeA)" d="M-1100,380 Q-825.0,310.0 -550.0,380 Q-275.0,450.0 0.0,380 Q275.0,310.0 550.0,380 Q825.0,450.0 1100.0,380 Q1375.0,310.0 1650.0,380 Q1925.0,450.0 2200.0,380 Q2475.0,310.0 2750.0,380 Q3025.0,450.0 3300.0,380 Q3575.0,310.0 3850.0,380"/><path class="lbWaveCore" stroke="url(#lbGradOrangeA)" d="M-1100,380 Q-825.0,310.0 -550.0,380 Q-275.0,450.0 0.0,380 Q275.0,310.0 550.0,380 Q825.0,450.0 1100.0,380 Q1375.0,310.0 1650.0,380 Q1925.0,450.0 2200.0,380 Q2475.0,310.0 2750.0,380 Q3025.0,450.0 3300.0,380 Q3575.0,310.0 3850.0,380"/></g>
 </svg></div>
-<div class="lbLoginWrap">
-<div class="lbLoginBrand">
-<div class="lbLoginMark"><svg viewBox="0 0 48 48" width="26" height="26" fill="none" aria-hidden="true">
+<div class="lbLoginStage">
+<div class="lbLoginHero">
+<div class="lbLoginMark"><svg viewBox="0 0 48 48" width="46" height="46" fill="none" aria-hidden="true">
 <defs><linearGradient id="lbMarkGrad" x1="6" y1="12" x2="42" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#eafff6"/><stop offset="1" stop-color="#8ff0d7"/></linearGradient></defs>
 <path d="M9 19 C15 12, 25 12, 31 19 S43 30, 39 24" stroke="url(#lbMarkGrad)" stroke-width="6" stroke-linecap="round"/>
 <path d="M9 31 C15 24, 25 24, 31 31 S43 42, 39 36" stroke="url(#lbMarkGrad)" stroke-width="6" stroke-linecap="round"/>
 </svg></div>
-<h2>LexBank</h2>
+<h2>Lex<span class="lbWordAccent">Bank</span></h2>
 <p>Análise inteligente.<br>Diagnóstico preciso.</p>
 </div>
+<div class="lbLoginWrap">
 <div class="lbLoginForm">
 <h1>Entrar</h1>
 <div class="muted">Use seu e-mail corporativo para continuar</div>
@@ -434,6 +452,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <div id="lbLoginError"></div>
 <button class="btn primary" id="lbLoginBtn" type="submit"><span id="lbLoginBtnLabel">Entrar</span></button>
 </form>
+</div>
 </div>
 </div>
 </div>
