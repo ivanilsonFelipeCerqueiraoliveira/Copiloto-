@@ -196,12 +196,27 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lx-brand__name span{background:linear-gradient(100deg,var(--lx-turquoise),var(--lx-lilac));-webkit-background-clip:text;background-clip:text;color:transparent}
 .lx-brand__tagline{margin:18px 0 0;color:#d5e4ef;font-size:17px;line-height:1.45}
 .lx-auth-visual{grid-column:2;grid-row:1;position:relative;width:min(100%,440px);aspect-ratio:1.1;display:grid;place-items:center;justify-self:center}
+/* ===== Campo de estrelas cintilantes no fundo — profundidade extra, bem sutil ===== */
+.lx-stars{position:absolute;inset:0;z-index:0;pointer-events:none}
+.lx-stars span{position:absolute;width:2.5px;height:2.5px;border-radius:50%;background:#fff;box-shadow:0 0 6px 1px #ffffffaa;opacity:0;animation:lx-twinkle 2.6s ease-in-out infinite}
+/* ===== Anéis de pulso (sonar) saindo do cartão escaneado ===== */
+.lx-scan__pulse{position:absolute;inset:0;margin:auto;width:70%;height:70%;border-radius:18px;border:1px solid var(--lx-mint);opacity:0;animation:lx-pulse 2.4s ease-out infinite}
+.lx-scan__pulse--b{border-color:var(--lx-lilac);animation-delay:1.2s}
+/* ===== Linha de progresso + contador de porcentagem ao vivo ===== */
+.lx-progress-row{display:flex;align-items:center;gap:12px}
+.lx-progress-row .lx-progress{flex:1}
+.lx-progress-pct{font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:700;color:var(--lx-mint-soft);min-width:42px;text-align:right;text-shadow:0 0 10px rgba(101,245,181,.5)}
+@keyframes lx-twinkle{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes lx-pulse{0%{transform:scale(.75);opacity:.55}100%{transform:scale(1.55);opacity:0}}
 /* ===== Motivo "linha digitável sendo validada" — substitui o escudo genérico
    por algo que remete ao que o LexBank realmente faz. O código de barras é
    gerado pela MESMA função usada na Decodificação (lbBarcodeSvg), só que
    recolorida pro contexto escuro da transição. */
 .lx-scan{position:relative;z-index:2;width:clamp(190px,24vw,290px);display:flex;flex-direction:column;align-items:center;animation:lx-shield-float 3s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(101,245,181,.35)) drop-shadow(0 0 36px rgba(182,154,255,.25))}
-.lx-scan__frame{position:relative;width:100%;background:rgba(9,28,38,.6);border:1px solid rgba(165,255,215,.4);border-radius:14px;padding:18px 16px 14px;overflow:hidden;box-shadow:0 0 30px rgba(101,245,181,.14),inset 0 0 22px rgba(101,245,181,.07)}
+.lx-scan__frame{position:relative;width:100%;background:rgba(9,28,38,.5);backdrop-filter:blur(10px) saturate(1.4);-webkit-backdrop-filter:blur(10px) saturate(1.4);border:1px solid rgba(165,255,215,.4);border-radius:14px;padding:18px 16px 14px;overflow:hidden;box-shadow:0 0 30px rgba(101,245,181,.14),inset 0 0 22px rgba(101,245,181,.07);transition:border-color .5s ease,box-shadow .5s ease}
+/* a borda/glow do cartão acompanha a cor da etapa atual (JS seta data-step no overlay) */
+.lx-transition[data-step="1"] .lx-scan__frame{border-color:rgba(57,220,203,.55);box-shadow:0 0 30px rgba(57,220,203,.18),inset 0 0 22px rgba(57,220,203,.08)}
+.lx-transition[data-step="2"] .lx-scan__frame{border-color:rgba(182,154,255,.55);box-shadow:0 0 30px rgba(182,154,255,.2),inset 0 0 22px rgba(182,154,255,.08)}
 .lx-scan__barcode{width:100%;display:flex;justify-content:center}
 .lx-scan__barcode svg{width:100%;height:42px}
 .lx-scan__barcode svg rect{fill:var(--lx-mint-soft)}
@@ -429,6 +444,13 @@ table tr:hover td{background:rgba(127,127,127,.09)}
   <div class="lx-transition__ambient lx-transition__ambient--mint"></div>
   <div class="lx-transition__ambient lx-transition__ambient--lilac"></div>
   <div class="lx-transition__grid"></div>
+  <div class="lx-stars" aria-hidden="true">
+    <span style="top:12%;left:8%;animation-delay:.1s"></span><span style="top:22%;left:92%;animation-delay:.6s"></span>
+    <span style="top:68%;left:5%;animation-delay:1.1s"></span><span style="top:85%;left:88%;animation-delay:.3s"></span>
+    <span style="top:6%;left:45%;animation-delay:1.6s"></span><span style="top:40%;left:15%;animation-delay:.8s"></span>
+    <span style="top:52%;left:95%;animation-delay:1.3s"></span><span style="top:90%;left:40%;animation-delay:.4s"></span>
+    <span style="top:30%;left:70%;animation-delay:1.9s"></span><span style="top:75%;left:60%;animation-delay:.9s"></span>
+  </div>
   <div class="lx-transition__content" role="status" aria-live="polite" aria-atomic="true">
     <div class="lx-brand">
       <div class="lx-brand__mark" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">
@@ -442,6 +464,8 @@ table tr:hover td{background:rgba(127,127,127,.09)}
     <div class="lx-auth-visual" aria-hidden="true">
       <div class="lx-orbit lx-orbit--one"></div><div class="lx-orbit lx-orbit--two"></div><div class="lx-orbit lx-orbit--three"></div>
       <div class="lx-scan">
+        <div class="lx-scan__pulse lx-scan__pulse--a"></div>
+        <div class="lx-scan__pulse lx-scan__pulse--b"></div>
         <div class="lx-scan__frame">
           <div class="lx-scan__barcode" id="lxScanBarcode"></div>
           <div class="lx-scan__digits" id="lxScanDigits"></div>
@@ -455,7 +479,10 @@ table tr:hover td{background:rgba(127,127,127,.09)}
     </div>
     <div class="lx-progress-area">
       <h2 class="lx-progress-title">Carregando seu ambiente de <span>diagnóstico bancário</span>...</h2>
-      <div class="lx-progress" aria-hidden="true"><div class="lx-progress__bar"></div><div class="lx-progress__glint"></div></div>
+      <div class="lx-progress-row">
+        <div class="lx-progress" aria-hidden="true"><div class="lx-progress__bar"></div><div class="lx-progress__glint"></div></div>
+        <span class="lx-progress-pct" id="lxProgressPct" aria-hidden="true">0%</span>
+      </div>
       <ul class="lx-steps">
         <li class="lx-step" data-step="0"><span class="lx-step__icon"></span><span>Credenciais verificadas</span></li>
         <li class="lx-step" data-step="1"><span class="lx-step__icon"></span><span>Sincronizando motor CNAB e linha digitável</span></li>
@@ -876,22 +903,39 @@ function lbShowLoginTransition(options){
   const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   const total=reducedMotion?250:duration;
   const stage=total/3;
+  const pctEl=root.querySelector("#lxProgressPct");
   root.style.setProperty("--lx-duration",`${total}ms`);
   root.setAttribute("aria-hidden","false");
   void root.offsetWidth; // força reinício da animação se chamada de novo
   root.classList.add("is-active");
+  // contador de porcentagem ao vivo, independente dos 3 estágios — acompanha a
+  // mesma duração total da barra de progresso (--lx-duration).
+  const t0=performance.now();
+  let pctRunning=true;
+  function tickPct(now){
+    if(!pctRunning) return;
+    const pct=Math.min(100,Math.round(((now-t0)/total)*100));
+    if(pctEl) pctEl.textContent=pct+"%";
+    if(pct<100) requestAnimationFrame(tickPct);
+  }
+  requestAnimationFrame(tickPct);
   function reset(){
+    pctRunning=false;
     root.classList.remove("is-active");
     root.setAttribute("aria-hidden","true");
+    root.removeAttribute("data-step");
     root.style.removeProperty("--lx-duration");
     steps.forEach(s=>s.classList.remove("is-done","is-current"));
+    if(pctEl) pctEl.textContent="0%";
   }
   let i=0;
   function nextStep(){
+    root.setAttribute("data-step",String(i));
     steps.forEach((s,idx)=>{ s.classList.toggle("is-done",idx<i); s.classList.toggle("is-current",idx===i); });
     i++;
     if(i<=steps.length){ setTimeout(nextStep,stage); return; }
     steps.forEach(s=>{ s.classList.remove("is-current"); s.classList.add("is-done"); });
+    if(pctEl) pctEl.textContent="100%";
     setTimeout(()=>{ onComplete(); reset(); },reducedMotion?100:180);
   }
   nextStep();
