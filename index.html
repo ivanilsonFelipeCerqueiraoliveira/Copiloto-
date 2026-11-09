@@ -136,8 +136,9 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
   background-size:70px 70px,130px 130px,45px 45px;
   background-position:12px 18px,40px 90px,0 0}
 @keyframes lbMeshDrift{from{background-position:0 0}to{background-position:0 28px}}
-.lbLoginCircuit{position:absolute;right:4%;bottom:14%;width:360px;max-width:34%;height:auto;opacity:.55;pointer-events:none}
+.lbLoginCircuit{position:absolute;right:4%;top:8%;width:360px;max-width:34%;height:auto;opacity:.55;pointer-events:none}
 @media(max-width:860px){.lbLoginCircuit{display:none}}
+.lbLoginParticles{position:absolute;inset:0;pointer-events:none}
 .lbLoginWaves{position:absolute;inset:-40%;overflow:hidden;pointer-events:none;transform:rotate(-15deg)}
 .lbLoginWaves svg{width:100%;height:100%;display:block}
 .lbWaveLine path{fill:none;stroke-linecap:round}
@@ -163,7 +164,12 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lbLoginHero h2{font-family:var(--font-head);font-size:56px;line-height:1.05;margin:0;font-weight:800;letter-spacing:-.02em}
 .lbLoginHero h2 .lbWordAccent{background:linear-gradient(90deg,#39dccb,#4f8dff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lbLoginHero p{font-size:16.5px;color:#cfe3ea;line-height:1.55;margin:0}
-.lbLoginWrap{position:relative;z-index:1;width:100%;max-width:420px;flex:0 0 420px;background:linear-gradient(160deg,#ffffffd9,#e8edffcc);backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5);border:1px solid #ffffff80;border-radius:34px;box-shadow:0 30px 80px #00000055,0 0 60px #4f8dff22;overflow:hidden}
+.lbLoginWrap{position:relative;z-index:1;width:100%;max-width:420px;flex:0 0 420px;background:linear-gradient(160deg,#ffffffd9,#e8edffcc);backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5);border:1px solid #ffffff80;border-radius:34px;overflow:hidden;animation:lbCardBreathe 8s ease-in-out infinite}
+@keyframes lbCardBreathe{
+  0%,100%{box-shadow:0 30px 80px #00000055,0 0 36px #39dccb26}
+  50%{box-shadow:0 30px 80px #00000055,0 0 46px #8b5cf630}
+}
+@media(prefers-reduced-motion:reduce){.lbLoginWrap{animation:none;box-shadow:0 30px 80px #00000055,0 0 40px #4f8dff22}}
 @media(max-width:860px){.lbLoginStage{flex-direction:column;gap:32px}.lbLoginHero{align-items:center;text-align:center;max-width:420px}.lbLoginWrap{max-width:420px}}
 .lbLoginForm{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
 .lbLoginForm h1{font-size:22px;margin:0 0 4px}
@@ -182,7 +188,10 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 @keyframes lbShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 .lbRememberRow{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:10px 0 4px;cursor:pointer;user-select:none}
 .lbRememberRow input{accent-color:var(--blue);cursor:pointer}
-#lbLoginBtn{background:linear-gradient(90deg,#1fb8a8,#39dccb 45%,#8b5cf6);box-shadow:0 10px 26px #4f8dff40}
+#lbLoginBtn{background:linear-gradient(90deg,#1fb8a8,#39dccb 45%,#8b5cf6);box-shadow:0 10px 26px #4f8dff40;transition:transform .2s,filter .2s,box-shadow .2s}
+#lbLoginBtn:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 14px 34px #4f8dff55}
+#lbLoginBtn:active{transform:scale(.99)}
+@media(prefers-reduced-motion:reduce){#lbLoginBtn:hover{transform:none}}
 #lbLoginBtn.lbBusy{opacity:.82;cursor:progress}
 #lbLoginBtn.lbBusy #lbLoginBtnLabel::after{content:"";display:inline-block;width:13px;height:13px;margin-left:8px;vertical-align:-2px;border-radius:50%;border:2px solid #ffffff80;border-top-color:#fff;animation:lbSpin .6s linear infinite}
 @keyframes lbSpin{to{transform:rotate(360deg)}}
@@ -405,21 +414,23 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <div class="lbLoginMesh" aria-hidden="true"></div>
 <div class="lbLoginMesh lbLoginMesh--br" aria-hidden="true"></div>
 <div class="lbLoginStars" aria-hidden="true"></div>
-<svg class="lbLoginCircuit" aria-hidden="true" viewBox="0 0 420 200" preserveAspectRatio="none">
+<svg class="lbLoginCircuit" aria-hidden="true" viewBox="0 0 420 160" preserveAspectRatio="none">
 <g fill="none" stroke="#8fc0ffaa" stroke-width="1">
-<path d="M10,150 L70,150 L95,125 L160,125 L185,100 L260,100"/>
-<path d="M95,125 L95,170 L150,170"/>
-<path d="M260,100 L260,60 L320,60 L345,35 L410,35"/>
+<path id="lbCircuitPathA" d="M10,40 L80,40 L105,65 L170,65 L195,90 L270,90"/>
+<path d="M105,65 L105,20 L160,20"/>
+<path id="lbCircuitPathB" d="M270,90 L270,130 L330,130 L355,105 L410,105"/>
 </g>
 <g fill="#cfe3ff">
-<rect x="6" y="146" width="8" height="8" rx="1.5"/>
-<rect x="91" y="121" width="8" height="8" rx="1.5"/>
-<rect x="181" y="96" width="8" height="8" rx="1.5"/>
-<rect x="256" y="96" width="8" height="8" rx="1.5"/>
-<rect x="146" y="166" width="8" height="8" rx="1.5"/>
-<rect x="341" y="31" width="8" height="8" rx="1.5"/>
-<rect x="406" y="31" width="8" height="8" rx="1.5"/>
+<rect x="6" y="36" width="8" height="8" rx="1.5"/>
+<rect x="101" y="61" width="8" height="8" rx="1.5"/>
+<rect x="191" y="86" width="8" height="8" rx="1.5"/>
+<rect x="266" y="86" width="8" height="8" rx="1.5"/>
+<rect x="156" y="16" width="8" height="8" rx="1.5"/>
+<rect x="351" y="101" width="8" height="8" rx="1.5"/>
+<rect x="406" y="101" width="8" height="8" rx="1.5"/>
 </g>
+<circle r="3" fill="#a5ffd7"><animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#lbCircuitPathA"/></animateMotion></circle>
+<circle r="3" fill="#d8c5ff"><animateMotion dur="9s" repeatCount="indefinite" begin="1.5s" rotate="0"><mpath href="#lbCircuitPathB"/></animateMotion></circle>
 </svg>
 <div class="lbLoginWaves" aria-hidden="true"><svg viewBox="0 0 1600 480" preserveAspectRatio="none">
 <defs>
@@ -451,6 +462,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <g class="lbWaveLine lbWaveOrangeB"><path class="lbWaveGlow" stroke="url(#lbGradOrangeB)" d="M-1700,445 Q-1265,505.0 -830,445 Q-395,385.0 40,445 Q475,505.0 910,445 Q1345,385.0 1780,445 Q2215,505.0 2650,445 Q3085,385.0 3520,445 Q3955,505.0 4390,445 Q4825,385.0 5260,445"/><path class="lbWaveCore" stroke="url(#lbGradOrangeB)" d="M-1700,445 Q-1265,505.0 -830,445 Q-395,385.0 40,445 Q475,505.0 910,445 Q1345,385.0 1780,445 Q2215,505.0 2650,445 Q3085,385.0 3520,445 Q3955,505.0 4390,445 Q4825,385.0 5260,445"/></g>
 <g class="lbWaveLine lbWaveOrangeA"><path class="lbWaveGlow" stroke="url(#lbGradOrangeA)" d="M-1750,395 Q-1340,475.0 -930,395 Q-520,315.0 -110,395 Q300,475.0 710,395 Q1120,315.0 1530,395 Q1940,475.0 2350,395 Q2760,315.0 3170,395 Q3580,475.0 3990,395 Q4400,315.0 4810,395"/><path class="lbWaveCore" stroke="url(#lbGradOrangeA)" d="M-1750,395 Q-1340,475.0 -930,395 Q-520,315.0 -110,395 Q300,475.0 710,395 Q1120,315.0 1530,395 Q1940,475.0 2350,395 Q2760,315.0 3170,395 Q3580,475.0 3990,395 Q4400,315.0 4810,395"/></g>
 </svg></div>
+<canvas class="lbLoginParticles" aria-hidden="true"></canvas>
 <div class="lbLoginStage">
 <div class="lbLoginHero">
 <div class="lbLoginMark"><svg viewBox="0 0 48 48" width="46" height="46" fill="none" aria-hidden="true">
@@ -1020,6 +1032,36 @@ function lbToggleTheme(){
   lbApplyTheme(next);
 }
 lbApplyTheme(localStorage.getItem("lexbank_theme")||"light"); // padrão sempre claro; escuro só se o usuário escolher explicitamente
+(function lbLoginParticlesInit(){
+  const canvas=document.querySelector(".lbLoginParticles");
+  if(!canvas) return;
+  const ctx=canvas.getContext("2d",{alpha:true});
+  if(!ctx || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let w=0,h=0,raf=0,items=[];
+  const dpr=Math.min(devicePixelRatio||1,1.5);
+  const colors=["#65f5b5","#39dccb","#8b5cf6","#4f8dff"];
+  function resize(){
+    const r=canvas.getBoundingClientRect(); w=r.width; h=r.height;
+    canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const n=Math.min(70,Math.max(22,Math.floor(w*h/22000)));
+    items=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,
+      r:.5+Math.random()*1.5,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.16,
+      p:Math.random()*6.28,c:colors[Math.floor(Math.random()*colors.length)]}));
+  }
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of items){
+      p.x+=p.vx;p.y+=p.vy;p.p+=.012;
+      if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;
+      ctx.globalAlpha=.18+(Math.sin(p.p)+1)*.22;ctx.fillStyle=p.c;
+      ctx.shadowBlur=9;ctx.shadowColor=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;ctx.shadowBlur=0;raf=requestAnimationFrame(frame);
+  }
+  const observer=new ResizeObserver(resize);observer.observe(canvas);resize();frame();
+  addEventListener("pagehide",()=>{cancelAnimationFrame(raf);observer.disconnect()},{once:true});
+})();
 function lbShakeLogin(){
   const card=$("lbLogin").querySelector(".lbLoginForm");
   card.classList.remove("lbShake"); void card.offsetWidth; card.classList.add("lbShake");
