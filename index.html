@@ -130,14 +130,19 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lbLoginMesh--br::before{transform:perspective(900px) rotateX(-48deg);transform-origin:center bottom;
   background-image:radial-gradient(circle,#39dccbdd 1.5px,transparent 1.7px)}
 .lbLoginStars{position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,#ffffff2e 1px,transparent 1.4px);
-  background-size:70px 70px;background-position:12px 18px}
+  background-image:radial-gradient(circle,#ffffff33 1px,transparent 1.3px),
+    radial-gradient(circle,#ffffff22 1.6px,transparent 2px),
+    radial-gradient(circle,#ffffff1c .8px,transparent 1.1px);
+  background-size:70px 70px,130px 130px,45px 45px;
+  background-position:12px 18px,40px 90px,0 0}
 @keyframes lbMeshDrift{from{background-position:0 0}to{background-position:0 28px}}
-.lbLoginWaves{position:absolute;inset:-18%;overflow:hidden;pointer-events:none;transform:rotate(-6deg)}
+.lbLoginCircuit{position:absolute;right:4%;bottom:14%;width:360px;max-width:34%;height:auto;opacity:.55;pointer-events:none}
+@media(max-width:860px){.lbLoginCircuit{display:none}}
+.lbLoginWaves{position:absolute;inset:-40%;overflow:hidden;pointer-events:none;transform:rotate(-15deg)}
 .lbLoginWaves svg{width:100%;height:100%;display:block}
 .lbWaveLine path{fill:none;stroke-linecap:round}
-.lbWaveGlow{stroke-width:34;opacity:.42;filter:url(#lbGlow)}
-.lbWaveCore{stroke-width:3;opacity:.95}
+.lbWaveGlow{stroke-width:52;opacity:.4;filter:url(#lbGlow)}
+.lbWaveCore{stroke-width:10;opacity:.5;filter:url(#lbGlowCore)}
 .lbWaveOrangeA{animation:lbWaveScrollOrangeA 26s linear infinite}
 .lbWaveOrangeB{animation:lbWaveScrollOrangeB 30s linear infinite reverse}
 .lbWaveGreen{animation:lbWaveScrollGreen 32s linear infinite}
@@ -400,6 +405,22 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <div class="lbLoginMesh" aria-hidden="true"></div>
 <div class="lbLoginMesh lbLoginMesh--br" aria-hidden="true"></div>
 <div class="lbLoginStars" aria-hidden="true"></div>
+<svg class="lbLoginCircuit" aria-hidden="true" viewBox="0 0 420 200" preserveAspectRatio="none">
+<g fill="none" stroke="#8fc0ffaa" stroke-width="1">
+<path d="M10,150 L70,150 L95,125 L160,125 L185,100 L260,100"/>
+<path d="M95,125 L95,170 L150,170"/>
+<path d="M260,100 L260,60 L320,60 L345,35 L410,35"/>
+</g>
+<g fill="#cfe3ff">
+<rect x="6" y="146" width="8" height="8" rx="1.5"/>
+<rect x="91" y="121" width="8" height="8" rx="1.5"/>
+<rect x="181" y="96" width="8" height="8" rx="1.5"/>
+<rect x="256" y="96" width="8" height="8" rx="1.5"/>
+<rect x="146" y="166" width="8" height="8" rx="1.5"/>
+<rect x="341" y="31" width="8" height="8" rx="1.5"/>
+<rect x="406" y="31" width="8" height="8" rx="1.5"/>
+</g>
+</svg>
 <div class="lbLoginWaves" aria-hidden="true"><svg viewBox="0 0 1600 480" preserveAspectRatio="none">
 <defs>
 <linearGradient id="lbGradOrangeA" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1100" y2="0" spreadMethod="repeat">
@@ -420,7 +441,8 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <linearGradient id="lbGradBlue" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1350" y2="0" spreadMethod="repeat">
 <stop offset="0" stop-color="#4f8dff"/><stop offset=".5" stop-color="#8fc0ff"/><stop offset="1" stop-color="#4f8dff"/>
 </linearGradient>
-<filter id="lbGlow" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="7"/></filter>
+<filter id="lbGlow" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="18"/></filter>
+<filter id="lbGlowCore" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="4"/></filter>
 </defs>
 <g class="lbWaveLine lbWaveBlue"><path class="lbWaveGlow" stroke="url(#lbGradBlue)" d="M-1700,75 Q-1275,160.0 -850,75 Q-425,-10.0 0,75 Q425,160.0 850,75 Q1275,-10.0 1700,75 Q2125,160.0 2550,75 Q2975,-10.0 3400,75 Q3825,160.0 4250,75 Q4675,-10.0 5100,75"/><path class="lbWaveCore" stroke="url(#lbGradBlue)" d="M-1700,75 Q-1275,160.0 -850,75 Q-425,-10.0 0,75 Q425,160.0 850,75 Q1275,-10.0 1700,75 Q2125,160.0 2550,75 Q2975,-10.0 3400,75 Q3825,160.0 4250,75 Q4675,-10.0 5100,75"/></g>
 <g class="lbWaveLine lbWavePurple"><path class="lbWaveGlow" stroke="url(#lbGradPurple)" d="M-1800,235 Q-1325,335.0 -850,235 Q-375,135.0 100,235 Q575,335.0 1050,235 Q1525,135.0 2000,235 Q2475,335.0 2950,235 Q3425,135.0 3900,235 Q4375,335.0 4850,235"/><path class="lbWaveCore" stroke="url(#lbGradPurple)" d="M-1800,235 Q-1325,335.0 -850,235 Q-375,135.0 100,235 Q575,335.0 1050,235 Q1525,135.0 2000,235 Q2475,335.0 2950,235 Q3425,135.0 3900,235 Q4375,335.0 4850,235"/></g>
