@@ -535,6 +535,8 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <tr><td>Seta na borda esquerda</td><td>Abre a gaveta com os demais serviços, incluindo este guia.</td></tr>
 <tr><td>Ícone de lua/sol</td><td>Alterna entre tema claro e escuro (abre sempre no claro por padrão).</td></tr>
 <tr><td>Iniciais no canto superior direito</td><td>Seu menu de usuário — nome, e-mail, perfil e opção de sair.</td></tr>
+<tr><td>Painel "Visão geral" (aba Decodificação)</td><td>Resumo rápido do histórico de Casos: total de casos, quantos hoje, banco mais frequente e última atividade.</td></tr>
+<tr><td>Aviso rápido (popup)</td><td>Ao clicar em COMPARAR, GERAR LAUDO ou ANALISAR AGORA, aparece um aviso dizendo se foi encontrada uma possível causa, uma possível divergência, ou nenhuma divergência. Clique OK pra fechar e conferir o laudo completo logo abaixo.</td></tr>
 </table>
 
 <h3>Serviços principais</h3>
@@ -542,7 +544,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <p><b>Comparador</b> — cola a linha do Sankhya e a do banco lado a lado e mostra rapidamente em quais posições elas divergem, dígito a dígito.</p>
 <p><b>Laudo Automático</b> — o diagnóstico mais completo: consistência matemática de cada linha, onde divergem, causa provável, comparação campo a campo com ícones de status, e se aquele mesmo problema já aconteceu antes com aquele banco ("Casos parecidos"). Use o ícone de impressora ao lado do título pra imprimir ou salvar o laudo em PDF.</p>
 <p><b>Gerador / Validador</b> — monta uma linha digitável a partir dos dados de cadastro, aplicando as fórmulas públicas da FEBRABAN.</p>
-<p><b>Análise Guiada</b> — a resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) pra já saber se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão.</p>
+<p><b>Análise Guiada</b> — a resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) pra já saber se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão. Ao preencher Agência ou Conta, ela também avisa quando o valor tem menos dígitos do que o banco selecionado espera — sinal de que falta completar com zero (o lado, esquerda ou direita, ainda está sendo confirmado banco a banco).</p>
 
 <h3>Como ler os resultados</h3>
 <table>
@@ -560,7 +562,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <tr><td><b>Homologador de Remessa</b></td><td>Simula, sem gravar nada e só no seu navegador, como o banco reagiria a um arquivo de remessa (CNAB 240/400) dos 8 bancos suportados: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. É um layout transcrito de biblioteca open-source (conferido só em parte contra manuais oficiais) — não tem tabela de código de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno; e não verifica duplicidade entre remessas diferentes, porque isso exige um estado compartilhado que o LexBank (só cliente, sem servidor) não guarda. Use também o canal de teste do próprio banco antes de produção.</td></tr>
 <tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
-<tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador.</td></tr>
+<tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador — Laudo Automático, Análise Guiada, Homologador de Remessa e CNAB Explorer. Pode ser exportado em CSV, que abre direto no Excel.</td></tr>
 </table>
 
 <h3>Perguntas frequentes</h3>
@@ -2471,7 +2473,7 @@ function runGuidedDiagnosis(save){
 }
 function saveGuidedCase(bank,ref,status){
   let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");
-  h.unshift({data:new Date().toLocaleString("pt-BR"),banco:banks[bank]?banks[bank].name:bank,ref:ref||"Diagnóstico guiado",status:status==="bad"?lbIcon("bad")+" Erro encontrado":lbIcon("ok")+" Sem erro matemático"});
+  h.unshift({data:new Date().toLocaleString("pt-BR"),origem:"Análise Guiada",banco:banks[bank]?banks[bank].name:bank,ref:ref||"Diagnóstico guiado",status:status==="bad"?lbIcon("bad")+" Erro encontrado":lbIcon("ok")+" Sem erro matemático"});
   localStorage.setItem("lexbank_cases",JSON.stringify(h.slice(0,200)));renderHistory();
 }
 function clearGuidedDiagnosis(){
