@@ -168,6 +168,84 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 @keyframes lbSpin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#lbLoginBtn.lbBusy #lbLoginBtnLabel::after{animation:none}}
 @media(max-width:720px){.lbLoginWrap{flex-direction:column;max-width:420px}.lbLoginBrand{flex:none;padding:28px 28px 22px}.lbLoginForm{padding:28px}}
+/* ===== Transição de acesso (pós-login, pré-dashboard) — paleta e animação
+   próprias, independentes do tema claro/escuro do app (mesmo tratamento que a
+   tela de login já recebe hoje). ===== */
+:root{
+  --lx-bg:#071321;--lx-bg-2:#0b1b2b;--lx-mint:#65f5b5;--lx-mint-soft:#a5ffd7;
+  --lx-turquoise:#39dccb;--lx-lilac:#b69aff;--lx-lavender:#d8c5ff;--lx-white:#f5fbff;--lx-muted:#b9c9d7;
+}
+.lx-transition,.lx-transition *{box-sizing:border-box}
+.lx-transition{
+  position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:hidden;isolation:isolate;
+  color:var(--lx-white);
+  background:radial-gradient(ellipse at 18% 18%,rgba(57,220,203,.18),transparent 35%),radial-gradient(ellipse at 82% 78%,rgba(182,154,255,.19),transparent 38%),linear-gradient(135deg,#06111f 0%,#0a1b2b 52%,#10152d 100%);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .45s ease,visibility .45s ease;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+.lx-transition.is-active{opacity:1;visibility:visible;pointer-events:auto}
+.lx-transition__grid{position:absolute;inset:-30%;z-index:-1;opacity:.22;background-image:radial-gradient(rgba(135,220,225,.55) .8px,transparent .8px);background-size:19px 19px;mask-image:radial-gradient(ellipse at center,#000 0%,transparent 70%);animation:lx-grid-drift 18s linear infinite}
+.lx-transition__ambient{position:absolute;width:65vw;height:25vh;border-radius:50%;filter:blur(34px);opacity:.42;pointer-events:none}
+.lx-transition__ambient--mint{top:-13vh;left:-12vw;background:linear-gradient(90deg,transparent,var(--lx-mint),var(--lx-turquoise),transparent);transform:rotate(-13deg);animation:lx-wave 6s ease-in-out infinite alternate}
+.lx-transition__ambient--lilac{right:-15vw;bottom:-15vh;background:linear-gradient(90deg,transparent,var(--lx-lilac),#6d75ff,transparent);transform:rotate(-13deg);animation:lx-wave 7s ease-in-out infinite alternate-reverse}
+.lx-transition__content{position:relative;width:min(1100px,calc(100% - 64px));min-height:560px;display:grid;grid-template-columns:1fr 1.15fr;grid-template-rows:1fr auto;align-items:center;gap:8px 28px;padding:clamp(28px,5vw,70px)}
+.lx-brand{grid-column:1;grid-row:1;z-index:2}
+.lx-brand__mark{width:66px;height:66px;display:grid;place-items:center;margin-bottom:20px;border-radius:20px;background:linear-gradient(135deg,var(--lx-mint),var(--lx-turquoise) 55%,#826dff);box-shadow:0 0 35px rgba(57,220,203,.28)}
+.lx-brand__mark svg{width:42px}
+.lx-brand__name{font-size:clamp(42px,5.5vw,68px);line-height:1;font-weight:760;letter-spacing:-3px}
+.lx-brand__name span{background:linear-gradient(100deg,var(--lx-turquoise),var(--lx-lilac));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lx-brand__tagline{margin:18px 0 0;color:#d5e4ef;font-size:17px;line-height:1.45}
+.lx-auth-visual{grid-column:2;grid-row:1;position:relative;width:min(100%,440px);aspect-ratio:1.1;display:grid;place-items:center;justify-self:center}
+.lx-shield{position:relative;z-index:2;width:clamp(150px,20vw,230px);filter:drop-shadow(0 0 18px rgba(101,245,181,.55)) drop-shadow(0 0 42px rgba(182,154,255,.35));animation:lx-shield-float 3s ease-in-out infinite}
+.lx-shield svg{width:100%;overflow:visible}
+.lx-shield__outline{fill:rgba(35,220,185,.08);stroke:var(--lx-mint-soft);stroke-width:3}
+.lx-lock__body{fill:rgba(101,245,181,.2);stroke:var(--lx-turquoise);stroke-width:3}
+.lx-lock__arc,.lx-lock__keyline{fill:none;stroke:var(--lx-lavender);stroke-width:4;stroke-linecap:round}
+.lx-lock__key{fill:var(--lx-mint-soft)}
+.lx-orbit{position:absolute;left:50%;top:50%;width:95%;height:28%;border:2px solid transparent;border-radius:50%;transform:translate(-50%,-50%) rotate(-24deg);filter:drop-shadow(0 0 8px currentColor)}
+.lx-orbit--one{color:var(--lx-mint);border-top-color:var(--lx-mint);border-bottom-color:rgba(101,245,181,.28);animation:lx-orbit 4s linear infinite}
+.lx-orbit--two{width:110%;height:42%;color:var(--lx-lilac);border-top-color:var(--lx-lilac);transform:translate(-50%,-50%) rotate(24deg);animation:lx-orbit-reverse 5s linear infinite}
+.lx-orbit--three{width:75%;height:75%;border:1px dashed rgba(57,220,203,.6);animation:lx-spin 16s linear infinite}
+.lx-auth-visual__spark{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 18px 6px var(--lx-mint)}
+.lx-auth-visual__spark--a{top:18%;left:22%}
+.lx-auth-visual__spark--b{right:15%;bottom:20%;background:var(--lx-lilac);box-shadow:0 0 18px 6px var(--lx-lilac)}
+.lx-progress-area{grid-column:1/-1;grid-row:2;width:min(620px,100%);justify-self:center;z-index:3}
+.lx-progress-title{margin:0 0 18px;text-align:center;font-size:clamp(19px,2.2vw,25px);font-weight:620}
+.lx-progress-title span{background:linear-gradient(90deg,var(--lx-turquoise),var(--lx-lilac));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lx-progress{position:relative;height:12px;overflow:hidden;border:1px solid rgba(183,255,230,.55);border-radius:30px;background:rgba(255,255,255,.08);box-shadow:0 0 18px rgba(101,245,181,.16)}
+.lx-progress__bar{width:0%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--lx-mint),var(--lx-turquoise),var(--lx-lilac));box-shadow:0 0 18px var(--lx-mint)}
+.lx-transition.is-active .lx-progress__bar{animation:lx-progress-fill var(--lx-duration,2400ms) cubic-bezier(.22,.8,.25,1) forwards}
+.lx-progress__glint{position:absolute;top:-8px;bottom:-8px;left:-15%;width:16%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);filter:blur(3px)}
+.lx-transition.is-active .lx-progress__glint{animation:lx-glint 1.15s ease-in-out infinite}
+.lx-steps{display:grid;grid-template-columns:1fr;gap:11px;width:fit-content;margin:22px auto 0;padding:0;list-style:none;color:var(--lx-muted);font-size:14px}
+.lx-step{display:flex;align-items:center;gap:11px;opacity:.42;transition:opacity .3s ease,color .3s ease}
+.lx-step.is-done,.lx-step.is-current{opacity:1;color:var(--lx-white)}
+.lx-step__icon{display:inline-grid;place-items:center;flex:0 0 19px;width:19px;height:19px;border:2px solid rgba(101,245,181,.55);border-radius:50%}
+.lx-step.is-done .lx-step__icon{border:0;background:var(--lx-mint)}
+.lx-step.is-done .lx-step__icon::after{content:"✓";color:#08251e;font-weight:800;font-size:13px}
+.lx-step.is-current .lx-step__icon{border-color:var(--lx-lilac);border-right-color:transparent;animation:lx-spin .8s linear infinite}
+.lx-transition__bottomline{position:absolute;bottom:5%;left:-10%;width:120%;height:2px;background:linear-gradient(90deg,transparent,var(--lx-mint),var(--lx-lilac),transparent);box-shadow:0 0 20px var(--lx-turquoise);opacity:.7;transform:rotate(-2deg)}
+@keyframes lx-progress-fill{to{width:100%}}
+@keyframes lx-glint{0%{left:-15%}100%{left:110%}}
+@keyframes lx-spin{to{transform:rotate(360deg)}}
+@keyframes lx-orbit{to{transform:translate(-50%,-50%) rotate(336deg)}}
+@keyframes lx-orbit-reverse{to{transform:translate(-50%,-50%) rotate(-336deg)}}
+@keyframes lx-shield-float{0%,100%{translate:0 0}50%{translate:0 -9px}}
+@keyframes lx-wave{to{translate:4vw 4vh;scale:1.12}}
+@keyframes lx-grid-drift{to{transform:translate3d(19px,19px,0)}}
+@media(max-width:720px){
+  .lx-transition__content{width:calc(100% - 28px);min-height:auto;grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:12px;padding:30px 18px}
+  .lx-brand{grid-column:1;grid-row:1;text-align:center}
+  .lx-brand__mark{margin:0 auto 12px;width:48px;height:48px;border-radius:15px}
+  .lx-brand__name{font-size:42px}
+  .lx-brand__tagline{margin-top:8px;font-size:14px}
+  .lx-auth-visual{grid-column:1;grid-row:2;width:min(74vw,270px)}
+  .lx-progress-area{grid-column:1;grid-row:3}
+  .lx-steps{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .lx-transition *,.lx-transition *::before,.lx-transition *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
 .confBadge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:800;margin-left:8px;vertical-align:middle;white-space:nowrap}
 .confBadge.confVerified{background:var(--ok-bg);color:var(--ok-fg);border:1px solid var(--ok-border)}
 .confBadge.confPartial{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-border)}
@@ -330,6 +408,45 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 </form>
 </div>
 </div>
+</div>
+<!-- ===== Transição de acesso — exibida só depois que o login é aceito, antes de
+     abrir o app (nunca substitui a autenticação, nunca aparece em login inválido
+     nem no auto-login silencioso de quem já estava conectado). ===== -->
+<div id="lxTransition" class="lx-transition" aria-hidden="true">
+  <div class="lx-transition__ambient lx-transition__ambient--mint"></div>
+  <div class="lx-transition__ambient lx-transition__ambient--lilac"></div>
+  <div class="lx-transition__grid"></div>
+  <div class="lx-transition__content" role="status" aria-live="polite" aria-atomic="true">
+    <div class="lx-brand">
+      <div class="lx-brand__mark" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">
+        <defs><linearGradient id="lxMarkGrad" x1="6" y1="12" x2="42" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#eafff6"/><stop offset="1" stop-color="#8ff0d7"/></linearGradient></defs>
+        <path d="M9 19 C15 12, 25 12, 31 19 S43 30, 39 24" stroke="url(#lxMarkGrad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <path d="M9 31 C15 24, 25 24, 31 31 S43 42, 39 36" stroke="url(#lxMarkGrad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+      </svg></div>
+      <div class="lx-brand__name">Lex<span>Bank</span></div>
+      <p class="lx-brand__tagline">Análise inteligente.<br>Diagnóstico preciso.</p>
+    </div>
+    <div class="lx-auth-visual" aria-hidden="true">
+      <div class="lx-orbit lx-orbit--one"></div><div class="lx-orbit lx-orbit--two"></div><div class="lx-orbit lx-orbit--three"></div>
+      <div class="lx-shield"><svg viewBox="0 0 120 140" focusable="false">
+        <path class="lx-shield__outline" d="M60 5 108 24v39c0 32-20 55-48 70C32 118 12 95 12 63V24L60 5Z"/>
+        <rect class="lx-lock__body" x="39" y="61" width="42" height="34" rx="7"/>
+        <path class="lx-lock__arc" d="M47 61V48a13 13 0 0 1 26 0v13"/>
+        <circle class="lx-lock__key" cx="60" cy="77" r="4"/><path class="lx-lock__keyline" d="M60 81v7"/>
+      </svg></div>
+      <div class="lx-auth-visual__spark lx-auth-visual__spark--a"></div><div class="lx-auth-visual__spark lx-auth-visual__spark--b"></div>
+    </div>
+    <div class="lx-progress-area">
+      <h2 class="lx-progress-title">Conectando você ao <span>LexBank</span>...</h2>
+      <div class="lx-progress" aria-hidden="true"><div class="lx-progress__bar"></div><div class="lx-progress__glint"></div></div>
+      <ul class="lx-steps">
+        <li class="lx-step" data-step="0"><span class="lx-step__icon"></span><span>Credenciais confirmadas</span></li>
+        <li class="lx-step" data-step="1"><span class="lx-step__icon"></span><span>Conexão segura estabelecida</span></li>
+        <li class="lx-step" data-step="2"><span class="lx-step__icon"></span><span>Preparando ambiente de validação</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="lx-transition__bottomline"></div>
 </div>
 <div id="lbApp">
 <button id="lbSideNavHandle" class="lbSideNavHandle" onclick="lbToggleSideNav()" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="lbSideNav"><span class="lbSideNavArrow">›</span></button>
@@ -716,6 +833,42 @@ function lbUnlockApp(email,opts){
   }
   if(!opts.silent) setTimeout(()=>lbToast(`Bem-vindo(a), ${name}! 👋`,"ok"),350);
 }
+/* ===== Transição de acesso — toca só depois que o login é aceito (chamada
+   dentro de lbLogin(), nunca em lbCheckAuth()/auto-login silencioso nem em
+   caso de e-mail inválido). Nunca substitui a validação acima: só decora o
+   intervalo entre "login aceito" e lbUnlockApp() já sendo chamado de qualquer
+   forma. API equivalente à do kit fornecido (show/onComplete), só renomeada
+   pro padrão lb* do projeto. */
+function lbShowLoginTransition(options){
+  options=options||{};
+  const root=$("lxTransition");
+  const onComplete=typeof options.onComplete==="function"?options.onComplete:()=>{};
+  if(!root){ onComplete(); return; }
+  const steps=[...root.querySelectorAll(".lx-step")];
+  const duration=Math.max(900,Number(options.duration)||2400);
+  const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const total=reducedMotion?250:duration;
+  const stage=total/3;
+  root.style.setProperty("--lx-duration",`${total}ms`);
+  root.setAttribute("aria-hidden","false");
+  void root.offsetWidth; // força reinício da animação se chamada de novo
+  root.classList.add("is-active");
+  function reset(){
+    root.classList.remove("is-active");
+    root.setAttribute("aria-hidden","true");
+    root.style.removeProperty("--lx-duration");
+    steps.forEach(s=>s.classList.remove("is-done","is-current"));
+  }
+  let i=0;
+  function nextStep(){
+    steps.forEach((s,idx)=>{ s.classList.toggle("is-done",idx<i); s.classList.toggle("is-current",idx===i); });
+    i++;
+    if(i<=steps.length){ setTimeout(nextStep,stage); return; }
+    steps.forEach(s=>{ s.classList.remove("is-current"); s.classList.add("is-done"); });
+    setTimeout(()=>{ onComplete(); reset(); },reducedMotion?100:180);
+  }
+  nextStep();
+}
 function lbToggleUserMenu(e){
   if(e) e.stopPropagation();
   const dd=$("lbUserDropdown");
@@ -774,7 +927,7 @@ function lbLogin(){
     if(remember){ localStorage.setItem("lexbank_auth_email",email); sessionStorage.removeItem("lexbank_auth_email"); }
     else { sessionStorage.setItem("lexbank_auth_email",email); localStorage.removeItem("lexbank_auth_email"); }
     btn.classList.remove("lbBusy"); btn.disabled=false;
-    lbUnlockApp(email);
+    lbShowLoginTransition({duration:2400,onComplete:()=>lbUnlockApp(email)});
   },420);
 }
 function lbLogout(){
