@@ -196,12 +196,25 @@ mark{background:var(--warn-bg);color:var(--warn-fg);border-radius:2px;padding:0 
 .lx-brand__name span{background:linear-gradient(100deg,var(--lx-turquoise),var(--lx-lilac));-webkit-background-clip:text;background-clip:text;color:transparent}
 .lx-brand__tagline{margin:18px 0 0;color:#d5e4ef;font-size:17px;line-height:1.45}
 .lx-auth-visual{grid-column:2;grid-row:1;position:relative;width:min(100%,440px);aspect-ratio:1.1;display:grid;place-items:center;justify-self:center}
-.lx-shield{position:relative;z-index:2;width:clamp(150px,20vw,230px);filter:drop-shadow(0 0 18px rgba(101,245,181,.55)) drop-shadow(0 0 42px rgba(182,154,255,.35));animation:lx-shield-float 3s ease-in-out infinite}
-.lx-shield svg{width:100%;overflow:visible}
-.lx-shield__outline{fill:rgba(35,220,185,.08);stroke:var(--lx-mint-soft);stroke-width:3}
-.lx-lock__body{fill:rgba(101,245,181,.2);stroke:var(--lx-turquoise);stroke-width:3}
-.lx-lock__arc,.lx-lock__keyline{fill:none;stroke:var(--lx-lavender);stroke-width:4;stroke-linecap:round}
-.lx-lock__key{fill:var(--lx-mint-soft)}
+/* ===== Motivo "linha digitável sendo validada" — substitui o escudo genérico
+   por algo que remete ao que o LexBank realmente faz. O código de barras é
+   gerado pela MESMA função usada na Decodificação (lbBarcodeSvg), só que
+   recolorida pro contexto escuro da transição. */
+.lx-scan{position:relative;z-index:2;width:clamp(190px,24vw,290px);display:flex;flex-direction:column;align-items:center;animation:lx-shield-float 3s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(101,245,181,.35)) drop-shadow(0 0 36px rgba(182,154,255,.25))}
+.lx-scan__frame{position:relative;width:100%;background:rgba(9,28,38,.6);border:1px solid rgba(165,255,215,.4);border-radius:14px;padding:18px 16px 14px;overflow:hidden;box-shadow:0 0 30px rgba(101,245,181,.14),inset 0 0 22px rgba(101,245,181,.07)}
+.lx-scan__barcode{width:100%;display:flex;justify-content:center}
+.lx-scan__barcode svg{width:100%;height:42px}
+.lx-scan__barcode svg rect{fill:var(--lx-mint-soft)}
+.lx-scan__digits{margin-top:10px;text-align:center;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:2px;color:var(--lx-mint-soft);opacity:.8;white-space:nowrap;overflow:hidden}
+.lx-scan__line{position:absolute;left:3%;right:3%;height:3px;top:0;border-radius:2px;background:linear-gradient(90deg,transparent,var(--lx-mint),var(--lx-turquoise),transparent);box-shadow:0 0 14px var(--lx-mint);animation:lx-scan-sweep 1.8s ease-in-out infinite}
+.lx-scan__check{position:absolute;right:10px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--lx-mint);color:#06251f;display:grid;place-items:center;opacity:0;transform:scale(.4);animation:lx-check-blink 1.8s ease-in-out infinite}
+.lx-scan__check svg{width:14px;height:14px}
+.lx-scan__tag{position:absolute;font-family:ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.4px;padding:4px 9px;border-radius:7px;white-space:nowrap}
+.lx-scan__tag--a{top:-14px;left:-8px;background:rgba(182,154,255,.14);border:1px solid rgba(182,154,255,.4);color:var(--lx-lavender);animation:lx-tag-float 4s ease-in-out infinite}
+.lx-scan__tag--b{bottom:-12px;right:-6px;background:rgba(101,245,181,.12);border:1px solid rgba(101,245,181,.4);color:var(--lx-mint-soft);animation:lx-tag-float 5s ease-in-out infinite reverse}
+@keyframes lx-scan-sweep{0%{top:0}50%{top:calc(100% - 3px)}100%{top:0}}
+@keyframes lx-check-blink{0%,65%{opacity:0;transform:scale(.4)}82%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes lx-tag-float{0%,100%{translate:0 0}50%{translate:0 -6px}}
 .lx-orbit{position:absolute;left:50%;top:50%;width:95%;height:28%;border:2px solid transparent;border-radius:50%;transform:translate(-50%,-50%) rotate(-24deg);filter:drop-shadow(0 0 8px currentColor)}
 .lx-orbit--one{color:var(--lx-mint);border-top-color:var(--lx-mint);border-bottom-color:rgba(101,245,181,.28);animation:lx-orbit 4s linear infinite}
 .lx-orbit--two{width:110%;height:42%;color:var(--lx-lilac);border-top-color:var(--lx-lilac);transform:translate(-50%,-50%) rotate(24deg);animation:lx-orbit-reverse 5s linear infinite}
@@ -428,21 +441,25 @@ table tr:hover td{background:rgba(127,127,127,.09)}
     </div>
     <div class="lx-auth-visual" aria-hidden="true">
       <div class="lx-orbit lx-orbit--one"></div><div class="lx-orbit lx-orbit--two"></div><div class="lx-orbit lx-orbit--three"></div>
-      <div class="lx-shield"><svg viewBox="0 0 120 140" focusable="false">
-        <path class="lx-shield__outline" d="M60 5 108 24v39c0 32-20 55-48 70C32 118 12 95 12 63V24L60 5Z"/>
-        <rect class="lx-lock__body" x="39" y="61" width="42" height="34" rx="7"/>
-        <path class="lx-lock__arc" d="M47 61V48a13 13 0 0 1 26 0v13"/>
-        <circle class="lx-lock__key" cx="60" cy="77" r="4"/><path class="lx-lock__keyline" d="M60 81v7"/>
-      </svg></div>
+      <div class="lx-scan">
+        <div class="lx-scan__frame">
+          <div class="lx-scan__barcode" id="lxScanBarcode"></div>
+          <div class="lx-scan__digits" id="lxScanDigits"></div>
+          <div class="lx-scan__line"></div>
+          <div class="lx-scan__check"><svg viewBox="0 0 20 20" focusable="false"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        </div>
+        <span class="lx-scan__tag lx-scan__tag--a">CNAB 240/400</span>
+        <span class="lx-scan__tag lx-scan__tag--b">DV ✓</span>
+      </div>
       <div class="lx-auth-visual__spark lx-auth-visual__spark--a"></div><div class="lx-auth-visual__spark lx-auth-visual__spark--b"></div>
     </div>
     <div class="lx-progress-area">
-      <h2 class="lx-progress-title">Conectando você ao <span>LexBank</span>...</h2>
+      <h2 class="lx-progress-title">Carregando seu ambiente de <span>diagnóstico bancário</span>...</h2>
       <div class="lx-progress" aria-hidden="true"><div class="lx-progress__bar"></div><div class="lx-progress__glint"></div></div>
       <ul class="lx-steps">
-        <li class="lx-step" data-step="0"><span class="lx-step__icon"></span><span>Credenciais confirmadas</span></li>
-        <li class="lx-step" data-step="1"><span class="lx-step__icon"></span><span>Conexão segura estabelecida</span></li>
-        <li class="lx-step" data-step="2"><span class="lx-step__icon"></span><span>Preparando ambiente de validação</span></li>
+        <li class="lx-step" data-step="0"><span class="lx-step__icon"></span><span>Credenciais verificadas</span></li>
+        <li class="lx-step" data-step="1"><span class="lx-step__icon"></span><span>Sincronizando motor CNAB e linha digitável</span></li>
+        <li class="lx-step" data-step="2"><span class="lx-step__icon"></span><span>Preparando ambiente de diagnóstico</span></li>
       </ul>
     </div>
   </div>
@@ -844,6 +861,16 @@ function lbShowLoginTransition(options){
   const root=$("lxTransition");
   const onComplete=typeof options.onComplete==="function"?options.onComplete:()=>{};
   if(!root){ onComplete(); return; }
+  const bcSlot=root.querySelector("#lxScanBarcode"), digitsSlot=root.querySelector("#lxScanDigits");
+  if(bcSlot&&!bcSlot.dataset.filled){
+    // dígitos decorativos (tamanho de código de barras real, 44 posições) — gerados na hora,
+    // sem significado numérico, só pra dar vida ao motivo visual com o MESMO renderizador de
+    // código de barras já usado na Decodificação (lbBarcodeSvg).
+    const digits=Array.from({length:44},(_,i)=>(i*13+7)%10).join("");
+    bcSlot.innerHTML=lbBarcodeSvg(digits)||"";
+    if(digitsSlot) digitsSlot.textContent=digits.replace(/(.{5})/g," $1").trim();
+    bcSlot.dataset.filled="1";
+  }
   const steps=[...root.querySelectorAll(".lx-step")];
   const duration=Math.max(900,Number(options.duration)||2400);
   const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
