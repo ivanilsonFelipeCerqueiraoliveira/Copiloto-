@@ -219,7 +219,7 @@ footer p{color:var(--muted);font-size:13px;margin:4px 0}
 
 <div class="servicecard">
 <h3>Análise Guiada <span class="tag">a resposta mais rápida</span></h3>
-<p>Cole só a linha do Sankhya (a do banco é opcional) e já veja se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão. Ao preencher Agência ou Conta, ela também avisa quando o valor tem menos dígitos do que o banco selecionado espera — sinal de que falta completar com zero (o lado, esquerda ou direita, ainda está sendo confirmado banco a banco).</p>
+<p>Cole só a linha do Sankhya (a do banco é opcional) e já veja se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão. Ao preencher Agência ou Conta, ela também avisa quando o valor tem menos dígitos do que o banco selecionado espera — e já diz para completar com zero à <b>esquerda</b> (confirmado no código-fonte do Sankhya para Banco do Brasil, Itaú, Bradesco e Safra; veja a aba Regras Bancárias). O Laudo Automático e o Comparador também citam, quando relevante, comportamentos conhecidos do Sankhya para aquele banco específico.</p>
 </div>
 </section>
 
@@ -250,7 +250,8 @@ footer p{color:var(--muted);font-size:13px;margin:4px 0}
 <table>
 <tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo dos 8 bancos suportados (Bradesco 240 a partir do manual oficial; os demais, incluindo Bradesco 400, com o mesmo layout transcrito de biblioteca open-source já usado no Homologador de Remessa). Pra remessas Bradesco também monta um "Resumo da remessa" em linguagem de negócio: empresa pagadora, CNPJ, convênio, agência/conta e o que está sendo pago em cada título.</td></tr>
 <tr><td><b>Homologador de Remessa</b></td><td>Simula, sem gravar nada e só no seu navegador, como o banco reagiria a um arquivo de remessa (CNAB 240/400) dos 8 bancos suportados: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. É um layout transcrito de biblioteca open-source (conferido só em parte contra manuais oficiais) — não tem tabela de código de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno; e não verifica duplicidade entre remessas diferentes, porque isso exige um estado compartilhado que o LexBank (só cliente, sem servidor) não guarda. Use também o canal de teste do próprio banco antes de produção.</td></tr>
-<tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
+<tr><td><b>Regras Bancárias</b></td><td>Como o Sankhya calcula de verdade nosso número, campo livre e dígitos verificadores em cada um dos 8 bancos suportados — larguras de agência/conta, fórmula do DV, variações por carteira, zero-padding confirmado e os pontos de atenção/bugs conhecidos de cada banco, levantado direto no código-fonte.</td></tr>
+<tr><td><b>Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
 <tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador — Laudo Automático, Análise Guiada, Homologador de Remessa e CNAB Explorer. Pode ser exportado em CSV, que abre direto no Excel.</td></tr>
 </table>

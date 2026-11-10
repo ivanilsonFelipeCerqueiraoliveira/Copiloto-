@@ -56,11 +56,16 @@ nav{background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:
 .lbSideNavGroup{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:12px 12px 4px;margin-top:4px;border-top:1px solid var(--line)}
 .lbSideNavGroup:first-of-type{margin-top:0;border-top:none}
 .lbSideNav button{display:block;width:100%;text-align:left;border-radius:9px;padding:11px 12px}
-@media(max-width:720px){.lbSideNavHandle{width:20px;height:56px}.lbSideNav{width:82vw;max-width:280px}.lbSideNavHandle.open{left:82vw}table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}}
+@media(max-width:720px){.lbSideNavHandle{width:20px;height:56px}.lbSideNav{width:82vw;max-width:280px}.lbSideNavHandle.open{left:82vw}table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+  /* Tabelas de texto corrido (ex.: Regras Bancárias) ficam ilegíveis se só
+     rolarem na horizontal — aqui preferimos quebrar a frase dentro da célula. */
+  .lbRuleTable{display:table!important;overflow-x:visible!important;table-layout:fixed;width:100%}
+  .lbRuleTable td,.lbRuleTable th{white-space:normal;word-break:break-word;overflow-wrap:break-word}
+}
 @media(prefers-reduced-motion:reduce){.lbSideNavHandle,.lbSideNav,.lbSideNavOverlay,.lbSideNavArrow{transition:none}}
 main{max-width:1500px;margin:22px auto;padding:0 20px}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0e262208}
 h1{font-size:24px;margin:0 0 5px;letter-spacing:-.01em}h2{font-size:17px;margin:0 0 13px}h3{font-size:14px;margin:18px 0 8px}.muted{color:var(--muted);font-size:13px}.form{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:#33534d}.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:9px;padding:10px;font-size:14px;background:var(--card);font-family:inherit;color:var(--ink)}.field textarea{min-height:145px;font-family:ui-monospace,Consolas,monospace}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;transition:filter .15s,transform .05s}.btn:hover{filter:brightness(1.06)}.primary{background:var(--blue);color:#fff;box-shadow:0 2px 8px #0c948840}.secondary{background:var(--blue-tint);color:var(--blue-dark)}.danger{background:var(--bad-bg);color:var(--red)}
-.status{padding:12px;border-radius:10px;font-weight:700;margin-bottom:12px}.ok{background:var(--ok-bg);color:var(--ok-fg)}.warn{background:var(--warn-bg);color:var(--warn-fg)}.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.status{padding:12px;border-radius:10px;font-weight:700;margin-bottom:12px;overflow-wrap:anywhere}.ok{background:var(--ok-bg);color:var(--ok-fg)}.warn{background:var(--warn-bg);color:var(--warn-fg)}.bad{background:var(--bad-bg);color:var(--bad-fg)}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.kpi{border:1px solid var(--line);background:var(--surface-2);border-radius:11px;padding:11px}.kpi b{display:block;font-size:18px;margin-top:3px;overflow:hidden;text-overflow:ellipsis}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--surface-2);font-family:var(--font-head);font-weight:700}pre{background:#0a2622;color:#d3ece7;padding:13px;border-radius:10px;overflow:auto;font-size:12px;line-height:1.5}
 .badge{display:inline-block;padding:3px 8px;border-radius:99px;background:var(--blue-tint);color:var(--blue-dark);font-size:11px;font-weight:800}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pos{font-family:ui-monospace,Consolas,monospace}.small{font-size:11px}.link{color:var(--blue);text-decoration:none;font-weight:700}
@@ -609,7 +614,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <p><b>Comparador</b> — cola a linha do Sankhya e a do banco lado a lado e mostra rapidamente em quais posições elas divergem, dígito a dígito.</p>
 <p><b>Laudo Automático</b> — o diagnóstico mais completo: consistência matemática de cada linha, onde divergem, causa provável, comparação campo a campo com ícones de status, e se aquele mesmo problema já aconteceu antes com aquele banco ("Casos parecidos"). Use o ícone de impressora ao lado do título pra imprimir ou salvar o laudo em PDF.</p>
 <p><b>Gerador / Validador</b> — monta uma linha digitável a partir dos dados de cadastro, aplicando as fórmulas públicas da FEBRABAN.</p>
-<p><b>Análise Guiada</b> — a resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) pra já saber se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão. Ao preencher Agência ou Conta, ela também avisa quando o valor tem menos dígitos do que o banco selecionado espera — sinal de que falta completar com zero (o lado, esquerda ou direita, ainda está sendo confirmado banco a banco).</p>
+<p><b>Análise Guiada</b> — a resposta mais rápida: cole só a linha do Sankhya (a do banco é opcional) pra já saber se o erro é matemático, cadastral ou uma divergência com o banco. Use o Laudo Automático quando precisar do laudo formal, com casos parecidos e impressão. Ao preencher Agência ou Conta, ela também avisa quando o valor tem menos dígitos do que o banco selecionado espera — e já diz para completar com zero à <b>esquerda</b> (confirmado no código-fonte do Sankhya para Banco do Brasil, Itaú, Bradesco e Safra; veja a aba <b>Regras Bancárias</b>). O Laudo Automático e o Comparador também citam, quando relevante, comportamentos conhecidos do Sankhya para aquele banco específico (ex.: Sicoob, Safra, Itaú, Santander e BB têm particularidades documentadas).</p>
 
 <h3>Como ler os resultados</h3>
 <table>
@@ -625,7 +630,8 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <table>
 <tr><td><b>CNAB Explorer</b></td><td>Leitura e análise posicional de arquivos CNAB 240/400 — formato, tipo de registro, segmento, busca por termo/posição e decodificação campo a campo dos 8 bancos suportados (Bradesco 240 a partir do manual oficial; os demais, incluindo Bradesco 400, com o mesmo layout transcrito de biblioteca open-source já usado no Homologador de Remessa). Pra remessas Bradesco também monta um "Resumo da remessa" em linguagem de negócio: empresa pagadora, CNPJ, convênio, agência/conta e o que está sendo pago em cada título.</td></tr>
 <tr><td><b>Homologador de Remessa</b></td><td>Simula, sem gravar nada e só no seu navegador, como o banco reagiria a um arquivo de remessa (CNAB 240/400) dos 8 bancos suportados: título por título, aceito ou rejeição provável, com o campo exato e a regra por trás. É um layout transcrito de biblioteca open-source (conferido só em parte contra manuais oficiais) — não tem tabela de código de rejeição do banco, não calcula o DV do Nosso Número e não gera arquivo-retorno; e não verifica duplicidade entre remessas diferentes, porque isso exige um estado compartilhado que o LexBank (só cliente, sem servidor) não guarda. Use também o canal de teste do próprio banco antes de produção.</td></tr>
-<tr><td><b>Regras Bancárias / Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
+<tr><td><b>Regras Bancárias</b></td><td>Como o Sankhya calcula de verdade nosso número, campo livre e dígitos verificadores em cada um dos 8 bancos suportados — larguras de agência/conta, fórmula do DV, variações por carteira, zero-padding confirmado e os pontos de atenção/bugs conhecidos de cada banco. Levantado direto no código-fonte (BoletoHelper, ContaBancariaHelper, classes do JBoleto), não no manual do banco.</td></tr>
+<tr><td><b>Motor de Diagnóstico</b></td><td>Catálogo de regras versionadas por banco. Em breve — ainda sem conteúdo cadastrado pra maioria dos bancos.</td></tr>
 <tr><td><b>Mapas Oficiais</b></td><td>Mapa de campos por posição, banco e tipo de registro CNAB.</td></tr>
 <tr><td><b>Casos</b></td><td>Histórico local dos laudos e diagnósticos já gerados neste navegador — Laudo Automático, Análise Guiada, Homologador de Remessa e CNAB Explorer. Pode ser exportado em CSV, que abre direto no Excel.</td></tr>
 </table>
@@ -669,7 +675,7 @@ table tr:hover td{background:rgba(127,127,127,.09)}
 <div id="homResult"><div class="muted">Nenhum arquivo simulado ainda.</div></div>
 </div></section>
 
-<section id="regras" class="tab"><div class="card lbComingSoonWrap"><h1>Catálogo de regras bancárias</h1><div class="muted">Estrutura preparada para cadastrar regras por banco, modalidade, carteira e versão. A regra deve ter fonte oficial e data/versão do manual.</div><div id="rules"></div><div class="lbComingSoon">Em breve</div></div></section>
+<section id="regras" class="tab"><div class="card"><h1>Catálogo de regras bancárias</h1><div class="muted">Como o Sankhya efetivamente calcula nosso número, campo livre e dígitos verificadores em cada banco — levantado direto no código-fonte (BoletoHelper, ContaBancariaHelper e as classes de banco do JBoleto), banco a banco, com os pontos de atenção e códigos de erro conhecidos de cada um.</div></div><div id="rules"></div></section>
 
 <section id="biblioteca" class="tab"><div class="card"><h1>Biblioteca oficial</h1><div class="muted">Fontes iniciais. A plataforma deve armazenar a URL, documento, versão e vigência do manual usado como fonte normativa.</div><div id="docs"></div></div></section>
 
@@ -866,16 +872,6 @@ const banks={
 "748":{name:"Sicredi"},
 "756":{name:"Sicoob"}
 };
-const rules=[
-["001","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal BB"],
-["033","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal Santander"],
-["104","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal Caixa"],
-["237","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal Bradesco"],
-["341","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal Itaú"],
-["422","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal Safra"],
-["748","Cobrança","CNAB 240/400","Sicredi: conferir Agência, Conta+DV, Modalidade, Posto/Convênio, Carteira e Número do Beneficiário","Sankhya"],
-["756","Cobrança","CNAB 240/400","Estrutura pendente de cadastro específico","Portal Sicoob"]
-];
 const docs=[
 ["Sankhya","Divergência entre linha digitável gerada pelo banco e Sankhya","https://ajuda.sankhya.com.br/hc/pt-br/articles/34278159731351-Diverg%C3%AAncia-entre-a-linha-digit%C3%A1vel-gerada-pelo-banco-e-a-registrada-no-Sankhya-Saiba-como-resolver"],
 ["Sankhya","Financeiro / Base de artigos","https://ajuda.sankhya.com.br/hc/pt-br/sections/360007436153-Financeiro"],
@@ -1381,6 +1377,13 @@ function lbBankMismatchWarning(selectedBank,decodedBank){
   const decName=banks[decodedBank]?banks[decodedBank].name:decodedBank;
   return `<div class="status warn">${lbIcon("warn")} <b>O banco selecionado no formulário (${selectedBank} — ${selName}) é diferente do banco decodificado na própria linha (${decodedBank} — ${decName}).</b> A leitura do Campo Livre abaixo usa o banco decodificado da linha (${decodedBank}), que é quem realmente define essa composição. Se a linha é mesmo de ${decName}, corrija o banco selecionado no formulário — usar o template do banco errado pode nomear o campo divergente incorretamente.</div>`;
 }
+function lbSankhyaBankNotes(bank){
+  const r=LB_SANKHYA_RULES[bank];
+  if(!r||!r.pontosDeAtencao||!r.pontosDeAtencao.length) return "";
+  return `<div class="card calloutWarn"><h3>${lbIcon("info")} Comportamentos conhecidos do Sankhya para este banco</h3>`+
+    r.pontosDeAtencao.map(p=>`<p class="muted">${lbEsc(p)}</p>`).join("")+
+    `<p class="small muted">Fonte: código-fonte Sankhya (BoletoHelper/JBoleto), levantado em 09/11/2026 — ver aba Regras Bancárias. É contexto, não significa necessariamente que é a causa desta divergência específica.</p></div>`;
+}
 function lbCampoLivreNote(bank,len,diffs,rawA,rawB){
   const {cl,dv}=lbClassifyDiffs(len,diffs);
   if(!cl.length) return "";
@@ -1772,18 +1775,152 @@ function lbBankFieldWidth(bank,token){
   const n=tmpl.split("").filter(c=>c===token).length;
   return n||null;
 }
-/* ===== Lado do zero de preenchimento (Agência/Conta) — PENDENTE =====
-   Ainda não temos, pra nenhum banco, confirmação de qual lado (esquerda/direita)
-   o Sankhya usa pra completar Agência/Conta quando o cadastro tem menos dígitos
-   que o esperado. Isso será levantado diretamente no código-fonte do Sankhya
-   (não no manual do banco, que pode não refletir o que o sistema realmente faz) e
-   preenchido aqui depois, banco a banco — formato esperado por entrada:
-   "237":{agencia:{lado:"esquerda",fonte:"código-fonte Sankhya, <módulo/arquivo>, <data>"},
-          conta:{lado:"esquerda",fonte:"..."}}
-   Enquanto uma entrada não existir aqui, o aviso de campo curto mostra só o
-   tamanho esperado (já confirmado via Campo Livre) sem arriscar dizer de que lado
-   completar — nunca adivinhamos isso. */
-const LB_BANK_PADDING_SIDE={};
+/* ===== Lado do zero de preenchimento (Agência/Conta) — CONFIRMADO =====
+   Levantado no código-fonte real do Sankhya (BoletoHelper.java e auxiliares,
+   documento "Geração de Boletos — Linha Digitável e Código de Barras",
+   09/11/2026): o preenchimento de campos numéricos de largura fixa (agência,
+   conta, convênio etc.) usa a função utilitária strZero(valor,n,descr), que
+   SEMPRE completa com zeros à ESQUERDA — é a mesma função para os 8 bancos
+   no escopo, não há banco com preenchimento à direita documentado.
+   Só entra aqui o campo (agência/conta) cujo tamanho já é confirmado via
+   Campo Livre (lbBankFieldWidth) — nenhum lado é citado para campo sem
+   tamanho confirmado. */
+const LB_SANKHYA_STRZERO_FONTE="BoletoHelper.strZero — código-fonte Sankhya (doc. \"Geração de Boletos — Linha Digitável e Código de Barras\", 09/11/2026)";
+const LB_BANK_PADDING_SIDE={
+  "001":{agencia:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE},conta:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE+" — atenção: no cadastro, dígito \"X\" na conta (CODCTABCO) vira \"0\", não é um zero de preenchimento comum"}},
+  "341":{agencia:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE},conta:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE}},
+  "237":{agencia:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE},conta:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE}},
+  "422":{agencia:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE},conta:{lado:"esquerda",fonte:LB_SANKHYA_STRZERO_FONTE}}
+  /* Santander (033), Caixa (104), Sicoob (756) e Sicredi (748) não têm agência/conta
+     como campo separado de tamanho fixo no Campo Livre (usam convênio/beneficiário) —
+     lbBankFieldWidth já retorna null pra eles, então nenhuma entrada é necessária aqui. */
+};
+/* ===== Catálogo de regras bancárias — direto do código-fonte do Sankhya =====
+   Fonte única: documento "Geração de Boletos — Linha Digitável e Código de
+   Barras" (levantamento no código-fonte do Sankhya — BoletoHelper.java,
+   ContaBancariaHelper.java e classes org.jboleto.bancos — 09/11/2026).
+   Não é o manual do banco: é o que o Sankhya efetivamente calcula. Alimenta
+   a aba "Regras Bancárias" (renderBankRules). O documento identifica o banco
+   como "Santander (353)"; como o código FEBRABAN/COMPE real do Santander é
+   033 — o mesmo já usado em todo o LexBank — os dados abaixo foram aplicados
+   à chave "033", sem inventar nada além dessa correspondência de código. */
+const LB_SANKHYA_RULES={
+  "001":{
+    nome:"Banco do Brasil",
+    larguras:{agencia:4,conta:8},
+    larguraObs:"Agência = CODAGE sem o último dígito (dígito verificador), 4 posições. Conta = CODCTABCO, com o dígito \"X\" do cadastro virando \"0\", 8 posições.",
+    variantes:[
+      {condicao:"Carteira 1835",nossoNumero:"NN (10 posições)",campoLivre:"000000 + convênio (7) + NN (10) + carteira (2)"},
+      {condicao:"Convênio > 999999 e carteira 11, 12, 17, 18 ou 19",nossoNumero:"NN (10 posições)",campoLivre:"igual à carteira 1835"},
+      {condicao:"Carteira 1621 ou 1821",nossoNumero:"Convênio (8) + NUFIN (9)",campoLivre:"convênio (6) + código do parceiro (5) + NN + 21"},
+      {condicao:"Carteira 16 ou 18 com Modalidade = 21",nossoNumero:"NN (11 posições)",campoLivre:"convênio + (convênio + NN) + 21"},
+      {condicao:"Demais carteiras",nossoNumero:"Convênio (6) + NN (5) + DV módulo 11 (pesos 9→2 da direita; resto 10 vira \"X\")",campoLivre:"NN (11) + agência (4) + conta (8) + carteira (2)"},
+      {condicao:"Conta integrada via API (banco ativo, status OK, tipo boleto)",nossoNumero:"NN (10 posições)",campoLivre:"—"}
+    ],
+    pontosDeAtencao:["Corte final em 12 posições: na carteira 1621/1821 (convênio 8 + NUFIN 9 = 17 dígitos), o início do convênio é perdido ao gravar o nosso número final — pode explicar nosso número \"incompleto\" nesses casos."]
+  },
+  "341":{
+    nome:"Itaú",
+    larguras:{agencia:4,conta:5},
+    larguraObs:"Conta de 5 posições é a usada no cálculo do dígito (DAC); no campo livre a conta aparece com 6 posições (já incluindo o próprio dígito verificador).",
+    resumo:{nossoNumero:"Carteira (3) + NN (8) + DAC",campoLivre:"NN completo com carteira e DAC (12) + agência (4) + conta com DV (6) + 000"},
+    dv:"DAC: módulo 10, pesos 1 e 2 alternados (quando o produto tem dois dígitos, eles são somados), calculado sobre agência(4) + conta(5) + carteira(3) + NN(8).",
+    pontosDeAtencao:[
+      "Carteiras 126, 131, 146, 150 e 168: agência e conta viram \"000000000\" só para o cálculo do DAC (não é o valor real usado no resto do boleto).",
+      "O campo livre ignora o atributo \"carteira\" do cadastro e depende de o NOSSONUM já gravado conter carteira + NN + DAC corretos (12 posições) — nosso número gravado errado se propaga pro campo livre sem novo aviso."
+    ],
+    erros:[{codigo:"CORE_E01413",desc:"Base para o DAC com menos de 20 dígitos"},{codigo:"CORE_E01414",desc:"Erro ao formatar o campo livre (NumberFormatException) — mensagem \"Verifique o cadastro da conta\""}]
+  },
+  "237":{
+    nome:"Bradesco",
+    larguras:{agencia:4,conta:7},
+    resumo:{nossoNumero:"Carteira (2) + agência (4) + NN (7) + DV",campoLivre:"Agência (4, sem DV) + carteira (2) + NN (11) + conta (7, sem DV) + 0"},
+    dv:"Módulo 11, pesos 2 a 7 da direita para a esquerda; resto 1 vira \"P\"; resto 0 vira \"0\".",
+    pontosDeAtencao:["Carteira 19 com a conta listada no parâmetro conta.correspondente.bradesco.usa.convenio: a agência é substituída pelo convênio (4 posições) — divergência de agência nesse caso pode ser esperada, não é erro de cadastro."]
+  },
+  "033":{
+    nome:"Santander",
+    larguras:{agencia:3,conta:6},
+    larguraObs:"Agência (3) e conta (6) só aparecem no cálculo do dígito verificador das carteiras \"outras\" — o campo livre em si não carrega agência/conta, só convênio, nosso número e carteira.",
+    variantes:[
+      {condicao:"Carteira < 10, 101 ou 102",nossoNumero:"NN (12) + DV módulo 11 (pesos 2 a 9; resto 1 vira 0; resto 0 vira 1, ou 0 quando a carteira é negativa ou 101)"},
+      {condicao:"Demais carteiras",nossoNumero:"NN (6) + DV (dois dígitos encadeados, módulo 11) sobre agência(3) + conta(6) + NN"}
+    ],
+    resumo:{campoLivre:"9 + código do cliente/convênio (7) + NN (13) + IOS fixo (0) + carteira (3)"},
+    pontosDeAtencao:["Carteira negativa: o sistema usa o valor absoluto e aplica a mesma regra de DV da carteira 0.","O IOS do campo livre é sempre fixo em \"0\" — nunca reflete uma cobrança real de IOS, se existir."]
+  },
+  "104":{
+    nome:"Caixa",
+    larguraObs:"Agência/convênio não têm tamanho único — mudam de composição conforme a carteira (tabela abaixo). Por isso o LexBank não arrisca um tamanho fixo de agência/conta para a Caixa fora do Comparador/Decodificação (que já seguem o layout real da linha).",
+    resumo:{campoLivre:"Nosso número + agência + código de operação + código fornecido pela agência — a montagem de cada parte depende da carteira"},
+    dv:"DV do nosso número: módulo 11 (pesos 2 a 9); resultado 0, 1 ou maior que 9 vira 0.",
+    variantes:[
+      {condicao:"Carteira 14 ou 24",nossoNumero:"Carteira (2) + 000000 + NN (9) + DV",campoLivre:"nosso número = convênio (7); agência fixa 0001/0002; operação 0004; fornecido = NN (9) + DV"},
+      {condicao:"Carteira 80, 81 ou 82",nossoNumero:"Carteira (2) + NN (8) + DV",campoLivre:"NN (10) + agência + 870 + convênio (8)"},
+      {condicao:"Carteira 870 ou 872",nossoNumero:"8000/8200 + NN (11) + DV",campoLivre:"convênio (5) + agência + carteira (3) + 00 + NN (11)"},
+      {condicao:"Carteira 908",nossoNumero:"segue a mesma regra de \"carteira acima de 800\"",campoLivre:"—"},
+      {condicao:"Carteira acima de 800 (exceto 870/872/908)",nossoNumero:"Carteira (3) + NN (7) + DV",campoLivre:"NN (10) + agência + convênio (3) + conta (8)"},
+      {condicao:"Carteira 12",nossoNumero:"9 + NN (9) + DV",campoLivre:"NN (10) + agência + 870 + convênio sem DV (8)"},
+      {condicao:"Demais carteiras",nossoNumero:"NN (10) + DV",campoLivre:"1 + convênio (6) + 9 + 000000 + NN"}
+    ],
+    pontosDeAtencao:["Carteira 12: valor do título acima de R$ 9.999.999,99 gera erro (CORE_E01419) — boleto não é gerado."],
+    erros:[{codigo:"CORE_E01419",desc:"Carteira 12 com valor do título acima do limite permitido"}]
+  },
+  "756":{
+    nome:"Sicoob",
+    larguras:{agencia:4},
+    larguraObs:"Agência com mais de 4 posições, ou com \"-\", é cortada para 4 dígitos (não dá erro — simplesmente usa só os 4 primeiros/últimos dígitos conforme a formatação do cadastro).",
+    resumo:{nossoNumero:"NN (7) + DV",campoLivre:"Carteira (1) + agência (4) + modalidade (2) + convênio (7) + NN (8) + parcela (3, do desdobramento, padrão 001)"},
+    dv:"Módulo 11, pesos 3,1,9,7… sobre agência(4) + convênio(10) + NN(7); resto 0 ou 1 vira 0.",
+    pontosDeAtencao:["Bug conhecido do Sankhya: o valor padrão de modalidade (\"02\") nunca é aplicado, porque a função que buscaria o valor nulo da conta nunca devolve null — sem modalidade cadastrada, o campo livre sai com \"00\" em vez de \"02\". Divergência de modalidade \"00\" neste banco pode ser esse comportamento, não um erro de cadastro."]
+  },
+  "748":{
+    nome:"Sicredi",
+    larguras:{agencia:4},
+    resumo:{nossoNumero:"Ano (2) + indicador (1) + NN (5) + DV",campoLivre:"Tipo de cobrança (1 se carteira = 1, senão 3) + 1 + NN (9) + agência (4) + posto (2) + beneficiário (5) + 10 + DV"},
+    dv:"Módulo 11 (pesos 2 a 9) sobre agência(4) + posto(2, do convênio) + beneficiário(5) + ano + indicador + NN; resto 10 ou 11 vira 0.",
+    pontosDeAtencao:[
+      "Único banco do escopo em que os dígitos da linha digitável são calculados sobre a string invertida — os demais seguem o módulo 10 direto, padrão Febraban.",
+      "Indicador do nosso número (padrão 2): quando o nosso número passa de 99999, ele volta a 1 e o indicador sobe 1 (e o indicador, depois de 9, também volta a 1)."
+    ]
+  },
+  "422":{
+    nome:"Safra",
+    larguras:{agencia:5,conta:9},
+    larguraObs:"Larguras válidas só para a variante padrão (ver abaixo) — nas carteiras 6 e 9 a composição muda.",
+    resumo:{nossoNumero:"NN (8) + DV"},
+    variantes:[
+      {condicao:"Padrão",campoLivre:"7 + agência (5) + conta (9) + NN (9) + carteira (1 dígito, o último)"},
+      {condicao:"Carteira 6",campoLivre:"7 + convênio (6, no lugar da agência) + conta fixa 00000000 + NN (9) + carteira fixa 4"},
+      {condicao:"Carteira 9, ou CEP do parceiro fora das faixas cadastradas (com a opção fin.validar.ceps.boletas.banco.safra ligada)",campoLivre:"gerado pela classe do Bradesco (o código do banco no boleto passa a 237); agência/conta vêm de CODAGEBENEF/CODCTABENEF (3114 / 0176300 quando vazios); carteira 09; nosso número = ano corrente (2) + 9 dígitos"}
+    ],
+    pontosDeAtencao:["No modo \"vira Bradesco\" (carteira 9 ou CEP fora de faixa): o código de barras começa com 237 e o nosso número usa o ano da GERAÇÃO do boleto, não o do vencimento — reimprimir em outro ano sem o dígito já gravado muda o resultado."]
+  }
+};
+/* Erros e regras genéricas (mesmo documento) que valem para qualquer banco do
+   escopo, usados no bloco fixo no topo da aba "Regras Bancárias". */
+const LB_SANKHYA_ESTRUTURA_COMUM={
+  codigoBarras:"Banco (3) + Moeda \"9\" (1) + DV geral (1) + Fator de vencimento (4) + Valor (10) + Campo livre (25) = 44 posições (padrão Febraban; o Sicredi só muda a forma de calcular os DVs).",
+  linhaDigitavel:[
+    "Campo 1 = Banco + Moeda + Campo livre[0..5] + DV módulo 10",
+    "Campo 2 = Campo livre[5..15] + DV módulo 10",
+    "Campo 3 = Campo livre[15..25] + DV módulo 10",
+    "Campo 4 = DV geral do código de barras (módulo 11)",
+    "Campo 5 = Fator de vencimento + Valor"
+  ],
+  dvCampo:"DV dos campos 1 a 3: módulo 10, pesos 2,1,2,1… da direita para a esquerda; produto de dois dígitos tem os dígitos somados; DV = 10 − (soma % 10), 10 vira 0.",
+  dvGeral:"DV geral do código de barras: módulo 11, pesos 2 a 9 da direita para a esquerda; resultado 0, 1 ou maior que 9 vira 1.",
+  fatorVencimento:"Dias desde 07/10/1997; acima de 9999 subtrai 9000 (reinício em 2025); aceita até 5500 dias no futuro e 3000 no passado — fora disso, o Sankhya recusa o cálculo.",
+  valor:"10 dígitos, sem separadores. Moeda: sempre fixa em \"9\".",
+  errosGerais:[
+    {codigo:"CORE_E01381",desc:"Conta sem modelo de impressão de boleto cadastrado (MODBOLETA)"},
+    {codigo:"CORE_E01416",desc:"Campo numérico (ex.: agência) cadastrado com mais dígitos do que o banco permite"},
+    {codigo:"CORE_E01417",desc:"Classe de banco de X a Z bloqueada na geração da linha digitável"},
+    {codigo:"CORE_E05634",desc:"Banco sem regra cadastrada para calcular o nosso número"},
+    {codigo:"CORE_E05635",desc:"Banco sem regra cadastrada para calcular a linha digitável"}
+  ],
+  fonte:"Código-fonte Sankhya — BoletoHelper.java, ContaBancariaHelper.java e org.jboleto (classes de banco); documento \"Geração de Boletos — Linha Digitável e Código de Barras\", 09/11/2026."
+};
 function lbPaddingHint(bank,campo,valorRaw){
   const token=campo==="agencia"?"A":"V";
   const label=campo==="agencia"?"Agência":"Conta";
@@ -1895,6 +2032,7 @@ function compare(){
     const fields=[...new Set(named.map(x=>x.field))];
     html+=`<p class="muted">Campos afetados: <b>${fields.join(", ")}</b>.</p>`;
     html+=lbCampoLivreNote(effBank,len,diffs,a,b);
+    html+=lbSankhyaBankNotes(effBank);
   } else if(diffs.length){
     html+="<h3>Posições divergentes</h3><pre>"+diffs.join(", ")+"</pre><p class='muted'>Para nomear os campos, informe linhas de mesmo tamanho (44, 47 ou 48 dígitos).</p>";
   }
@@ -2185,7 +2323,61 @@ $("cnabFormat").addEventListener("change",lbCnabAuto);
 $("cnabType").addEventListener("change",lbCnabAuto);
 
 /* ===== Regras / Biblioteca / Histórico ===== */
-function renderRules(){$("rules").innerHTML="<table><tr><th>Banco</th><th>Produto</th><th>Layout</th><th>Regra atual</th><th>Fonte</th></tr>"+rules.map(r=>`<tr><td>${r[0]} — ${banks[r[0]].name}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")+"</table>"}
+function lbRenderSankhyaErrorTable(errors){
+  if(!errors||!errors.length) return "";
+  return `<table class="lbRuleTable"><tr><th>Código</th><th>Quando acontece</th></tr>${errors.map(e=>`<tr><td class="pos">${lbEsc(e.codigo)}</td><td>${lbEsc(e.desc)}</td></tr>`).join("")}</table>`;
+}
+function renderBankRules(){
+  const el=$("rules"); if(!el) return;
+  const c=LB_SANKHYA_ESTRUTURA_COMUM;
+  let html=`<div class="card">
+    <h2>Estrutura comum (padrão Febraban, 44 posições)</h2>
+    <div class="muted">${lbEsc(c.codigoBarras)}</div>
+    <h3>Linha digitável</h3>
+    <ul>${c.linhaDigitavel.map(l=>`<li>${lbEsc(l)}</li>`).join("")}</ul>
+    <div class="muted" style="margin-top:8px">${lbEsc(c.dvCampo)}</div>
+    <div class="muted" style="margin-top:6px">${lbEsc(c.dvGeral)}</div>
+    <div class="muted" style="margin-top:6px">${lbEsc(c.fatorVencimento)}</div>
+    <div class="muted" style="margin-top:6px">${lbEsc(c.valor)}</div>
+    <h3>Erros gerais conhecidos</h3>
+    ${lbRenderSankhyaErrorTable(c.errosGerais)}
+    <div class="small muted" style="margin-top:10px">Fonte: ${lbEsc(c.fonte)}</div>
+  </div>`;
+  Object.keys(banks).forEach(cod=>{
+    const r=LB_SANKHYA_RULES[cod];
+    const nome=banks[cod].name;
+    if(!r){
+      html+=`<div class="card"><h2>${lbEsc(cod)} — ${lbEsc(nome)}</h2><div class="muted">Estrutura pendente de cadastro específico neste levantamento.</div></div>`;
+      return;
+    }
+    let body="";
+    const badges=[];
+    if(r.larguras){
+      if(r.larguras.agencia) badges.push(`Agência: ${r.larguras.agencia} dígitos`);
+      if(r.larguras.conta) badges.push(`Conta: ${r.larguras.conta} dígitos`);
+    }
+    const pad=LB_BANK_PADDING_SIDE[cod];
+    if(pad&&pad.agencia) badges.push(`Zero à ${pad.agencia.lado}`);
+    if(badges.length) body+=`<div style="margin-bottom:10px">${badges.map(b=>`<span class="badge">${lbEsc(b)}</span> `).join("")}</div>`;
+    if(r.larguraObs) body+=`<div class="muted" style="margin-bottom:10px">${lbEsc(r.larguraObs)}</div>`;
+    if(r.resumo){
+      if(r.resumo.nossoNumero) body+=`<div><b>Nosso número:</b> ${lbEsc(r.resumo.nossoNumero)}</div>`;
+      if(r.resumo.campoLivre) body+=`<div style="margin-top:4px"><b>Campo livre:</b> ${lbEsc(r.resumo.campoLivre)}</div>`;
+    }
+    if(r.dv) body+=`<div class="muted" style="margin-top:6px">${lbEsc(r.dv)}</div>`;
+    if(r.variantes&&r.variantes.length){
+      body+=`<h3>Variações por carteira/condição</h3><table class="lbRuleTable"><tr><th>Condição</th><th>Nosso número</th><th>Campo livre</th></tr>${r.variantes.map(v=>`<tr><td>${lbEsc(v.condicao)}</td><td>${lbEsc(v.nossoNumero||"—")}</td><td>${lbEsc(v.campoLivre||"—")}</td></tr>`).join("")}</table>`;
+    }
+    if(r.pontosDeAtencao&&r.pontosDeAtencao.length){
+      body+=`<h3>Pontos de atenção</h3>${r.pontosDeAtencao.map(p=>`<div class="status warn">${lbIcon("warn")} ${lbEsc(p)}</div>`).join("")}`;
+    }
+    if(r.erros&&r.erros.length){
+      body+=`<h3>Erros conhecidos</h3>${lbRenderSankhyaErrorTable(r.erros)}`;
+    }
+    html+=`<div class="card"><h2>${lbEsc(cod)} — ${lbEsc(nome)}</h2>${body}</div>`;
+  });
+  el.innerHTML=html;
+}
 function renderDocs(){$("docs").innerHTML="<table><tr><th>Origem</th><th>Documento</th><th>Referência</th></tr>"+docs.map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td><a class='link' href='${d[2]}' target='_blank' rel='noopener'>Abrir fonte</a></td></tr>`).join("")+"</table>"}
 function renderHistory(){let h=JSON.parse(localStorage.getItem("lexbank_cases")||"[]");$("history").innerHTML=h.length?"<table><tr><th>Data</th><th>Origem</th><th>Banco</th><th>Referência</th><th>Status</th></tr>"+h.map(x=>`<tr><td>${x.data}</td><td>${x.origem||"Laudo Automático"}</td><td>${x.banco}</td><td>${x.ref}</td><td>${x.status}</td></tr>`).join("")+"</table>":"<p class='muted'>Nenhum caso salvo.</p>";lbRenderOverviewPanel();}
 function clearHistory(){localStorage.removeItem("lexbank_cases");renderHistory()}
@@ -2413,6 +2605,7 @@ function generateReport(save){
         html+="<table><tr><th>Posição</th><th>Campo</th><th>Sankhya</th><th>Banco</th></tr>"+named.slice(0,200).map(x=>`<tr><td>${x.pos}</td><td>${x.field}</td><td class="pos">${x.s}</td><td class="pos">${x.k}</td></tr>`).join("")+"</table>";
         html+="<h3>4. Causa provável</h3><ul>"+causeList.map(c=>"<li>"+c+"</li>").join("")+"</ul>";
         html+=lbCampoLivreNote(effBank,len,diffs,rawA,rawB);
+        html+=lbSankhyaBankNotes(effBank);
       }
       if(len===47||len===44){
         const cmpRows=lbCompareAllFields(effBank,len,rawA,rawB);
@@ -3248,6 +3441,6 @@ function lbToggleSideNav(){ $("lbSideNav").classList.contains("open") ? lbCloseS
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") lbCloseSideNav(); });
 lbBuildSideNav();
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(`nav button[data-tab="${b.dataset.tab}"]`).forEach(x=>x.classList.add("active"));$(b.dataset.tab).classList.add("active");lbCloseSideNav();});
-renderRules();renderDocs();renderHistory();renderEngineList();renderMaps();
+renderBankRules();renderDocs();renderHistory();renderEngineList();renderMaps();
 </script>
 </body></html>
